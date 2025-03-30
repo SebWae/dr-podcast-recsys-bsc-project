@@ -1,10 +1,8 @@
 from sentence_transformers import SentenceTransformer
 
-# Load a pre-trained model
-model = SentenceTransformer('all-MiniLM-L6-v2')  # Small, fast, and effective
+model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+descriptions = ["Denne episode handler om kunstig intelligens og dens indflydelse på samfundet.", 
+                "En dybdegående analyse af rumforskning."]
+embeddings = model.encode(descriptions)
 
-# Encode a single sentence
-sentence = "Deep learning is a subset of machine learning."
-embedding = model.encode(sentence)
-
-print(embedding) 
+print(embeddings)
