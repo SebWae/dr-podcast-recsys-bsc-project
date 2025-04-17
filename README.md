@@ -1,13 +1,13 @@
 # Podcast Episode Recommendations in a Public Service Setting
 This is the repository for my BSc project in Data Science @ IT University of Copenhagen.  
-In collaboration with DR (Danmark's Radio). 
+In collaboration with DR (Danmarks Radio). 
 
 Supervisor: Toine Bogers
 
 
 ## Project Structure
 ```
-├── data                                    <- data folder
+├── data                                  
 │   │
 │   ├── podcast_data_filtered.parquet       <- parquet file containing filtered data
 │   │
@@ -15,27 +15,27 @@ Supervisor: Toine Bogers
 │   │
 │   └── podcast_data_transformed.parquet    <- parquet file containing transformed data
 │
-├── eda                                     <- folder for exploratory data analysis
+├── eda                                   
 │   │
 │   └── eda.ipynb                           <- notebook for exploratory data analysis (eda)
 │
-├── scripts                                 <- Source code for the project
+├── scripts                             
 │   │
-│   ├── 01_filter.py                        <- Marks the directory as a Python package
+│   ├── 01_filter.py                        <- script for filtering the raw data
 │   │
-│   ├── 02_transform.py                     <- Script for data preprocessing and transformation
+│   ├── 02_transform.py                     <- script for applying data transformations
 │   │
-│   ├── 03_extract_metadata.py              <- Script for training the models
+│   ├── 03_extract_metadata.py              <- script for extracting podcast episode metadata
 │   │
-│   ├── 04_train_test.py                    <- Script for selecting the best perfoming model
+│   ├── 04_train_test.py                    <- script for splitting the data into a train and test set
 │   │
-│   ├── 05a_cf_recommender.py               <- Script for comparing new best model and production model
+│   ├── 05a_cf_recommender.py               <- script for implementing collaborative filtering recommender
 │   │
-│   ├── 05b_cb_recommender.py               <- Script for deploying model
+│   ├── 05b_cb_recommender.py               <- script for implementing content-based recommenders
 │   │
-│   ├── 05c_hybrid_recommender.py           <- Constants and paths used in the pipeline's scripts
+│   ├── 05c_hybrid_recommender.py           <- script for implementing hybrid recommender
 │   │
-│   └── 06_evaluation.py                    <- Encapsulated code from the .py monolith.
+│   └── 06_evaluation.py                    <- script for evaluating recommender systems
 │  
 ├── .gitattributes                          <- for handling large file storage of parquet files
 │
