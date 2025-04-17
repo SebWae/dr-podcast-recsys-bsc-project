@@ -1,8 +1,19 @@
 import numpy as np
+import os
 import pandas as pd
+import sys
+
+# adding the parent directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
+
+from config import (
+    FILTERED_DATA_PATH,
+    TRANSFORMED_DATA_PATH,
+)
+
 
 # loading filtered data
-transformed_df = pd.read_parquet("data/podcast_data_filtered.parquet")
+transformed_df = pd.read_parquet(FILTERED_DATA_PATH)
 
 # transforming episode duration to float
 transformed_df["episode_duration"] = (
@@ -26,7 +37,5 @@ transformed_df["completion_rate"] = np.where(
 transformed_df["platform"] = transformed_df["platform"].replace({"mobile web": "Web"})
 transformed_df["device_type"] = transformed_df["device_type"].replace({"Other": "PC"})
 
-
-
-
-transformed_df
+# saving the transformed data as parquet file
+transformed_df.to_parquet(TRANSFORMED_DATA_PATH, index=False)
