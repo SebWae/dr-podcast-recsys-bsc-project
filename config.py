@@ -1,4 +1,4 @@
-# for filtering data
+# for filtering and transforming data
 END_DATE = "2024-12-01 23:59:59"
 FILTERED_DATA_PATH = "data\podcast_data_filtered.parquet"  
 MIN_CONTENT_TIME_SPENT = 60  
@@ -20,5 +20,18 @@ VAR_RENAME_DICT = {"Date:Time (evar16)":           "date_time",
                    "Kategori":                     "category",
                    "Content Time Spent (revent1)": "content_time_spent",
                    }
+TRANSFORMED_DATA_PATH = "data\podcast_data_transformed.parquet"
 
-# for transforming data
+
+# for extracting metadata
+
+
+# for train-test splitting
+
+
+
+# for implementing recommenders
+
+
+
+# for evaluation
