@@ -1,8 +1,8 @@
 # for filtering data
 END_DATE = "2024-12-01 23:59:59"
-FILTERED_DATA_PATH = "data/podcast_data_filtered.parquet"  
+FILTERED_DATA_PATH = "data\podcast_data_filtered.parquet"  
 MIN_CONTENT_TIME_SPENT = 60  
-RAW_DATA_PATH = "data/podcast_data.parquet"
+RAW_DATA_PATH = "data\podcast_data_raw.parquet"
 START_DATE = "2024-09-02 00:00:00"
 VAR_RENAME_DICT = {"Date:Time (evar16)":           "date_time",
                    "UserID Visit (evar95)":        "user_id",
