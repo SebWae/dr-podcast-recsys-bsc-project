@@ -1,11 +1,12 @@
 # Podcast Episode Recommendations in a Public Service Setting
-This is the repository for my BSc project in Data Science @ IT University of Copenhagen.
+This is the repository for my BSc project in Data Science @ IT University of Copenhagen.  
 In collaboration with DR (Danmark's Radio). 
 
 Supervisor: Toine Bogers
 
 
 ## Project Structure
+```
 ├── data                                    <- data folder
 │   │
 │   ├── podcast_data_filtered.parquet       <- parquet file containing filtered data
@@ -43,3 +44,4 @@ Supervisor: Toine Bogers
 ├── README.md                               <- project description and how to run the code
 │
 └── utils.py                                <- utility functions used in the scripts
+```
