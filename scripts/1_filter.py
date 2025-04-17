@@ -3,7 +3,7 @@ import pandas as pd
 import sys
 
 # adding the parent directory to the Python path
-sys.path.append(os.path.abspath(".."))
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 from config import (
     RAW_DATA_PATH,
