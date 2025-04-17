@@ -62,7 +62,7 @@ cts_grp_df = filtered_df.groupby(["user_id", "prd_number"]).agg(
 cts_grp_df = cts_grp_df[(cts_grp_df["content_time_spent"] > MIN_CONTENT_TIME_SPENT)]
 
 # filter out dates that are outside desired range
-cts_grp_df = cts_grp_df[(cts_grp_df["date"] >= START_DATE) & (cts_grp_df["date"] <= END_DATE)]
+cts_grp_df = cts_grp_df[(cts_grp_df["date_time"] >= START_DATE) & (cts_grp_df["date_time"] <= END_DATE)]
 
 # saving the filtered data as parquet file
 cts_grp_df.to_parquet(FILTERED_DATA_PATH, index=False)
