@@ -21,6 +21,6 @@ interaction_matrix = utils.prep_interaction_matrix(
     df=train_df,
     user_col="user_id",
     item_col="prd_number",
-    rating_col="content_time_spent",
+    rating_col="completion_rate",
 )
 
