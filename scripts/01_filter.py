@@ -41,6 +41,9 @@ filtered_df = filtered_df[filtered_df["device_type"].isin(main_devices)]
 exclude_combinations = {("mobile web", "Other"), ("web", "Mobile Phone"), ("web", "Tablet")}
 filtered_df = filtered_df.loc[~df[["platform", "device_type"]].apply(tuple, axis=1).isin(exclude_combinations)]
 
+# filter out interactions outside of desired date range
+filtered_df = filtered_df[(filtered_df["date_time"] >= START_DATE) & (filtered_df["date_time"] <= END_DATE)]
+
 # grouping rows by user_id and prd_number
 filtered_df["date_time"] = pd.to_datetime(filtered_df["date_time"], format="%d:%m:%Y|%H:%M")
 cts_grp_df = filtered_df.groupby(["user_id", "prd_number"]).agg(
@@ -60,9 +63,6 @@ cts_grp_df = filtered_df.groupby(["user_id", "prd_number"]).agg(
 
 # filtering on content time spent
 cts_grp_df = cts_grp_df[(cts_grp_df["content_time_spent"] > MIN_CONTENT_TIME_SPENT)]
-
-# filter out dates that are outside desired range
-cts_grp_df = cts_grp_df[(cts_grp_df["date_time"] >= START_DATE) & (cts_grp_df["date_time"] <= END_DATE)]
 
 # saving the filtered data as parquet file
 cts_grp_df.to_parquet(FILTERED_DATA_PATH, index=False)
