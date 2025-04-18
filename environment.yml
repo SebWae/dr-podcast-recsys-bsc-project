@@ -12,6 +12,7 @@ dependencies:
   - ca-certificates=2025.2.25=haa95532_0
   - certifi=2025.1.31=py310haa95532_0
   - charset-normalizer=3.4.1=pyhd8ed1ab_0
+  - colorama=0.4.6=py310haa95532_0
   - cramjam=2.9.1=py310haa69e8e_0
   - fastparquet=2024.2.0=py310h9128911_0
   - fsspec=2024.12.0=py310haa95532_0
@@ -59,6 +60,7 @@ dependencies:
   - sqlite=3.45.3=h2bbff1b_0
   - tbb=2021.9.0=h91493d7_0
   - tk=8.6.14=h0416ee5_0
+  - tqdm=4.67.1=py310h9909e9c_0
   - tzdata=2025a=h04d1e81_0
   - ucrt=10.0.22621.0=h57928b3_1
   - urllib3=2.4.0=pyhd8ed1ab_0
@@ -82,7 +84,6 @@ dependencies:
       - beautifulsoup4==4.13.4
       - bleach==6.2.0
       - cffi==1.17.1
-      - colorama==0.4.6
       - comm==0.2.2
       - debugpy==1.8.14
       - decorator==5.2.1
