@@ -41,9 +41,12 @@ METADATA_COLUMNS = {"series_title":         "first",
 
 
 # for train-test splitting
+COLUMNS_TO_KEEP = ["user_id", "prd_number", "completion_rate"]
 MIN_PLAYS_PER_EPISODE = 10
 MIN_PLAYS_PER_USER = 2
 SPLIT_DATE = "2024-11-01"
+TEST_DATA_PATH = "data\podcast_data_test.parquet"
+TRAIN_DATA_PATH = "data\podcast_data_train.parquet"
 
 
 # for implementing recommenders
