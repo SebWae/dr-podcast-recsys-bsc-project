@@ -26,6 +26,6 @@ def prep_interaction_matrix(df: pd.DataFrame,
     matrix_values = interaction_matrix.values
 
     # convert matrix to COO format
-    interaction_matrix = coo_matrix(matrix_values)
+    interaction_matrix = coo_matrix(matrix_values).tocsr()
     
     return interaction_matrix
