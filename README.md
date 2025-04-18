@@ -45,3 +45,16 @@ Supervisor: Toine Bogers
 │
 └── utils.py                                <- utility functions used in the scripts
 ```
+
+## How to run the code?
+It is recommended to run the code using the virtual environment specified by `environment.yml`. This requires `conda 24.9.2`.
+
+Create the virtual environment by running:
+```
+conda env create -f environment.yml
+``` 
+
+Activate the environment by running:
+```
+conda activate dr-recsys-env
+```
