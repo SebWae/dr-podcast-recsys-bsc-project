@@ -41,6 +41,8 @@ METADATA_COLUMNS = {"series_title":         "first",
 
 
 # for train-test splitting
+MIN_PLAYS_PER_EPISODE = 10
+MIN_PLAYS_PER_USER = 2
 SPLIT_DATE = "2024-11-01"
 
 
