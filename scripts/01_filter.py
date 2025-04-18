@@ -41,11 +41,13 @@ filtered_df = filtered_df[filtered_df["device_type"].isin(main_devices)]
 exclude_combinations = {("mobile web", "Other"), ("web", "Mobile Phone"), ("web", "Tablet")}
 filtered_df = filtered_df.loc[~df[["platform", "device_type"]].apply(tuple, axis=1).isin(exclude_combinations)]
 
+# formatting the date_time column
+filtered_df["date_time"] = pd.to_datetime(filtered_df["date_time"], format="%d:%m:%Y|%H:%M")
+
 # filter out interactions outside of desired date range
 filtered_df = filtered_df[(filtered_df["date_time"] >= START_DATE) & (filtered_df["date_time"] <= END_DATE)]
 
 # grouping rows by user_id and prd_number
-filtered_df["date_time"] = pd.to_datetime(filtered_df["date_time"], format="%d:%m:%Y|%H:%M")
 cts_grp_df = filtered_df.groupby(["user_id", "prd_number"]).agg(
     date_time =             ("date_time",           lambda x: x.loc[df.loc[x.index, "content_time_spent"].idxmax()]),
     series_title =          ("series_title",        "first"),
