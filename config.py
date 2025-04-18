@@ -41,7 +41,7 @@ METADATA_COLUMNS = {"series_title":         "first",
 
 
 # for train-test splitting
-
+SPLIT_DATE = "2024-11-01"
 
 
 # for implementing recommenders
