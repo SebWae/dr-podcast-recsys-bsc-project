@@ -21,16 +21,45 @@ def compare_lists(list1: list, list2: list) -> float:
     len1 = len(list1)
     len2 = len(list2)
 
+    # lists must have the same length
     if len1 != len2:
         raise ValueError("Lists must have the same length.")
     else:
         diff_count = 0
+        # counting the number of differences between the two lists
         for i in range(len1):
             if list1[i] != list2[i]:
                 diff_count += 1
+        
+        # calculating the percentage of differences
         diff_percentage = diff_count / len1
 
         return diff_percentage
+
+
+def compute_dcg(recommendations: list, gain_dict: dict) -> float:
+    """
+    Computes the Discounted Cumulative Gain (DCG) for a list of recommendations.
+    
+    Parameters:
+    - recommendations:   List of recommended items.
+    - gain_dict:        Dictionary mapping items to their gains.
+
+    Returns:
+    - dcg:              Discounted Cumulative Gain for the recommendations.
+    """
+    dcg = 0
+
+    # iterating through the recommendations and calculating DCG
+    for j, item in enumerate(recommendations):
+
+        # only obtaining a discounted gain for items in the gain_dict
+        if item in gain_dict:
+            gain = gain_dict[item]
+            discounted_gain = gain / np.log2(j + 2)
+            dcg += discounted_gain
+
+    return dcg
 
 
 def get_top_n_recommendations_all_users(model: LightFM, 
