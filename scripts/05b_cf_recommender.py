@@ -67,12 +67,14 @@ for epoch in tqdm(range(N_EPOCHS)):
     # stopping if the % of changed recommendations has increased or is equal to the previous epoch
     if diff_percentage >= prev_diff:
         print("Stopping early")
+        print("Extracting recommendations")
+        recs_dict = utils.extract_recommendations(recommendations=recommendations,
+                                                  user_mapping=user_mapping,
+                                                  n_recs=N_RECOMMENDATIONS,
+                                                  recommendations_key=RECOMMENDATIONS_KEY_CF)
         print("Saving previous recommendations")
-        utils.save_recommendations(user_mapping=user_mapping,
-                                   n_recs=N_RECOMMENDATIONS,
-                                   recommendations=prev_recommendations,
-                                   recommendations_key=RECOMMENDATIONS_KEY_CF,
-                                   file_path=RECOMMENDATIONS_PATH)
+        utils.save_dict_to_json(data_dict=recs_dict,
+                                file_path=RECOMMENDATIONS_PATH)
         break
 
     prev_recommendations = recommendations
