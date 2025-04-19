@@ -4,7 +4,7 @@ import time
 
 from lightfm import LightFM
 import pandas as pd
-import tqdm
+from tqdm import tqdm
 
 # adding the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
@@ -12,6 +12,12 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 import utils
 from config import (
     TRAIN_DATA_PATH,
+    N_COMPONENTS,
+    RANDOM_STATE,
+    N_RECOMMENDATIONS,
+    N_EPOCHS,
+    RECOMMENDATIONS_KEY_CF,
+    RECOMMENDATIONS_PATH,
 )
 
 
@@ -19,60 +25,56 @@ from config import (
 train_df = pd.read_parquet(TRAIN_DATA_PATH)
 
 # preparing the interaction matrix
-interaction_matrix = utils.prep_interaction_matrix(
-    df=train_df,
-    user_col="user_id",
-    item_col="prd_number",
-    rating_col="completion_rate",
-)
+interaction_matrix = utils.prep_interaction_matrix(df=train_df, 
+                                                   user_col="user_id", 
+                                                   item_col="prd_number", 
+                                                   rating_col="completion_rate")
 
-# user and item lists
-user_list = interaction_matrix.index.to_list()
-item_list = interaction_matrix.columns.to_list()
+# list of users and items
+user_list = sorted(train_df['user_id'].unique().tolist())
+n_users = len(user_list)
+item_list = sorted(train_df['prd_number'].unique().tolist())
 
 # user and item mappings
 user_mapping = {user: i for i, user in enumerate(user_list)}
 item_mapping = {i: item for i, item in enumerate(item_list)}
 
-# initializing LightFM model
-model = LightFM(loss="logistic", no_components=10)
+# LightFM model
+cf_model = LightFM(loss="logistic", 
+                   no_components=N_COMPONENTS, 
+                   random_state=RANDOM_STATE)
 
-# Time the fitting process
-start_time = time.time()
+# initializing recommendations
+prev_recommendations = ["0" for _ in range(n_users * N_RECOMMENDATIONS)]
+prev_diff = 1.1
 
-# Use tqdm to show progress bar during the fitting task
-for epoch in tqdm(range(n_epochs), desc="Fitting the model", unit="epoch"):
-    model.fit(interaction_matrix, epochs=1, num_threads=1)
+for epoch in tqdm(range(N_EPOCHS)):
+    print("Epoch", epoch + 1)
 
-end_time = time.time()
+    # fitting the model
+    cf_model.fit_partial(interaction_matrix)
 
-# Calculate the time taken
-fitting_time = end_time - start_time
-print(f"Model fitting took {fitting_time:.2f} seconds")
-
-
-# Function to get top N recommendations for a user (excluding already rated items)
-def get_top_n_recommendations(model, interaction_matrix, user_id, n):
-    # obtain index for user_id
-    user_idx = user_mapping[user_id]
+    # getting the top N recommendations for all users
+    recommendations = utils.get_top_n_recommendations_all_users(model=cf_model, 
+                                                                interaction_matrix=interaction_matrix, 
+                                                                user_list=user_list, 
+                                                                item_mapping=item_mapping, 
+                                                                n=N_RECOMMENDATIONS)
     
-    # Predict scores for all items for the user
-    scores = model.predict(user_idx, np.arange(interaction_matrix.shape[1]))
-    
-    # Get the user's already rated items (i.e., items with non-zero ratings)
-    rated_items = interaction_matrix[user_idx].toarray().flatten()
-    print(rated_items)
-    # Mask out already rated items by setting their scores to 0
-    scores[rated_items > 0] = 0
-    print(scores)
-    # Get the indices of the top N items (excluding rated items)
-    top_items = scores.argsort()[-n:][::-1]
-    print(top_items)
-    # Map the item indices to the actual product numbers
-    top_items_prd = [item_mapping[i] for i in top_items]
-    
-    return top_items_prd
+    # computing the proportion of changed recommendations
+    diff_percentage = utils.compare_lists(prev_recommendations, recommendations)
+    print("% of recommendations changed:", diff_percentage)
 
-# Get top 3 recommendations for user 1
-top_recommendations = get_top_n_recommendations(model, interaction_matrix, user_id="ove", n=2)
-print("Top 3 recommendations for user 1:", top_recommendations)
+    # stopping if the % of changed recommendations has increased or is equal to the previous epoch
+    if diff_percentage >= prev_diff:
+        print("Stopping early")
+        print("Saving previous recommendations")
+        utils.save_recommendations(user_mapping=user_mapping,
+                                   n_recs=N_RECOMMENDATIONS,
+                                   recommendations=prev_recommendations,
+                                   recommendations_key=RECOMMENDATIONS_KEY_CF,
+                                   file_path=RECOMMENDATIONS_PATH)
+        break
+
+    prev_recommendations = recommendations
+    prev_diff = diff_percentage
