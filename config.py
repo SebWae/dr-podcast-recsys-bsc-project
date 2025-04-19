@@ -50,7 +50,11 @@ TRAIN_DATA_PATH = "data\podcast_data_train.parquet"
 
 
 # for implementing recommenders
-
-
+N_COMPONENTS = 40   # inspired by Funk SVD
+N_EPOCHS = 1000
+N_RECOMMENDATIONS = 10
+RANDOM_STATE = 250500
+RECOMMENDATIONS_KEY_CF = "cf_recommendations"
+RECOMMENDATIONS_PATH = "results/recommendations.json"
 
 # for evaluation
