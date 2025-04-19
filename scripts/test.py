@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 import utils
 
-n_epochs = 100
+n_epochs = 1000
 n_recommendations = 2
 
 # Dummy data
@@ -35,10 +35,10 @@ print("User mapping:", user_mapping)
 n_users = len(user_list)
 
 # LightFM model
-model = LightFM(loss="logistic", no_components=10, random_state=250500)
+model = LightFM(loss="logistic", no_components=40, random_state=250500)
 
 prev_recommendations = ["0" for _ in range(n_users * n_recommendations)]
-prev_diff = 1
+prev_diff = 1.1
 
 for epoch in tqdm(range(n_epochs)):
     print("Epoch", epoch + 1)
@@ -47,7 +47,7 @@ for epoch in tqdm(range(n_epochs)):
     print("Recommendations:", recommendations)
     diff_percentage = utils.compare_lists(prev_recommendations, recommendations)
     print("% of recommendations changed:", diff_percentage)
-    if diff_percentage > prev_diff:
+    if diff_percentage >= prev_diff:
         print("Stopping early")
         break
     prev_recommendations = recommendations
