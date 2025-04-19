@@ -2,64 +2,54 @@ from lightfm import LightFM
 import numpy as np
 from scipy.sparse import coo_matrix
 import pandas as pd
-import time
-from tqdm import tqdm  
+from tqdm import tqdm
+import sys 
+import os
 
-n_epochs = 10
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
+
+import utils
+
+n_epochs = 100
+n_recommendations = 2
 
 # Dummy data
-# df = pd.DataFrame({
-#     'user_id': ["1", "1", "2", "2", "3", "3"],
-#     'prd_number': ["101", "102", "101", "103", "102", "104"],
-#     'completion_rate': [0.5, 0.8, 0.6, 0.7, 0.9, 0.4]
-# })
+df = pd.DataFrame({
+    'user_id': ["bent", "bent", "ove", "ove", "kirsten", "kirsten"],
+    'prd_number': ["101", "103", "101", "103", "102", "104"],
+    'completion_rate': [0.5, 0.8, 0.6, 0.7, 0.9, 0.4]
+})
+
 
 # loading training data
-df = pd.read_parquet("data/podcast_data_train.parquet")
-
-# Pivot to interaction matrix
-interaction_matrix = df.pivot(index="user_id", columns="prd_number", values="completion_rate").fillna(0)
-item_mapping = interaction_matrix.columns.to_list()
-print(interaction_matrix)
-
-interaction_matrix = coo_matrix(interaction_matrix.values).tocsr()
+# df = pd.read_parquet("data/podcast_data_train.parquet")
+interaction_matrix = utils.prep_interaction_matrix(df=df, 
+                                                   user_col="user_id", 
+                                                   item_col="prd_number", 
+                                                   rating_col="completion_rate")
+item_list = sorted(df['prd_number'].unique().tolist())
+item_mapping = {i: item for i, item in enumerate(item_list)}
+user_list = sorted(df['user_id'].unique().tolist())
+user_mapping = {user: i for i, user in enumerate(user_list)}
+print("User mapping:", user_mapping)
+n_users = len(user_list)
 
 # LightFM model
-model = LightFM(loss="logistic", no_components=10)
+model = LightFM(loss="logistic", no_components=10, random_state=250500)
 
-# Time the fitting process
-start_time = time.time()
+prev_recommendations = ["0" for _ in range(n_users * n_recommendations)]
+prev_diff = 1
 
-# Use tqdm to show progress bar during the fitting task
-for epoch in tqdm(range(n_epochs), desc="Fitting the model", unit="epoch"):
-    model.fit(interaction_matrix, epochs=1, num_threads=1)
+for epoch in tqdm(range(n_epochs)):
+    print("Epoch", epoch + 1)
+    model.fit_partial(interaction_matrix)
+    recommendations = utils.get_top_n_recommendations_all_users(model, interaction_matrix, user_list, item_mapping, n=n_recommendations)
+    print("Recommendations:", recommendations)
+    diff_percentage = utils.compare_lists(prev_recommendations, recommendations)
+    print("% of recommendations changed:", diff_percentage)
+    if diff_percentage > prev_diff:
+        print("Stopping early")
+        break
+    prev_recommendations = recommendations
+    prev_diff = diff_percentage
 
-end_time = time.time()
-
-# Calculate the time taken
-fitting_time = end_time - start_time
-print(f"Model fitting took {fitting_time:.2f} seconds")
-
-
-# Function to get top N recommendations for a user (excluding already rated items)
-def get_top_n_recommendations(model, interaction_matrix, user_id, n=3):
-    # Predict scores for all items for the user
-    scores = model.predict(user_id, np.arange(interaction_matrix.shape[1]))
-    
-    # Get the user's already rated items (i.e., items with non-zero ratings)
-    rated_items = interaction_matrix[user_id].toarray().flatten()
-    
-    # Mask out already rated items by setting their scores to 0
-    scores[rated_items > 0] = 0
-    print(scores)
-    # Get the indices of the top N items (excluding rated items)
-    top_items = scores.argsort()[-n:][::-1]
-
-    # Map the item indices to the actual product numbers
-    top_items_prd = [item_mapping[i] for i in top_items]
-    
-    return top_items_prd
-
-# Get top 3 recommendations for user 1
-top_recommendations = get_top_n_recommendations(model, interaction_matrix, user_id=1, n=1)
-print("Top 3 recommendations for user 1:", top_recommendations)
