@@ -62,6 +62,39 @@ def compute_dcg(recommendations: list, gain_dict: dict) -> float:
     return dcg
 
 
+def extract_recommendations(recommendations: list,
+                            user_mapping: dict, 
+                            n_recs: int,
+                            recommendations_key: str) -> dict:
+    """
+    Extracts recommendations for each user from the list of recommendations.
+
+    Parameters:
+    - recommendations:      List of recommended items.
+    - user_mapping:         Dictionary mapping user IDs to indices.
+    - n_recs:               Number of recommendations per user.
+    - recommendations_key:  Key for the recommendations in the final dictionary.
+
+    Returns:
+    - final_dict:           Final dictionary containing recommendations for each user.
+    """
+    # initializing dictionary to hold recommendations for each user
+    recommendations_dict = {user_id: [] for user_id in user_mapping.keys()}
+    n_users = len(user_mapping)
+
+    # extracting recommendations for each user
+    for i in range(n_users):
+        for j in range(n_recs):
+            rec = recommendations[i * n_recs + j]
+            user_id = list(user_mapping.keys())[i]
+            recommendations_dict[user_id].append(rec)
+    
+    # creating final dictionary
+    final_dict = {recommendations_key: recommendations_dict}
+
+    return final_dict
+
+
 def get_top_n_recommendations_all_users(model: LightFM, 
                                         interaction_matrix: csr_matrix, 
                                         user_list: list,
@@ -123,7 +156,6 @@ def prep_interaction_matrix(df: pd.DataFrame,
     Returns:
     - interaction_matrix:   Sparse matrix of interactions as a csr_matrix from scipy.sparse.
     """
-    
     # create the interaction matrix from the DataFrame
     interaction_matrix = df.pivot(index=user_col, columns=item_col, values=rating_col)
 
@@ -137,34 +169,14 @@ def prep_interaction_matrix(df: pd.DataFrame,
     return interaction_matrix
 
 
-def save_recommendations(user_mapping: dict, 
-                         n_recs: int, 
-                         recommendations: list, 
-                         recommendations_key: str,
-                         file_path: str) -> None:
+def save_dict_to_json(data_dict: dict, file_path: str) -> None:
     """
-    Saves the recommendations to a JSON file.
+    Saves a dictionary to a JSON file.
 
     Parameters:
-    - user_mapping:     Dictionary mapping user IDs to indices.
-    - n_recs:           Number of recommendations per user.
-    - recommendations:  Dictionary of recommendations to save.
-    - file_path:        Path to the JSON file (can include folder or just the filename).
+    - data_dict:    Dictionary containing the data to be saved.
+    - file_path:    Path to the JSON file (can include folder or just the filename).
     """
-    # initializing dictionary to hold recommendations for each user
-    recommendations_dict = {user_id: [] for user_id in user_mapping.keys()}
-    n_users = len(user_mapping)
-
-    # extracting recommendations for each user
-    for i in range(n_users):
-        for j in range(n_recs):
-            rec = recommendations[i * n_recs + j]
-            user_id = list(user_mapping.keys())[i]
-            recommendations_dict[user_id].append(rec)
-    
-    # creating final dictionary
-    final_dict = {recommendations_key: recommendations_dict}
-
     # directory name from the file path
     folder = os.path.dirname(file_path)
     
@@ -180,7 +192,7 @@ def save_recommendations(user_mapping: dict,
         data = {}
 
     # updating the data with the new dictionary of recommendations
-    data.update(final_dict)
+    data.update(data_dict)
 
     # writing the data back to the file
     with open(file_path, "w") as f:
