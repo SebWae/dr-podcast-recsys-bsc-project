@@ -2,7 +2,9 @@ import json
 import os
 import sys
 
+import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 # adding the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
@@ -12,6 +14,8 @@ from config import (
     TRAIN_DATA_PATH,
     TEST_DATA_PATH,
     RECOMMENDATIONS_PATH,
+    USER_EVAL_PATH,
+    RECOMMENDER_EVAL_PATH,
 )
 
 
@@ -21,43 +25,75 @@ train_df = pd.read_parquet(TRAIN_DATA_PATH)
 # importing test data
 test_df = pd.read_parquet(TEST_DATA_PATH)
 
-# grouping by user_id and counting the number of consumed items (not for completion_rate)
-train_df_grouped = train_df.groupby("user_id")["prd_number"].count().reset_index()
-
 # Open and load the JSON file
 with open(RECOMMENDATIONS_PATH, "r") as file:
     data = json.load(file)
 
-# dictionaries to store evaluation metrics
-recommender_dict_global = {}
-user_dict_global = {}
+completion_rate_dict = {}
+
+# iterating through the rows of the test_df to build the dictionary
+for _, row in test_df.iterrows():
+    user = row['user_id']
+    prd = row['prd_number']
+    completion_rate = row['completion_rate']
+    
+    # If the user_id is not already in the dictionary, add it with an empty dictionary
+    if user not in completion_rate_dict:
+        completion_rate_dict[user] = {}
+    
+    # Add the prd_number and completion_rate to the user's dictionary
+    completion_rate_dict[user][prd] = completion_rate
 
 recommenders = ["cf_recommendations"]
 
-for recommender in recommenders:
+for recommender in tqdm(recommenders):
     # retrieving relevant recommendations
-    recommendations = data["cf_recommendations"]
+    recommendations = data[recommender]
 
     # dictionaries to store evaluation metrics for each recommender
     recommender_dict = {}
     user_dict = {}
 
-    # dictionary containing test items for each user
-    test_items = {}
-    for id, row in test_df.iterrows():
-        if row["user_id"] not in test_items:
-            test_items[row["user_id"]] = set()
-        test_items[row["user_id"]].add(row["prd_number"])
-
     hit_dict = {user_id: 0 for user_id in recommendations.keys()}
+    ndcg_dict = hit_dict.copy()
 
     for user_id, rec_items in recommendations.items():
+        # computing hit-rate (binary) for each user
         rec_items = set(rec_items)
-        true_items = test_items[user_id]
+        true_items = set(completion_rate_dict[user_id].keys())
         correct_recs = rec_items.intersection(true_items)
         n_correct_recs = len(correct_recs)
         if n_correct_recs > 0:
             hit_dict[user_id] += 1
-    
+
+        # computing NDCG for each user
+        gain_dict = completion_rate_dict[user_id]
+        optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)
+        dcg = utils.compute_dcg(rec_items, gain_dict)
+        dcg_star = utils.compute_dcg(optimal_items, gain_dict)
+        ndcg = dcg / dcg_star 
+        ndcg_dict[user_id] = ndcg
+
     # adding hit_dict to user_dict
     user_dict["hit_rate"] = hit_dict
+    
+    # adding ndcg_dict to user_dict
+    user_dict["ndcg"] = ndcg_dict
+
+    # calculating global hit rate
+    hit_rate = np.mean(list(hit_dict.values()))
+    recommender_dict["hit_rate"] = hit_rate
+    
+    # calculating global ndcg
+    ndcg = np.mean(list(ndcg_dict.values()))
+    recommender_dict["ndcg"] = ndcg
+
+    # final dictionaries
+    final_user_dict = {recommender: user_dict}
+    final_recommender_dict = {recommender: recommender_dict}
+
+    # saving the results
+    utils.save_dict_to_json(data_dict=final_user_dict, 
+                            file_path=USER_EVAL_PATH)
+    utils.save_dict_to_json(data_dict=final_recommender_dict, 
+                            file_path=RECOMMENDER_EVAL_PATH)
