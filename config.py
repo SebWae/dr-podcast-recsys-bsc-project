@@ -56,7 +56,10 @@ N_RECOMMENDATIONS = 10
 RANDOM_STATE = 250500
 RECOMMENDATIONS_KEY_CF = "cf_recommendations"
 RECOMMENDATIONS_PATH = "results/recommendations.json"
+RECOMMENDERS = ["cf_recommendations"]
+
 
 # for evaluation
+EVALUATION_METRICS = ["hit_rate", "ndcg"]
 RECOMMENDER_EVAL_PATH = "results/recommender_eval.json"
 USER_EVAL_PATH = "results/user_eval.json"
