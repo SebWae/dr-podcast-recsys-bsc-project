@@ -13,6 +13,7 @@ from config import (
     TRAIN_DATA_PATH,
     TEST_DATA_PATH,
     RECOMMENDATIONS_PATH,
+    RECOMMENDERS,
     USER_EVAL_PATH,
     RECOMMENDER_EVAL_PATH,
 )
@@ -44,9 +45,7 @@ for _, row in test_df.iterrows():
     # Add the prd_number and completion_rate to the user's dictionary
     completion_rate_dict[user][prd] = completion_rate
 
-recommenders = ["cf_recommendations"]
-
-for recommender in tqdm(recommenders):
+for recommender in tqdm(RECOMMENDERS):
     # retrieving relevant recommendations
     recommendations = data[recommender]
 
