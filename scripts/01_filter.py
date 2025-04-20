@@ -12,6 +12,7 @@ from config import (
     END_DATE, 
     MIN_CONTENT_TIME_SPENT,
     FILTERED_DATA_PATH,
+    MIN_PLAYS_PER_EPISODE,
 )
 
 
@@ -65,6 +66,12 @@ cts_grp_df = filtered_df.groupby(["user_id", "prd_number"]).agg(
 
 # filtering on content time spent
 cts_grp_df = cts_grp_df[(cts_grp_df["content_time_spent"] > MIN_CONTENT_TIME_SPENT)]
+
+# grouping by prd_number and counting the number of plays for each episode
+prd_grp_df = cts_grp_df.groupby('prd_number')['user_id'].count()
+
+# filtering away episodes below threshold fo number of plays per episode
+cts_grp_df = cts_grp_df[cts_grp_df['prd_number'].isin(prd_grp_df[prd_grp_df >= MIN_PLAYS_PER_EPISODE].index)]
 
 # saving the filtered data as parquet file
 cts_grp_df.to_parquet(FILTERED_DATA_PATH, index=False)

@@ -7,7 +7,6 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 from config import (
     TRANSFORMED_DATA_PATH,
-    MIN_PLAYS_PER_EPISODE,
     SPLIT_DATE,
     MIN_PLAYS_PER_USER,
     COLUMNS_TO_KEEP,
@@ -19,15 +18,9 @@ from config import (
 # loading the transformed data
 transformed_df = pd.read_parquet(TRANSFORMED_DATA_PATH)
 
-# grouping by prd_number and counting the number of plays for each episode
-prd_grp_df = transformed_df.groupby('prd_number')['user_id'].count()
-
-# filtering away episodes below threshold fo number of plays per episode
-filtered_df = transformed_df[transformed_df['prd_number'].isin(prd_grp_df[prd_grp_df >= MIN_PLAYS_PER_EPISODE].index)]
-
 # applying the global user split
-int_train_df = filtered_df[filtered_df['date'] < SPLIT_DATE]
-int_test_df = filtered_df[filtered_df['date'] >= SPLIT_DATE]
+int_train_df = transformed_df[transformed_df['date'] < SPLIT_DATE]
+int_test_df = transformed_df[transformed_df['date'] >= SPLIT_DATE]
 
 # number of unique users both in the intermediary train and test data
 common_users = set(int_train_df['user_id']).intersection(set(int_test_df['user_id']))
