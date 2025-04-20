@@ -1,10 +1,20 @@
 import json
 import os
+import sys
+from typing import Tuple
 
 from lightfm import LightFM
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
+from scipy.stats import entropy
+
+# adding the parent directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
+
+from config import (
+    RANDOM_STATE,
+)
 
 
 def compare_lists(list1: list, list2: list) -> float:
@@ -198,3 +208,80 @@ def save_dict_to_json(data_dict: dict, file_path: str) -> None:
     with open(file_path, "w") as f:
         json.dump(data, f, indent=4)
 
+
+def permutation_test(dist1: dict, 
+                     dist2: dict, 
+                     N=1000, 
+                     n_permutations=10000) -> Tuple[float, float]:
+    """
+    Computes the KL Divergence between the input distributions, dist1 and dist2.
+    Performs a permutation test to check if dist2 is significantly different from dist1.
+
+    Parameters:
+    - dist1:            Dictionary of category: prob, the target distribution P in the KL formula. 
+    - dist1:            Dictionary of category: prob, the candidate distribution Q in the KL formula.
+    - N:                Size of sample vectors (default value: 100). 
+    - n_permutations:   Number of permutations used in the test (default value: 1000).
+
+    Returns: 
+    - observed_kl:      Observed KL Divergence between dist1 and dist2. 
+    - p_value:          The obtained p-value from the permutation test.
+    """
+    # setting seed
+    np.random.seed(RANDOM_STATE)
+    
+    # obtain all categories
+    dist1_categories = set(dist1.keys())
+    dist2_categories = set(dist2.keys())
+    all_categories = list(dist1_categories.union(dist2_categories))
+
+    # vectors for all categories
+    vec1 = np.array([dist1.get(cat, 0.0) for cat in all_categories])
+    vec2 = np.array([dist2.get(cat, 0.0) for cat in all_categories])
+
+    # Laplace smoothing to avoid division by zero
+    epsilon = 1e-10
+    vec1 += epsilon
+    vec2 += epsilon
+
+    # normalizing probability vectors to make sure they sum to 1
+    vec1 /= vec1.sum()
+    vec2 /= vec2.sum()
+
+    # computing observed KL divergence
+    observed_kl = entropy(vec1, vec2)
+
+    # generating synthetic samples
+    sample1 = np.random.choice(all_categories, size=N, p=vec1)
+    sample2 = np.random.choice(all_categories, size=N, p=vec2)
+
+    # combining samples and initializing sample labels (0 or 1)
+    combined = np.concatenate([sample1, sample2])
+    labels = np.array([0]*N + [1]*N)
+
+    # performing the permutation test
+    permuted_kls = []
+
+    for _ in range(n_permutations):
+        # shuffling the labels
+        np.random.shuffle(labels)
+        g1 = combined[labels == 0]
+        g2 = combined[labels == 1]
+        
+        # generating probability vectors
+        p1 = np.array([np.sum(g1 == cat) for cat in all_categories], dtype=float)
+        p2 = np.array([np.sum(g2 == cat) for cat in all_categories], dtype=float)
+
+        # applying Laplace smoothing 
+        p1 += epsilon
+        p2 += epsilon
+        
+        # computing KL divergence for the current permutation
+        kl = entropy(p1, p2)
+        permuted_kls.append(kl)
+
+    # computing p-value
+    p_value = np.mean(np.array(permuted_kls) >= observed_kl)
+
+    return observed_kl, p_value
+    
