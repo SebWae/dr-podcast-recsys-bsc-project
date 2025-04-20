@@ -58,3 +58,5 @@ RECOMMENDATIONS_KEY_CF = "cf_recommendations"
 RECOMMENDATIONS_PATH = "results/recommendations.json"
 
 # for evaluation
+RECOMMENDER_EVAL_PATH = "results/recommender_eval.json"
+USER_EVAL_PATH = "results/user_eval.json"
