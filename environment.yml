@@ -27,6 +27,7 @@ dependencies:
   - icu=73.1=h6c2663c_0
   - idna=3.10=pyhd8ed1ab_1
   - intel-openmp=2024.2.1=h57928b3_1083
+  - joblib=1.4.2=py310haa95532_0
   - jpeg=9e=h827c3e9_3
   - kiwisolver=1.4.8=py310h5da7b33_0
   - krb5=1.20.1=h5b6d351_0
@@ -83,12 +84,14 @@ dependencies:
   - qtwebchannel=6.7.3=h5da7b33_0
   - qtwebsockets=6.7.3=h5da7b33_0
   - requests=2.32.3=pyhd8ed1ab_1
+  - scikit-learn=1.6.1=py310h585ebfc_0
   - scipy=1.10.1=py310h578b7cb_0
   - setuptools=75.8.0=py310haa95532_0
   - sip=6.10.0=py310h5da7b33_0
   - six=1.17.0=py310haa95532_0
   - sqlite=3.45.3=h2bbff1b_0
   - tbb=2021.9.0=h91493d7_0
+  - threadpoolctl=3.5.0=py310h9909e9c_0
   - tk=8.6.14=h0416ee5_0
   - tornado=6.4.2=py310h827c3e9_0
   - tqdm=4.67.1=py310h9909e9c_0
