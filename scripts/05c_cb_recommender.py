@@ -1,3 +1,6 @@
+# TODO: remove stopwords from episode descriptions and apply stemming
+# TODO: create embeddings for various level of metadata and weighting schemes
+
 import os
 import pandas as pd
 import sys
