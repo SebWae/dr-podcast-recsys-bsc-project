@@ -38,6 +38,7 @@ METADATA_COLUMNS = {"series_title":         "first",
                     "category":             "first",
                     "episode_description":  "first",
                     }
+METADATA_PATH = "data\episode_metadata.parquet"
 
 
 # for train-test splitting
