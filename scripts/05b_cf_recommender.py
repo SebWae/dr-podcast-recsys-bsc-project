@@ -8,7 +8,6 @@ from tqdm import tqdm
 # adding the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
-import utils
 from config import (
     TRAIN_DATA_PATH,
     N_COMPONENTS,
@@ -18,6 +17,7 @@ from config import (
     RECOMMENDATIONS_KEY_CF,
     RECOMMENDATIONS_PATH,
 )
+import utils
 
 
 # loading the train data
