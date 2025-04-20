@@ -7,11 +7,10 @@ from lightfm import LightFM
 # adding the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
-import utils
 from config import (
     TRAIN_DATA_PATH,
 )
-
+import utils
 
 # loading the train data
 train_df = pd.read_parquet(TRAIN_DATA_PATH)
