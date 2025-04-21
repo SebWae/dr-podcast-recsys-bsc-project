@@ -17,7 +17,7 @@ stemmer = SnowballStemmer("danish")
 
 
 
-texts = ["Lyssky med milliarder i Dubai", "Gad vide om mågerne vender tilbage til Korsør"]
+texts = [" ", ""]
 
 for i, text in enumerate(texts):
     # Tokenize the text (split it into words)
