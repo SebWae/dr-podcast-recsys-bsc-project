@@ -1,5 +1,3 @@
-# TODO: split "unik titel" column to obtain episode title
-
 import os
 import pandas as pd
 import sys
