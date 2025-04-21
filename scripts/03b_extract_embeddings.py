@@ -1,0 +1,85 @@
+import os
+import sys
+
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import SnowballStemmer
+import pandas as pd
+from sentence_transformers import SentenceTransformer
+from tqdm import tqdm
+
+# adding the parent directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
+
+from config import (
+    METADATA_PATH,
+    EMBEDDINGS_TITLE_PATH,
+    EMBEDDINGS_DESCR_PATH,
+    EMBEDDINGS_COMBI_PATH,
+)
+import utils
+
+# downloading stopwords
+nltk.download('stopwords')
+
+
+# dictionaries to hold embeddings
+embedding_dicts = {0: {},
+                   1: {},
+                   2: {}}
+
+# sentence transformer model used to obtain embeddings
+model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+
+# Danish stopwords
+stop_words = set(stopwords.words('danish'))
+
+# Danish stemmer
+stemmer = SnowballStemmer("danish")
+
+# loading metadata
+meta_df = pd.read_parquet(METADATA_PATH)
+
+# computing embeddings for each episode
+print("Computing embeddings.")
+for _, row in tqdm(meta_df.iterrows(), total=len(meta_df)):
+    # extracting prd_number and textual features
+    prd_number = row["prd_number"]
+    episode_title = row.get("episode_title", "") or ""
+    episode_description = row.get("episode_description", "") or ""
+    title_and_descr = episode_title + " " + episode_description
+    texts = [episode_title, episode_description, title_and_descr]
+
+    for i, text in enumerate(texts):
+        # tokenizing the text 
+        words = text.split()
+
+        # removing stopwords
+        filtered_words = [word for word in words if word.lower() not in stop_words]
+
+        # joining the words back into a sentence
+        filtered_text = " ".join(filtered_words)
+
+        # stemming the filtered words
+        stemmed_words = [stemmer.stem(word) for word in filtered_words]
+
+        # joining the words back into a sentence
+        stemmed_text = " ".join(stemmed_words)
+        
+        # generating embedding
+        embedding = model.encode(stemmed_text).tolist()
+
+        embedding_dicts[i][prd_number] = embedding
+
+# paths to embedding locations
+emb_paths = [EMBEDDINGS_TITLE_PATH, EMBEDDINGS_DESCR_PATH, EMBEDDINGS_COMBI_PATH]
+
+# saving embeddings
+print("Saving embeddings.")
+for i, emb_dict in enumerate(embedding_dicts.values()):
+    emb_dict_formatted = utils.format_embedding_dict(emb_dict)
+    emb_df = pd.DataFrame(emb_dict_formatted)
+    path = emb_paths[i]
+    emb_df.to_parquet(path, index=False)
+
+print("Done! Embeddings have been saved to embeddings folder.")
