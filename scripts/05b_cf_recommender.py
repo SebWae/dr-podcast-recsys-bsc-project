@@ -14,6 +14,7 @@ from config import (
     RANDOM_STATE,
     N_RECOMMENDATIONS,
     N_EPOCHS,
+    EPSILON,
     RECOMMENDATIONS_KEY_CF,
     RECOMMENDATIONS_PATH,
 )
@@ -45,10 +46,9 @@ cf_model = LightFM(loss="logistic",
 
 # initializing recommendations
 prev_recommendations = ["0" for _ in range(n_users * N_RECOMMENDATIONS)]
-prev_diff = 1.1
 
 for epoch in tqdm(range(N_EPOCHS)):
-    print("Epoch", epoch + 1)
+    print("\n Epoch", epoch + 1)
 
     # fitting the model
     cf_model.fit_partial(interaction_matrix)
@@ -62,20 +62,19 @@ for epoch in tqdm(range(N_EPOCHS)):
     
     # computing the proportion of changed recommendations
     diff_percentage = utils.compare_lists(prev_recommendations, recommendations)
-    print("% of recommendations changed:", diff_percentage)
+    print(f"{diff_percentage*100:.2f}% of the recommendations changed.", )
 
-    # stopping if the % of changed recommendations has increased or is equal to the previous epoch
-    if diff_percentage >= prev_diff:
+    # stopping if less than <EPSILON> of the recommendations are changing
+    if diff_percentage < EPSILON:
         print("Stopping early")
         print("Extracting recommendations")
         recs_dict = utils.extract_recommendations(recommendations=recommendations,
                                                   user_mapping=user_mapping,
                                                   n_recs=N_RECOMMENDATIONS,
                                                   recommendations_key=RECOMMENDATIONS_KEY_CF)
-        print("Saving previous recommendations")
+        print("Saving recommendations")
         utils.save_dict_to_json(data_dict=recs_dict,
                                 file_path=RECOMMENDATIONS_PATH)
         break
 
     prev_recommendations = recommendations
-    prev_diff = diff_percentage
