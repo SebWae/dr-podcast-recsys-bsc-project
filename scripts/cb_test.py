@@ -29,7 +29,7 @@ df = pd.DataFrame({
 })
 
 item_features = pd.DataFrame({
-    'prd_number': ["101", "102", "103", "104"],
+    'prd_number': ["101", "102", "103", "108"],
     'feature1': [0.5, 0.45, 0.41, 0.9],
     'feature2': [0.2, 0.25, 0.89, 0.95],
     'feature3': [0.6, 0.6, 0.7, 0.85],
