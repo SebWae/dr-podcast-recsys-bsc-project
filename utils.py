@@ -109,7 +109,8 @@ def get_top_n_recommendations_all_users(model: LightFM,
                                         interaction_matrix: csr_matrix, 
                                         user_list: list,
                                         item_mapping: dict, 
-                                        n) -> list:
+                                        n,
+                                        item_matrix: csr_matrix = None) -> list:
     """
     Retrieves the top N recommendations for all users.
 
@@ -131,7 +132,11 @@ def get_top_n_recommendations_all_users(model: LightFM,
         user_idx = user_mapping[user_id]
 
         # retrieving scores for all items for the user
-        scores = model.predict(user_idx, np.arange(interaction_matrix.shape[1]))
+        if item_matrix is not None:
+            n_items = item_matrix.shape[0]
+            scores = model.predict(user_idx, np.arange(n_items), item_features=item_matrix)
+        else:
+            scores = model.predict(user_idx, np.arange(interaction_matrix.shape[1]))
         
         # setting the scores of consumed items to 0 so they won't be recommended
         consumed_items = interaction_matrix[user_idx].nonzero()[1]
