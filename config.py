@@ -51,6 +51,9 @@ TRAIN_DATA_PATH = "data\podcast_data_train.parquet"
 
 
 # for implementing recommenders
+EMBEDDINGS_COMBI_PATH = "embeddings\combined_embeddings.parquet"
+EMBEDDINGS_DESCR_PATH = "embeddings\descr_embeddings.parquet"
+EMBEDDINGS_TITLE_PATH = "embeddings\title_embeddings.parquet"
 EPSILON = 0.01
 N_COMPONENTS = 40   # inspired by Funk SVD
 N_EPOCHS = 1000
