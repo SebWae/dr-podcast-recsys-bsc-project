@@ -5,8 +5,9 @@ import os
 import sys
 
 from lightfm import LightFM
+import numpy as np
 import pandas as pd
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, hstack
 from tqdm import tqdm
 
 # adding the parent directory to the Python path
@@ -14,6 +15,7 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 from config import (
     TRAIN_DATA_PATH,
+    TEST_DATA_PATH,
     N_COMPONENTS,
     RANDOM_STATE,
     N_RECOMMENDATIONS,
@@ -29,7 +31,7 @@ from config import (
 )
 import utils
 
-# loading the train data
+# loading train data
 train_df = pd.read_parquet(TRAIN_DATA_PATH)
 
 # preparing the interaction matrix
@@ -39,10 +41,23 @@ interaction_matrix = utils.prep_interaction_matrix(df=train_df,
                                                    rating_col="completion_rate",
 )
 
-# list of users and items
+# list of users
 user_list = sorted(train_df['user_id'].unique().tolist())
 n_users = len(user_list)
-item_list = sorted(train_df['prd_number'].unique().tolist())
+
+# loading test data
+test_df = pd.read_parquet(TEST_DATA_PATH)
+
+# finding new items
+train_items = set(train_df["prd_number"])
+test_items = set(test_df["prd_number"])
+new_items = test_items.difference(train_items)
+all_items = train_items.union(test_items)
+item_list = sorted(list(all_items))
+
+# extra matrix of zeros for new items
+zero_matrix = np.zeros((n_users, len(new_items)))
+interaction_matrix_w_zeros = hstack([interaction_matrix, zero_matrix]).tocsr()
 
 # user and item mappings
 user_mapping = {user: i for i, user in enumerate(user_list)}
