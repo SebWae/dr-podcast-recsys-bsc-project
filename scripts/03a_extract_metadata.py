@@ -1,6 +1,7 @@
 import os
-import pandas as pd
 import sys
+
+import pandas as pd
 
 # adding the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
