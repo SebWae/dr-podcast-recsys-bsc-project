@@ -76,6 +76,7 @@ for path, key in zip(emb_paths, cb_keys):
     print(f"\n Generating recommendations for {key}:")
     # initializing recommendations
     prev_recommendations = ["0" for _ in range(n_users * N_RECOMMENDATIONS)]
+    prev_diff = 0
 
     # loading embeddings
     emb_df = pd.read_parquet(path)
@@ -107,8 +108,11 @@ for path, key in zip(emb_paths, cb_keys):
         diff_percentage = utils.compare_lists(prev_recommendations, recommendations)
         print(f"{diff_percentage*100:.2f}% of the recommendations changed.", )
 
-        # stopping if less than <EPSILON> of the recommendations are changing
-        if diff_percentage < EPSILON:
+        # comparing the diff_percentage with the previous epoch
+        change_diff_percentage = abs(diff_percentage - prev_diff)
+
+        # stopping if change_diff_percentage is less than EPSILON
+        if change_diff_percentage < EPSILON:
             print("Stopping early")
             print("Extracting recommendations")
             recs_dict = utils.extract_recommendations(recommendations=recommendations,
