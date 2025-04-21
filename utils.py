@@ -105,6 +105,30 @@ def extract_recommendations(recommendations: list,
     return final_dict
 
 
+def format_embedding_dict(emb_dict: dict) -> dict:
+    """
+    Converts a dictionary with episodes as keys to have one episode key and feature keys.
+
+    Parameters:
+    - emb_dict:         Dictionary in the format {"id1": [embedding1], "id2": [embedding2], ...}
+
+    Returnes:
+    - reshaped_dict:    Dictionary in the format {"episodes": ["id1", "id2", ...], "feature1": [x_11, x_21, ...], "feature2": [x_12, x_22, ...], ...}
+    """
+    # input dict as dataframe
+    emb_df = pd.DataFrame(emb_dict)
+
+    # transposing and resetting index
+    reshaped_df = emb_df.T.reset_index()
+
+    # renaming columns
+    n_features = len(reshaped_df.columns) - 1
+    feature_columns = [f"feature{i+1}" for i in range(n_features)]
+    reshaped_df.columns = ['episode'] + feature_columns
+    formatted_dict = reshaped_df.to_dict(orient="list")
+
+    return formatted_dict
+
 def get_top_n_recommendations_all_users(model: LightFM, 
                                         interaction_matrix: csr_matrix, 
                                         user_list: list,
