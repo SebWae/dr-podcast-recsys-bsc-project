@@ -56,7 +56,9 @@ N_COMPONENTS = 40   # inspired by Funk SVD
 N_EPOCHS = 1000
 N_RECOMMENDATIONS = 10
 RANDOM_STATE = 250500
+RECOMMENDATIONS_KEY_CB = "cb_recommendations"
 RECOMMENDATIONS_KEY_CF = "cf_recommendations"
+RECOMMENDATIONS_KEY_HYBRID = "hybrid_recommendations"
 RECOMMENDATIONS_PATH = "results/recommendations.json"
 RECOMMENDERS = ["cf_recommendations"]
 
