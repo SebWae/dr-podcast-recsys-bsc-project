@@ -51,6 +51,7 @@ TRAIN_DATA_PATH = "data\podcast_data_train.parquet"
 
 
 # for implementing recommenders
+EPSILON = 0.01
 N_COMPONENTS = 40   # inspired by Funk SVD
 N_EPOCHS = 1000
 N_RECOMMENDATIONS = 10
