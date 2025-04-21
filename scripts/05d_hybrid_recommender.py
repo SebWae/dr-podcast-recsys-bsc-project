@@ -2,6 +2,7 @@ import os
 import sys
 
 from lightfm import LightFM
+import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix, hstack, identity
 from tqdm import tqdm
@@ -11,13 +12,15 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 from config import (
     TRAIN_DATA_PATH,
+    TEST_DATA_PATH,
     N_COMPONENTS,
     RANDOM_STATE,
     N_RECOMMENDATIONS,
     N_EPOCHS,
     EPSILON,
-    RECOMMENDATIONS_KEY_CB,
+    RECOMMENDATIONS_KEY_HYBRID,
     RECOMMENDATIONS_PATH,
+    EMBEDDINGS_COMBI_PATH
 )
 import utils
 
@@ -31,16 +34,38 @@ interaction_matrix = utils.prep_interaction_matrix(df=train_df,
                                                    rating_col="completion_rate",
 )
 
-# list of users and items
+# list of users
 user_list = sorted(train_df['user_id'].unique().tolist())
 n_users = len(user_list)
-item_list = sorted(train_df['prd_number'].unique().tolist())
+
+# loading test data
+test_df = pd.read_parquet(TEST_DATA_PATH)
+
+# finding new items
+train_items = set(train_df["prd_number"])
+test_items = set(test_df["prd_number"])
+new_items = test_items.difference(train_items)
+all_items = train_items.union(test_items)
+item_list = sorted(list(all_items))
 
 # user and item mappings
 user_mapping = {user: i for i, user in enumerate(user_list)}
 item_mapping = {i: item for i, item in enumerate(item_list)}
 
-item_matrix = item_features.drop(columns='prd_number').values
+# extra matrix of zeros for new items
+zero_matrix = np.zeros((n_users, len(new_items)))
+interaction_matrix_w_zeros = hstack([interaction_matrix, zero_matrix]).tocsr()
+
+# loading embeddings
+emb_df = pd.read_parquet("embeddings/one_feature.parquet")
+
+# formatting the emb_df 
+emb_df = emb_df.rename(columns={"episode": "prd_number"})
+emb_dict = emb_df.to_dict(orient="list")
+emb_df_formatted = pd.DataFrame(emb_dict)
+
+# turning the embedding dataframe into an csr matrix
+item_matrix = emb_df_formatted.drop(columns='prd_number').values
 item_matrix_csr = csr_matrix(item_matrix)
 
 # Number of items
@@ -59,13 +84,13 @@ cb_model = LightFM(loss="logistic",
 
 # initializing recommendations
 prev_recommendations = ["0" for _ in range(n_users * N_RECOMMENDATIONS)]
-
+prev_diff = 0
 
 for epoch in tqdm(range(N_EPOCHS)):
     print("\n Epoch", epoch + 1)
 
     # fitting the model
-    cb_model.fit_partial(interactions=interaction_matrix, item_features=item_features_hybrid)
+    cb_model.fit_partial(interactions=interaction_matrix_w_zeros, item_features=item_features_hybrid)
 
     # getting the top N recommendations for all users
     recommendations = utils.get_top_n_recommendations_all_users(model=cb_model, 
@@ -79,17 +104,21 @@ for epoch in tqdm(range(N_EPOCHS)):
     diff_percentage = utils.compare_lists(prev_recommendations, recommendations)
     print(f"{diff_percentage*100:.2f}% of the recommendations changed.", )
 
-    # stopping if less than <EPSILON> of the recommendations are changing
-    if diff_percentage < EPSILON:
+    # comparing the diff_percentage with the previous epoch
+    change_diff_percentage = abs(diff_percentage - prev_diff)
+
+    # stopping if change_diff_percentage is less than EPSILON
+    if change_diff_percentage < EPSILON:
         print("Stopping early")
         print("Extracting recommendations")
         recs_dict = utils.extract_recommendations(recommendations=recommendations,
                                                   user_mapping=user_mapping,
                                                   n_recs=N_RECOMMENDATIONS,
-                                                  recommendations_key=RECOMMENDATIONS_KEY_CB)
+                                                  recommendations_key=RECOMMENDATIONS_KEY_HYBRID)
         print("Saving recommendations")
         utils.save_dict_to_json(data_dict=recs_dict,
                                 file_path=RECOMMENDATIONS_PATH)
         break
     
     prev_recommendations = recommendations
+    prev_diff = diff_percentage
