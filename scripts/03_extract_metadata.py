@@ -34,5 +34,32 @@ transformed_df_w_descr = pd.merge(transformed_df, descr_df, on="prd_number", how
 # grouping by prd_number and selecting metadata columns
 metadata_df = transformed_df_w_descr.groupby("prd_number").agg(METADATA_COLUMNS).reset_index()
 
+# extracting episode title from unique title and series title
+episode_titles = []
+
+for _, row in metadata_df.iterrows():
+    prd = row["prd_number"]
+    series_title = row["series_title"]
+    unique_title = row["unique_title"]
+
+    series_title_v1 = f"{series_title}:"
+    series_title_v2 = f"{series_title} - "
+
+    if unique_title == f"{series_title}_{prd}":
+        episode_titles.append("")
+    
+    else:
+        prd_removed = unique_title.replace(f"_{prd}", "")
+
+        if series_title_v1 in prd_removed:
+            prd_removed = prd_removed.replace(series_title_v1, "")
+        elif series_title_v2 in prd_removed:
+            prd_removed = prd_removed.replace(series_title_v2, "")
+
+        episode_titles.append(prd_removed)
+
+# adding the episode titles as a column to metadata_df
+metadata_df["episode_title"] = episode_titles
+
 # saving metadata_df
 metadata_df.to_parquet(METADATA_PATH)
