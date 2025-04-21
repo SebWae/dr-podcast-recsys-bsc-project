@@ -13,17 +13,17 @@ Dokumentar,0.007911480299281707,train
 Underholdning,0.001022317937673858,train
 NN,0.0008631482692167998,train
 Kor og orkestre,2.6706320210915836e-06,train
-Fakta og debat,0.5235478944689217,cf_recommendations
-Aktualitet,0.29096877249030173,cf_recommendations
+Fakta og debat,0.5217592023732205,cf_recommendations
+Aktualitet,0.288158472151521,cf_recommendations
 Nyheder,0.08718952412715687,cf_recommendations
-Unge,0.0867998385086626,cf_recommendations
-Livsstil,0.011493970404957083,cf_recommendations
-Underholdning,0.0,cf_recommendations
-Musik,0.0,cf_recommendations
-Historie,0.0,cf_recommendations
--,0.0,cf_recommendations
-Kor og orkestre,0.0,cf_recommendations
+Unge,0.08675419965244256,cf_recommendations
+Livsstil,0.016138601695659043,cf_recommendations
 Kultur,0.0,cf_recommendations
 Dokumentar,0.0,cf_recommendations
+Historie,0.0,cf_recommendations
+-,0.0,cf_recommendations
 NN,0.0,cf_recommendations
+Musik,0.0,cf_recommendations
+Kor og orkestre,0.0,cf_recommendations
+Underholdning,0.0,cf_recommendations
 Sport,0.0,cf_recommendations
