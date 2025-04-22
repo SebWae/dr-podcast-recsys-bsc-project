@@ -65,7 +65,7 @@ RECOMMENDATIONS_KEY_CB_TITLE = "cb_recommendations_title"
 RECOMMENDATIONS_KEY_CF = "cf_recommendations"
 RECOMMENDATIONS_KEY_HYBRID = "hybrid_recommendations"
 RECOMMENDATIONS_PATH = "results/recommendations.json"
-RECOMMENDERS = ["cf_recommendations"]
+RECOMMENDERS = ["cf_recommendations", "hybrid_recommendations"]
 
 
 # for evaluation
