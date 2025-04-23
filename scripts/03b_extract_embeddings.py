@@ -4,6 +4,7 @@ import sys
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
+import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
@@ -68,6 +69,11 @@ for _, row in tqdm(meta_df.iterrows(), total=len(meta_df)):
         
         # generating embedding
         embedding = model.encode(stemmed_text).tolist()
+
+        # normalize the embedding
+        norm = np.linalg.norm(embedding)
+        if norm != 0:  
+            embedding = (np.array(embedding) / norm).tolist()
 
         embedding_dicts[i][prd_number] = embedding
 
