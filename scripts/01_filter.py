@@ -97,7 +97,7 @@ val_test_datetime = SPLIT_DATE_VAL_TEST + " 00:00:00"
 train_users = filtered_df[filtered_df["date_time"] < train_val_datetime]
 val_users = filtered_df[(filtered_df["date_time"] >= train_val_datetime) & 
                         (filtered_df["date_time"] < val_test_datetime)]["user_id"]
-test_users = filtered_df[filtered_df["date_time"] >= train_val_datetime]["user_id"]
+test_users = filtered_df[filtered_df["date_time"] >= val_test_datetime]["user_id"]
 
 # filtering away users below threshold for number of plays per user
 grp_train_users = train_users.groupby('user_id')['prd_number'].count()
