@@ -43,12 +43,13 @@ METADATA_PATH = "data\episode_metadata.parquet"
 
 # for train-test splitting
 COLUMNS_TO_KEEP = ["user_id", "prd_number", "completion_rate"]
-MIN_PLAYS_PER_EPISODE = 10
 MIN_PLAYS_PER_USER = 2
+MIN_USERS_PER_SHOW = 10
 SPLIT_DATE_TRAIN_VAL = "2024-10-21"
 SPLIT_DATE_VAL_TEST = "2024-11-11"
 TEST_DATA_PATH = "data\podcast_data_test.parquet"
 TRAIN_DATA_PATH = "data\podcast_data_train.parquet"
+VAL_DATA_PATH = "data\podcast_data_val.parquet"
 
 
 # for implementing recommenders
