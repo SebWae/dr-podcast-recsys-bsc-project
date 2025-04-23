@@ -1,3 +1,4 @@
+from collections import defaultdict
 import json
 import os
 import sys
@@ -50,42 +51,49 @@ for recommender in tqdm(RECOMMENDERS):
     recommendations = data[recommender]
 
     # dictionaries to store evaluation metrics for each recommender
-    recommender_dict = {}
-    user_dict = {}
+    recommender_dict = defaultdict(dict)
+    user_dict = defaultdict(dict)
 
-    hit_dict = {user_id: 0 for user_id in recommendations.keys()}
-    ndcg_dict = hit_dict.copy()
+    # evaluation levels (@2, @6, and @10)
+    eval_levels = [2, 6, 10]    
 
-    for user_id, rec_items in recommendations.items():
-        # computing hit-rate (binary) for each user
-        rec_items = set(rec_items)
-        true_items = set(completion_rate_dict[user_id].keys())
-        correct_recs = rec_items.intersection(true_items)
-        n_correct_recs = len(correct_recs)
-        if n_correct_recs > 0:
-            hit_dict[user_id] += 1
+    for level in eval_levels:
+        # initializing dictionaries to store metrics per user
+        hit_dict = {user_id: 0 for user_id in recommendations.keys()}
+        ndcg_dict = hit_dict.copy()
 
-        # computing NDCG for each user
-        gain_dict = completion_rate_dict[user_id]
-        optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)
-        dcg = utils.compute_dcg(rec_items, gain_dict)
-        dcg_star = utils.compute_dcg(optimal_items, gain_dict)
-        ndcg = dcg / dcg_star 
-        ndcg_dict[user_id] = ndcg
+        for user_id, rec_items in recommendations.items():
+            # slicing rec_items according to level
+            rec_items = rec_items[:level]
 
-    # adding hit_dict to user_dict
-    user_dict["hit_rate"] = hit_dict
-    
-    # adding ndcg_dict to user_dict
-    user_dict["ndcg"] = ndcg_dict
+            # computing hit-rate (binary) for each user
+            true_items = set(completion_rate_dict[user_id].keys())
+            correct_recs = true_items.intersection(rec_items)
+            n_correct_recs = len(correct_recs)
+            if n_correct_recs > 0:
+                hit_dict[user_id] += 1
 
-    # calculating global hit rate
-    hit_rate = np.mean(list(hit_dict.values()))
-    recommender_dict["hit_rate"] = hit_rate
-    
-    # calculating global ndcg
-    ndcg = np.mean(list(ndcg_dict.values()))
-    recommender_dict["ndcg"] = ndcg
+            # computing NDCG for each user
+            gain_dict = completion_rate_dict[user_id]
+            optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)
+            dcg = utils.compute_dcg(rec_items, gain_dict)
+            dcg_star = utils.compute_dcg(optimal_items, gain_dict)
+            ndcg = dcg / dcg_star 
+            ndcg_dict[user_id] = ndcg
+
+        # adding hit_dict to user_dict
+        user_dict[level]["hit_rate"] = hit_dict
+        
+        # adding ndcg_dict to user_dict
+        user_dict[level]["ndcg"] = ndcg_dict
+
+        # calculating global hit rate
+        hit_rate = np.mean(list(hit_dict.values()))
+        recommender_dict[level]["hit_rate"] = hit_rate
+        
+        # calculating global ndcg
+        ndcg = np.mean(list(ndcg_dict.values()))
+        recommender_dict[level]["ndcg"] = ndcg
 
     # final dictionaries
     final_user_dict = {recommender: user_dict}
