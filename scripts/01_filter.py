@@ -80,8 +80,16 @@ cts_grp_df = filtered_df.groupby(["user_id", "prd_number"]).agg(
 # filtering on content time spent
 filtered_df = cts_grp_df[(cts_grp_df["content_time_spent"] > MIN_CONTENT_TIME_SPENT)]
 
+# counting the number of unique users for each podcast show
+print("Filtering out infrequent shows (filtering task 6/7)")
+show_grp_df = cts_grp_df.groupby('series_title')['user_id'].nunique()
+
+# filtering away shows listened to by less than 10 unique users
+filtered_df = filtered_df[filtered_df['series_title']
+                          .isin(show_grp_df[show_grp_df >= MIN_USERS_PER_SHOW].index)]
+
 # formatting split dates as datetime
-print("Filtering on train, val and test period (filtering task 6/7)")
+print("Filtering on train, val and test period (filtering task 7/7)")
 train_val_datetime = SPLIT_DATE_TRAIN_VAL + " 00:00:00"
 val_test_datetime = SPLIT_DATE_VAL_TEST + " 00:00:00"
 
@@ -102,14 +110,6 @@ common_users = filtered_train_users_set.intersection(val_users, test_users)
 
 # Filter the dataframe to include only these users
 filtered_df = filtered_df[filtered_df["user_id"].isin(common_users)]
-
-# counting the number of unique users for each podcast show
-print("Filtering out infrequent shows (filtering task 7/7)")
-show_grp_df = cts_grp_df.groupby('series_title')['user_id'].nunique()
-
-# filtering away episodes below threshold fo number of plays per episode
-filtered_df = filtered_df[filtered_df['series_title']
-                          .isin(show_grp_df[show_grp_df >= MIN_USERS_PER_SHOW].index)]
 
 # saving the filtered data as parquet file
 print("All filtering tasks have been completed! \n Saving filtered data to parquet.")
