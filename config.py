@@ -45,7 +45,8 @@ METADATA_PATH = "data\episode_metadata.parquet"
 COLUMNS_TO_KEEP = ["user_id", "prd_number", "completion_rate"]
 MIN_PLAYS_PER_EPISODE = 10
 MIN_PLAYS_PER_USER = 2
-SPLIT_DATE = "2024-11-11"
+SPLIT_DATE_TRAIN_VAL = "2024-10-21"
+SPLIT_DATE_VAL_TEST = "2024-11-11"
 TEST_DATA_PATH = "data\podcast_data_test.parquet"
 TRAIN_DATA_PATH = "data\podcast_data_train.parquet"
 
