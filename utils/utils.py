@@ -16,6 +16,7 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 from config import (
     RANDOM_STATE,
+    UTILS_PATH,
 )
 
 
@@ -137,49 +138,73 @@ def format_embedding_dict(emb_dict: dict) -> dict:
 
     return formatted_dict
 
-def get_top_n_recommendations_all_users(model: LightFM, 
-                                        interaction_matrix: csr_matrix, 
-                                        user_list: list,
-                                        item_mapping: dict, 
-                                        n: int,
-                                        item_matrix: csr_matrix = None) -> list:
+def get_scores_all_items(model: LightFM, 
+                         interaction_matrix: csr_matrix, 
+                         user_mapping: dict,
+                         item_mapping: dict) -> list:
     """
     Retrieves the top N recommendations for all users.
 
     Parameters:
     - model:                Trained LightFM model.  
     - interaction_matrix:   Sparse matrix of interactions in scr format.
-    - user_list:            List of user IDs.
-    - item_mapping:         Mapping of item indices to actual product numbers.
-    - n:                    Number of recommendations to retrieve.
+    - user_mapping:         Mapping of user IDs to indices 
+    - item_mapping:         Mapping of item indices to item IDs.
 
     Returns:
-    - recommendations:      List of recommended items for all users.
+    - scores_dict:          Dictionary of scores for each episode for each user.
     """
-    recommendations = []
-    user_mapping = {user: i for i, user in enumerate(user_list)}
+    users = user_mapping.keys()
+    scores_dict = {user_id: {prd_number: 0 for prd_number in item_mapping.values()} for user_id in users}
 
-    for user_id in user_list:
+    # loading utils dictionaries
+    with open("UTILS_PATH", "r") as file:
+        utils_dicts = json.load(file)
+
+    # extracting dictionaries
+    show_episodes_dict = utils_dicts["show_episodes"]
+    user_show_episodes_dict = utils_dicts["user_show_episodes"]
+
+    for user_id in users:
         # retrieving the index for user_id
         user_idx = user_mapping[user_id]
 
+        # retrieving scores for each show
         scores = model.predict(user_idx, np.arange(interaction_matrix.shape[1]))
         
-        # setting the scores of consumed items to 0 so they won't be recommended
-        consumed_items = interaction_matrix[user_idx].nonzero()[1]
-        scores[consumed_items] = 0
+        # normalizing the scores
+        norm = np.linalg.norm(scores)
+        scores = (np.array(scores) / norm).tolist()
 
-        # getting the indices of the top n items (excluding rated items)
-        top_items = scores.argsort()[-n:][::-1]
+        # dictionary of episodes user has listened to for each show
+        user_dict = user_show_episodes_dict[user_id]
+
+        for i, score in enumerate(scores):
+            item_id = item_mapping[i]
+            episodes = show_episodes_dict[item_id]
+            n_episodes = len(episodes)
+
+            if item_id in user_dict:
+                listened_episodes = user_dict[item_id]
+                most_recent_episode = listened_episodes[-1]
+                most_recent_episode_index = episodes.index(most_recent_episode)
+            
+                if most_recent_episode_index == n_episodes - 1:
+                    episodes_not_listened = sorted(set(episodes) - set(listened_episodes))
+                    n_episodes_not_listened = len(episodes_not_listened)
+
+                    if n_episodes_not_listened > 0:
+                        prd_to_recommend = episodes_not_listened[-1]
         
-        # mapping the item indices to the prd_numbers
-        top_items_prd = [item_mapping[i] for i in top_items]
-        
-        # appending to the list of recommendations
-        for item in top_items_prd:
-            recommendations.append(item)
-    
-    return recommendations
+                else:
+                    prd_to_recommend = episodes[most_recent_episode_index + 1]
+            
+            else:
+                prd_to_recommend = episodes[0]
+            
+            scores_dict[user_id][prd_to_recommend] = score
+
+    return scores_dict
 
 
 def prep_interaction_matrix(df: pd.DataFrame, 
