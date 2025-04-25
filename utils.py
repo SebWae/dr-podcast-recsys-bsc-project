@@ -1,3 +1,4 @@
+import itertools
 import json
 import os
 import sys
@@ -8,6 +9,7 @@ import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
 from scipy.stats import entropy
+from sklearn.metrics.pairwise import cosine_similarity
 
 # adding the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
@@ -52,7 +54,7 @@ def compute_dcg(recommendations: list, gain_dict: dict) -> float:
     Computes the Discounted Cumulative Gain (DCG) for a list of recommendations.
     
     Parameters:
-    - recommendations:   List of recommended items.
+    - recommendations:  List of recommended items.
     - gain_dict:        Dictionary mapping items to their gains.
 
     Returns:
@@ -70,6 +72,42 @@ def compute_dcg(recommendations: list, gain_dict: dict) -> float:
             dcg += discounted_gain
 
     return dcg
+
+
+def compute_diversity(recommendations: list, 
+                      item_features: pd.DataFrame,
+                      item_id_name: str) -> float:
+    """
+    Computes the diversity as the average intra-list distance (AILD) of a recommendations list.
+    Cosine similarity is chosen as the distance measure and is transformed to be in the range [0,1].
+
+    Parameters:
+    - recommendations:  List of recommended items.
+    - item_features:    DataFrame whose first column is the item IDs and the following columns are numerical item features.
+    - item_id_name:     Name of the column containing the item IDs. 
+
+    Returns:
+    - diversity:        Diversity metric in the range [0,1], 0 indicates similar items, 1 indicates diverse items.
+    """
+    diversities = []
+
+    # iterating through pairs of items
+    for item1, item2 in itertools.combinations(recommendations, 2):
+        # retrieving the feature vectors for the two items
+        vector_1 = item_features[item_features[item_id_name] == item1].iloc[:, 1:].values.flatten()
+        vector_2 = item_features[item_features[item_id_name] == item2].iloc[:, 1:].values.flatten()
+
+        # computing the cosine similarity between the two feature vectors
+        similarity = cosine_similarity([vector_1], [vector_2])[0][0]
+
+        # transforming similarity to range [0, 1] and flipping the interpretability 
+        diversity = 1 - (similarity + 1) / 2
+        diversities.append(diversity)
+
+    # computing the average diversity across all item pairs
+    avg_diversity = np.average(diversities)
+
+    return avg_diversity
 
 
 def extract_recommendations(recommendations: list,
