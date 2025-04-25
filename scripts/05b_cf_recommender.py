@@ -92,8 +92,7 @@ for n_components in n_components_values:
         show_recs = utils.get_top_n_recommendations_all_users(model=cf_model, 
                                                               interaction_matrix=interaction_matrix, 
                                                               user_list=user_list, 
-                                                              item_mapping=show_mapping, 
-                                                              n=N_RECOMMENDATIONS)
+                                                              item_mapping=show_mapping)
         
         # stopping if less than <EPSILON> of the recommendations are changing
         if ndcg < prev_ndcg:
