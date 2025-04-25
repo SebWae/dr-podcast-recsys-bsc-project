@@ -13,6 +13,7 @@ from config import (
     TRAIN_DATA_PATH,
     TEST_DATA_PATH,
     METADATA_PATH,
+    EMBEDDINGS_COMBI_PATH,
     SPLIT_DATE_VAL_TEST,
     USER_EVAL_PATH,
     RECOMMENDER_EVAL_PATH,
@@ -30,6 +31,9 @@ import utils
 train_df = pd.read_parquet(TRAIN_DATA_PATH)
 test_df = pd.read_parquet(TEST_DATA_PATH)
 meta_df = pd.read_parquet(METADATA_PATH)
+
+# loading embeddings
+emb_df = pd.read_parquet(EMBEDDINGS_COMBI_PATH)
 
 # left joining the metadata onto the train data
 train_w_meta = pd.merge(train_df, meta_df, on="prd_number", how="left")
@@ -76,6 +80,7 @@ for level in tqdm(eval_levels):
     # initializing dictionaries to store metrics per user
     hit_dict = {user_id: 0 for user_id in completion_rate_dict.keys()}
     ndcg_dict = hit_dict.copy()
+    diversity_dict = hit_dict.copy()
 
     # number of recommendations according to level
     recs = recommendations[:level]
@@ -101,13 +106,19 @@ for level in tqdm(eval_levels):
     # adding ndcg_dict to user_dict
     user_dict[level]["ndcg"] = ndcg_dict
 
-    # calculating global hit rate
+    # computing global hit rate
     hit_rate = np.mean(list(hit_dict.values()))
     recommender_dict[level]["hit_rate"] = hit_rate
 
-    # calculating global ndcg
+    # computing global ndcg
     ndcg = np.mean(list(ndcg_dict.values()))
     recommender_dict[level]["ndcg"] = ndcg
+
+    # computing global diversity (same for all users)
+    diversity = utils.compute_diversity(recommendations=recs, 
+                                        item_features=emb_df, 
+                                        item_id_name="episode")
+    recommender_dict[level]["diversity"] = diversity
 
 # final dictionaries
 final_user_dict = {"pop_baseline": user_dict}
