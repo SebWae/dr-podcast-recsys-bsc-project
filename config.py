@@ -23,10 +23,13 @@ VAR_RENAME_DICT = {"Date:Time (evar16)":           "date_time",
                    }
 
 
-# for extracting metadata
+# for extracting metadata, embeddings and utils
 DESCRIPTION_VAR_RENAME_DICT = {"PRD_NUMBER":       "prd_number",
                                "PRD_SHORTDESCR":   "episode_description",
                                }
+EMBEDDINGS_COMBI_PATH = "embeddings/combined_embeddings.parquet"
+EMBEDDINGS_DESCR_PATH = "embeddings/descr_embeddings.parquet"
+EMBEDDINGS_TITLE_PATH = "embeddings/title_embeddings.parquet"
 EPISODE_DESCRIPTION_PATH = "data\episode_descriptions.parquet"
 METADATA_COLUMNS = {"series_title":         "first",
                     "unique_title":         "first",
@@ -39,6 +42,7 @@ METADATA_COLUMNS = {"series_title":         "first",
                     "episode_description":  "first",
                     }
 METADATA_PATH = "data\episode_metadata.parquet"
+UTILS_PATH = "utils/utils.json"
 
 
 # for train-test splitting
@@ -53,9 +57,6 @@ VAL_DATA_PATH = "data\podcast_data_val.parquet"
 
 
 # for implementing recommenders
-EMBEDDINGS_COMBI_PATH = "embeddings/combined_embeddings.parquet"
-EMBEDDINGS_DESCR_PATH = "embeddings/descr_embeddings.parquet"
-EMBEDDINGS_TITLE_PATH = "embeddings/title_embeddings.parquet"
 N_EPOCHS = 1000
 N_RECOMMENDATIONS = 10
 RANDOM_STATE = 250500
