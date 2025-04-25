@@ -2,6 +2,7 @@ import os
 import sys
 
 from lightfm import LightFM
+import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
@@ -10,6 +11,8 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 from config import (
     TRAIN_DATA_PATH,
+    VAL_DATA_PATH,
+    METADATA_PATH,
     N_COMPONENTS,
     RANDOM_STATE,
     N_RECOMMENDATIONS,
@@ -21,14 +24,28 @@ from config import (
 import utils
 
 
-# loading the train data
+# loading train, validation and metadata
 train_df = pd.read_parquet(TRAIN_DATA_PATH)
+val_df = pd.read_parquet(VAL_DATA_PATH)
+meta_df = pd.read_parquet(METADATA_PATH)
+
+# left joining the metadata onto the train data
+train_w_meta = pd.merge(train_df, meta_df, on="prd_number", how="left")
+
+# grouping by user_id and series_title
+grouped_df = train_w_meta.groupby(["user_id", "series_title"]).agg(
+    avg_completion_rate =   ("completion_rate", "mean"),
+    n_episodes =            ("prd_number", "count")
+    ).reset_index()
+
+# computing ratings 
+grouped_df["cf_rating"] = grouped_df["avg_completion_rate"] * np.log10(grouped_df["n_episodes"] + 10)
 
 # preparing the interaction matrix
-interaction_matrix = utils.prep_interaction_matrix(df=train_df, 
+interaction_matrix = utils.prep_interaction_matrix(df=grouped_df, 
                                                    user_col="user_id", 
-                                                   item_col="prd_number", 
-                                                   rating_col="completion_rate")
+                                                   item_col="series_title", 
+                                                   rating_col="cf_rating")
 
 # list of users and items
 user_list = sorted(train_df['user_id'].unique().tolist())
