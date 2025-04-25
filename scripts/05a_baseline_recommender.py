@@ -18,7 +18,7 @@ from config import (
     USER_EVAL_PATH,
     RECOMMENDER_EVAL_PATH,
 )
-import utils
+import utils.utils as utils
 
 # the baseline recommender is being implemented differently from the other recommenders
 # identifies the 10 most listened shows in the training data 

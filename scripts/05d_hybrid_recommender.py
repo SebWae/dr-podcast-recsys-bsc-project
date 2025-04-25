@@ -22,7 +22,7 @@ from config import (
     RECOMMENDATIONS_PATH,
     EMBEDDINGS_COMBI_PATH
 )
-import utils
+import utils.utils as utils
 
 # loading the train data
 train_df = pd.read_parquet(TRAIN_DATA_PATH)

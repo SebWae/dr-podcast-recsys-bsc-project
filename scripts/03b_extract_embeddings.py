@@ -18,7 +18,7 @@ from config import (
     EMBEDDINGS_DESCR_PATH,
     EMBEDDINGS_COMBI_PATH,
 )
-import utils
+import utils.utils as utils
 
 # downloading stopwords
 nltk.download('stopwords')
