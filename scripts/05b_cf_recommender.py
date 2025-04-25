@@ -13,15 +13,13 @@ from config import (
     TRAIN_DATA_PATH,
     VAL_DATA_PATH,
     METADATA_PATH,
-    N_COMPONENTS,
     RANDOM_STATE,
     N_RECOMMENDATIONS,
     N_EPOCHS,
-    EPSILON,
     RECOMMENDATIONS_KEY_CF,
     RECOMMENDATIONS_PATH,
 )
-import utils
+import utils.utils as utils
 
 
 # loading train, validation and metadata
@@ -47,51 +45,67 @@ interaction_matrix = utils.prep_interaction_matrix(df=grouped_df,
                                                    item_col="series_title", 
                                                    rating_col="cf_rating")
 
+# grouping by user_id and series_title, and getting the prd_number with the most recent pub_date
+most_recent_prd = (train_w_meta.sort_values(by="pub_date", ascending=False)
+                   .groupby(["user_id", "series_title"])
+                   .first()["prd_number"]
+                   .reset_index()
+                   )
+
+# creating a dictionary to retrieve the most recent episode per show per user
+most_recent_episode_dict = {}
+for _, row in most_recent_prd.iterrows():
+    user_id = row["user_id"]
+    series_title = row["series_title"]
+    prd_number = row["prd_number"]
+    
+    if user_id not in most_recent_episode_dict:
+        most_recent_episode_dict[user_id] = {}
+    most_recent_episode_dict[user_id][series_title] = prd_number
+
 # list of users and items
 user_list = sorted(train_df['user_id'].unique().tolist())
-n_users = len(user_list)
-item_list = sorted(train_df['prd_number'].unique().tolist())
+item_list = sorted(train_w_meta['series_title'].unique().tolist())
 
 # user and item mappings
 user_mapping = {user: i for i, user in enumerate(user_list)}
-item_mapping = {i: item for i, item in enumerate(item_list)}
+show_mapping = {i: item for i, item in enumerate(item_list)}
 
-# LightFM model
-cf_model = LightFM(loss="logistic", 
-                   no_components=N_COMPONENTS, 
-                   random_state=RANDOM_STATE)
+# values for no_components to test
+n_components_values = [10, 20, 30, 40, 50, 60, 70, 80]
 
-# initializing recommendations
-prev_recommendations = ["0" for _ in range(n_users * N_RECOMMENDATIONS)]
+for n_components in n_components_values:
+    # initializing LightFM model
+    cf_model = LightFM(loss="logistic", 
+                       no_components=n_components, 
+                       random_state=RANDOM_STATE)
 
-for epoch in tqdm(range(N_EPOCHS)):
-    print("\n Epoch", epoch + 1)
+    prev_ndcg = 0
 
-    # fitting the model
-    cf_model.fit_partial(interaction_matrix)
+    for epoch in tqdm(range(N_EPOCHS)):
+        print("\n Epoch", epoch + 1)
 
-    # getting the top N recommendations for all users
-    recommendations = utils.get_top_n_recommendations_all_users(model=cf_model, 
-                                                                interaction_matrix=interaction_matrix, 
-                                                                user_list=user_list, 
-                                                                item_mapping=item_mapping, 
-                                                                n=N_RECOMMENDATIONS)
-    
-    # computing the proportion of changed recommendations
-    diff_percentage = utils.compare_lists(prev_recommendations, recommendations)
-    print(f"{diff_percentage*100:.2f}% of the recommendations changed.", )
+        # fitting the model
+        cf_model.fit_partial(interaction_matrix)
 
-    # stopping if less than <EPSILON> of the recommendations are changing
-    if diff_percentage < EPSILON:
-        print("Stopping early")
-        print("Extracting recommendations")
-        recs_dict = utils.extract_recommendations(recommendations=recommendations,
-                                                  user_mapping=user_mapping,
-                                                  n_recs=N_RECOMMENDATIONS,
-                                                  recommendations_key=RECOMMENDATIONS_KEY_CF)
-        print("Saving recommendations")
-        utils.save_dict_to_json(data_dict=recs_dict,
-                                file_path=RECOMMENDATIONS_PATH)
-        break
+        # getting the top N recommendations for all users
+        show_recs = utils.get_top_n_recommendations_all_users(model=cf_model, 
+                                                              interaction_matrix=interaction_matrix, 
+                                                              user_list=user_list, 
+                                                              item_mapping=show_mapping, 
+                                                              n=N_RECOMMENDATIONS)
+        
+        # stopping if less than <EPSILON> of the recommendations are changing
+        if ndcg < prev_ndcg:
+            print("Stopping early")
+            print("Extracting recommendations")
+            recs_dict = utils.extract_recommendations(recommendations=show_mapping,
+                                                    user_mapping=user_mapping,
+                                                    n_recs=N_RECOMMENDATIONS,
+                                                    recommendations_key=RECOMMENDATIONS_KEY_CF)
+            print("Saving recommendations")
+            utils.save_dict_to_json(data_dict=recs_dict,
+                                    file_path=RECOMMENDATIONS_PATH)
+            break
 
-    prev_recommendations = recommendations
+        prev_ndcg = ndcg
