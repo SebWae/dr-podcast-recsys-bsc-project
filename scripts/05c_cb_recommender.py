@@ -29,7 +29,7 @@ from config import (
     RECOMMENDATIONS_KEY_CB_DESCR,
     RECOMMENDATIONS_KEY_CB_TITLE
 )
-import utils
+import utils.utils as utils
 
 # loading train data
 train_df = pd.read_parquet(TRAIN_DATA_PATH)

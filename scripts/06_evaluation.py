@@ -18,7 +18,7 @@ from config import (
     USER_EVAL_PATH,
     RECOMMENDER_EVAL_PATH,
 )
-import utils
+import utils.utils as utils
 
 
 # importing training data
