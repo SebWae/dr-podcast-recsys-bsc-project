@@ -10,41 +10,59 @@ from tqdm import tqdm
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 from config import (
-    TRANSFORMED_DATA_PATH,
+    TRAIN_DATA_PATH,
     TEST_DATA_PATH,
+    METADATA_PATH,
+    SPLIT_DATE_VAL_TEST,
     USER_EVAL_PATH,
     RECOMMENDER_EVAL_PATH,
 )
 import utils
 
 # the baseline recommender is being implemented differently from the other recommenders
-# recommends the 10 most listened episodes for all users
+# identifies the 10 most listened shows in the training data 
+# recommends the first episode in the test set of the top 10 shows
+# if a show has not published any episodes in the test period, the newest episode overall will be recommended 
 # since the recommendations are identical for every user, there is no need to store them
 # thus, the baseline recommender will be evaluated directly in this script
 
-# loading the transformed data
-transformed_df = pd.read_parquet(TRANSFORMED_DATA_PATH)
-
-# loading the test data
+# loading train, test and metadata
+train_df = pd.read_parquet(TRAIN_DATA_PATH)
 test_df = pd.read_parquet(TEST_DATA_PATH)
+meta_df = pd.read_parquet(METADATA_PATH)
 
-# finding the most popular episodes
-episode_counts = transformed_df.groupby("prd_number").size().reset_index(name="count")
-top_10_episodes = episode_counts.nlargest(10, "count")["prd_number"].tolist()
+# left joining the metadata onto the train data
+train_w_meta = pd.merge(train_df, meta_df, on="prd_number", how="left")
 
+# identifying the top 10 shows
+show_counts = train_w_meta.groupby("series_title").size().reset_index(name="count")
+top_10_shows = show_counts.nlargest(10, "count")["series_title"].tolist()
+
+# finding most recent episode for each top 10 show after val-test split date
+recommendations = []
+for show in top_10_shows:
+    show_filtered = meta_df[(meta_df["series_title"] == show) & (meta_df["pub_date"] >= SPLIT_DATE_VAL_TEST)]
+    shows_after_split_date = len(show_filtered)
+
+    if shows_after_split_date == 0:
+        show_filtered = meta_df[meta_df["series_title"] == show]
+
+    show_filtered_sorted = show_filtered.sort_values(by="pub_date")
+    first_prd_number = show_filtered_sorted.iloc[0]["prd_number"]
+    recommendations.append(first_prd_number)
+
+# iterating through the rows of the test_df to build dictionary of completion rates
 completion_rate_dict = {}
 
-# iterating through the rows of the test_df to build the dictionary
 for _, row in test_df.iterrows():
     user = row['user_id']
     prd = row['prd_number']
     completion_rate = row['completion_rate']
     
-    # If the user_id is not already in the dictionary, add it with an empty dictionary
+    # adding new users with an empty dictionary
     if user not in completion_rate_dict:
         completion_rate_dict[user] = {}
     
-    # Add the prd_number and completion_rate to the user's dictionary
     completion_rate_dict[user][prd] = completion_rate
 
 # dictionaries to store evaluation metrics for each recommender
@@ -60,7 +78,7 @@ for level in tqdm(eval_levels):
     ndcg_dict = hit_dict.copy()
 
     # number of recommendations according to level
-    recs = top_10_episodes[:level]
+    recs = recommendations[:level]
 
     for user_id, gain_dict in completion_rate_dict.items():
         # computing hit-rate (binary) for each user
