@@ -10,6 +10,6 @@ import json
 # Load the JSON file
 with open("utils/utils.json", "r") as file:
     data = json.load(file)
-show_episode_dict = data["show_episodes_dict"]
+show_episode_dict = data["show_episodes"]
 
 print(show_episode_dict["Genvej"])
