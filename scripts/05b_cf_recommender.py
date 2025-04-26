@@ -1,3 +1,4 @@
+import csv
 import os
 import sys
 
@@ -14,8 +15,9 @@ from config import (
     VAL_DATA_PATH,
     METADATA_PATH,
     RANDOM_STATE,
-    N_RECOMMENDATIONS,
     N_EPOCHS,
+    EXPERIMENTS_CF_PATH,
+    N_RECOMMENDATIONS,
     RECOMMENDATIONS_KEY_CF,
     RECOMMENDATIONS_PATH,
 )
@@ -23,6 +25,7 @@ import utils.utils as utils
 
 
 # loading train, validation and metadata
+print("Loading data.")
 train_df = pd.read_parquet(TRAIN_DATA_PATH)
 val_df = pd.read_parquet(VAL_DATA_PATH)
 meta_df = pd.read_parquet(METADATA_PATH)
@@ -31,6 +34,7 @@ meta_df = pd.read_parquet(METADATA_PATH)
 train_w_meta = pd.merge(train_df, meta_df, on="prd_number", how="left")
 
 # grouping by user_id and series_title
+print("Constructing user-show interaction matrix.")
 grouped_df = train_w_meta.groupby(["user_id", "series_title"]).agg(
     avg_completion_rate =   ("completion_rate", "mean"),
     n_episodes =            ("prd_number", "count")
@@ -45,41 +49,34 @@ interaction_matrix = utils.prep_interaction_matrix(df=grouped_df,
                                                    item_col="series_title", 
                                                    rating_col="cf_rating")
 
-# grouping by user_id and series_title, and getting the prd_number with the most recent pub_date
-most_recent_prd = (train_w_meta.sort_values(by="pub_date", ascending=False)
-                   .groupby(["user_id", "series_title"])
-                   .first()["prd_number"]
-                   .reset_index()
-                   )
-
-# creating a dictionary to retrieve the most recent episode per show per user
-most_recent_episode_dict = {}
-for _, row in most_recent_prd.iterrows():
-    user_id = row["user_id"]
-    series_title = row["series_title"]
-    prd_number = row["prd_number"]
-    
-    if user_id not in most_recent_episode_dict:
-        most_recent_episode_dict[user_id] = {}
-    most_recent_episode_dict[user_id][series_title] = prd_number
-
 # list of users and items
 user_list = sorted(train_df['user_id'].unique().tolist())
 item_list = sorted(train_w_meta['series_title'].unique().tolist())
+all_items = meta_df["prd_number"].unique()
 
 # user and item mappings
 user_mapping = {user: i for i, user in enumerate(user_list)}
 show_mapping = {i: item for i, item in enumerate(item_list)}
 
+# dictionary containing completion rates for each user and consumed item in the validation data
+completion_rates_dict = utils.get_ratings_dict(data=val_df, 
+                                               user_col="user_id", 
+                                               item_col="prd_number", 
+                                               ratings_col="completion_rate") 
+
 # values for no_components to test
 n_components_values = [10, 20, 30, 40, 50, 60, 70, 80]
 
+# performing hyperparameter experiments for cf recommender
+print("Performing hyperparameter experiments.")
+print(f"Values for n_components to test: {n_components_values}")
+
 for n_components in n_components_values:
+    print(f"n_components: {n_components}")
     # initializing LightFM model
     cf_model = LightFM(loss="logistic", 
                        no_components=n_components, 
                        random_state=RANDOM_STATE)
-
     prev_ndcg = 0
 
     for epoch in tqdm(range(N_EPOCHS)):
@@ -88,23 +85,45 @@ for n_components in n_components_values:
         # fitting the model
         cf_model.fit_partial(interaction_matrix)
 
-        # getting the top N recommendations for all users
-        show_recs = utils.get_top_n_recommendations_all_users(model=cf_model, 
-                                                              interaction_matrix=interaction_matrix, 
-                                                              user_list=user_list, 
-                                                              item_mapping=show_mapping)
+        # getting scores for each item for each user
+        episode_scores = utils.get_scores_all_items(model=cf_model, 
+                                                    interaction_matrix=interaction_matrix, 
+                                                    user_mapping=user_mapping, 
+                                                    item_mapping=show_mapping,
+                                                    item_list=all_items)
         
-        # stopping if less than <EPSILON> of the recommendations are changing
+        recs_dict = utils.extract_recs(scores_dict=episode_scores,
+                                       n_recs=10)
+
+        # computing ndcg@10
+        ndcgs = []
+        for user_id, rec_items in recs_dict.items():
+            gain_dict = completion_rates_dict[user_id]
+            optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)
+            dcg = utils.compute_dcg(rec_items, gain_dict)
+            dcg_star = utils.compute_dcg(optimal_items, gain_dict)
+            ndcg_user = dcg / dcg_star 
+            ndcgs.append(ndcg_user)
+
+        ndcg = np.mean(ndcgs)
+        print(f"ndcg@10: {ndcg:.4f}")
+
+        # stopping if ndcg@10 decreases compared to previous epoch 
         if ndcg < prev_ndcg:
-            print("Stopping early")
-            print("Extracting recommendations")
-            recs_dict = utils.extract_recommendations(recommendations=show_mapping,
-                                                    user_mapping=user_mapping,
-                                                    n_recs=N_RECOMMENDATIONS,
-                                                    recommendations_key=RECOMMENDATIONS_KEY_CF)
-            print("Saving recommendations")
-            utils.save_dict_to_json(data_dict=recs_dict,
-                                    file_path=RECOMMENDATIONS_PATH)
+            print("ndcg@10 has decreased.")
+            print("Stopping early.")
+            print(f"Saving experiment results to {EXPERIMENTS_CF_PATH}.")
+
+            # writing row to csv
+            row = [n_components, ndcg]
+
+            with open(EXPERIMENTS_CF_PATH, mode="a", newline="") as file:
+                writer = csv.writer(file)
+                writer.writerow(row)
+
             break
 
         prev_ndcg = ndcg
+
+# training the actual cf recommender with the chosen value for n_components and saving the final recommendations
+
