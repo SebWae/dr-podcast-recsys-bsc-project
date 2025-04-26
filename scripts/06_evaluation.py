@@ -65,7 +65,7 @@ for recommender in tqdm(RECOMMENDERS):
 
             # computing NDCG for each user
             gain_dict = completion_rate_dict[user_id]
-            optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)
+            optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)[:level]
             dcg = utils.compute_dcg(rec_items, gain_dict)
             dcg_star = utils.compute_dcg(optimal_items, gain_dict)
             ndcg = dcg / dcg_star 
