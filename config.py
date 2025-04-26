@@ -57,10 +57,14 @@ VAL_DATA_PATH = "data\podcast_data_val.parquet"
 
 
 # for implementing recommenders
+DAMPING = 5
 EXPERIMENTS_CF_PATH = "results/cf_experiments.csv"
 EXPERIMENTS_HYBRID_PATH = "results/hybrid_experiments.csv"
+N_COMPONENTS = 60
 N_EPOCHS = 1000
 N_RECOMMENDATIONS = 10
+OPTIMAL_CF_PATH = "results/cf_optimal.csv"
+OPTIMAL_HYBRID_PATH = "results/hybrid_optimal.csv"
 RANDOM_STATE = 250500
 RECOMMENDATIONS_KEY_CB_COMBI = "cb_recommendations_combi"
 RECOMMENDATIONS_KEY_CB_DESCR = "cb_recommendations_descr"
@@ -69,6 +73,7 @@ RECOMMENDATIONS_KEY_CF = "cf_recommendations"
 RECOMMENDATIONS_KEY_HYBRID = "hybrid_recommendations"
 RECOMMENDATIONS_PATH = "results/recommendations.json"
 RECOMMENDERS = ["cf_recommendations", "hybrid_recommendations"]
+REG = 0.05
 
 
 # for evaluation
