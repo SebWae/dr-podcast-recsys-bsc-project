@@ -70,10 +70,10 @@ reg_values = [0.01, 0.05, 0.1]
 print("Performing initial hyperparameter experiments.")
 print(f"Testing values: n_components={n_components_values}, damping={damping_values}, reg={reg_values}")
 
-for n_components, damping, reg in product(n_components_values, damping_values, reg_values):
+for n_components, damping, reg in tqdm(list(product(n_components_values, damping_values, reg_values))):
     print(f"\nTesting combination: features={n_components}, damping={damping}, reg={reg}")
     prev_ndcg = 0
-    for epochs in tqdm(range(1, N_EPOCHS+1)):
+    for epochs in range(1, N_EPOCHS+1):
         print(f"\n Epoch {epochs}:")
 
         # initializing BiasedMF model
@@ -130,10 +130,10 @@ reg_values = [0.025, 0.05, 0.075]
 print("Performing enhanced hyperparameter experiments.")
 print(f"Testing values: n_components={n_components_values}, damping={damping_values}, reg={reg_values}")
 
-for n_components, damping, reg in product(n_components_values, damping_values, reg_values):
+for n_components, damping, reg in tqdm(list(product(n_components_values, damping_values, reg_values))):
     print(f"\nTesting combination: features={n_components}, damping={damping}, reg={reg}")
     prev_ndcg = 0
-    for epochs in tqdm(range(1, N_EPOCHS+1)):
+    for epochs in range(1, N_EPOCHS+1):
         print(f"\n Epoch {epochs}:")
 
         # initializing BiasedMF model
