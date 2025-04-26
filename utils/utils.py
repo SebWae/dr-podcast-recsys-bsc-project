@@ -138,24 +138,27 @@ def format_embedding_dict(emb_dict: dict) -> dict:
 
     return formatted_dict
 
+
 def get_scores_all_items(model: LightFM, 
                          interaction_matrix: csr_matrix, 
                          user_mapping: dict,
-                         item_mapping: dict) -> list:
+                         item_mapping: dict,
+                         item_list: list) -> list:
     """
-    Retrieves the top N recommendations for all users.
+    Retrieves a dictionary containing scores for every item for each user.
 
     Parameters:
     - model:                Trained LightFM model.  
     - interaction_matrix:   Sparse matrix of interactions in scr format.
     - user_mapping:         Mapping of user IDs to indices 
     - item_mapping:         Mapping of item indices to item IDs.
+    - item_list:            List of all items possible to recommend. 
 
     Returns:
     - scores_dict:          Dictionary of scores for each episode for each user.
     """
     users = user_mapping.keys()
-    scores_dict = {user_id: {prd_number: 0 for prd_number in item_mapping.values()} for user_id in users}
+    scores_dict = {user_id: {item: 0 for item in item_list} for user_id in users}
 
     # loading utils dictionaries
     with open("UTILS_PATH", "r") as file:
@@ -180,25 +183,32 @@ def get_scores_all_items(model: LightFM,
         user_dict = user_show_episodes_dict[user_id]
 
         for i, score in enumerate(scores):
+            # name of show and its episodes in publication order
             item_id = item_mapping[i]
             episodes = show_episodes_dict[item_id]
-            n_episodes = len(episodes)
 
+            # checking if user has listened to some episodes in show
             if item_id in user_dict:
                 listened_episodes = user_dict[item_id]
-                most_recent_episode = listened_episodes[-1]
-                most_recent_episode_index = episodes.index(most_recent_episode)
-            
-                if most_recent_episode_index == n_episodes - 1:
+                last_episode_user = listened_episodes[-1]
+                last_episode_show = episodes[-1]
+
+                # checking if user has listened to the most recent episode in show
+                if last_episode_user == last_episode_show:
                     episodes_not_listened = sorted(set(episodes) - set(listened_episodes))
                     n_episodes_not_listened = len(episodes_not_listened)
 
+                    # recommending the newest episode the user has not listened to
+                    # keep the score at 0 for all episodes in show if user has listened to all episodes published
                     if n_episodes_not_listened > 0:
                         prd_to_recommend = episodes_not_listened[-1]
-        
+
+                # recommending the next episode if new episodes are available
                 else:
+                    most_recent_episode_index = episodes.index(last_episode_user)
                     prd_to_recommend = episodes[most_recent_episode_index + 1]
             
+            # recommending the first episode of show if user has not listened to any episodes in show
             else:
                 prd_to_recommend = episodes[0]
             
