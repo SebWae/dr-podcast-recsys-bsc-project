@@ -81,37 +81,34 @@ def compute_diversity(recommendations: list,
     return avg_diversity
 
 
-def extract_recommendations(recommendations: list,
-                            user_mapping: dict, 
-                            n_recs: int,
-                            recommendations_key: str) -> dict:
+def extract_recs(score_dict: dict,
+                 n_recs: int) -> dict:
     """
-    Extracts recommendations for each user from the list of recommendations.
+    Extracts recommendations for each user from a dictionary of scores.
 
     Parameters:
-    - recommendations:      List of recommended items.
-    - user_mapping:         Dictionary mapping user IDs to indices.
-    - n_recs:               Number of recommendations per user.
-    - recommendations_key:  Key for the recommendations in the final dictionary.
+    - score_dict:   Dictionary of scores for each item for each user.
+    - n_recs:       Number of recommendations per user.
 
     Returns:
-    - final_dict:           Final dictionary containing recommendations for each user.
+    - recs_dict:    Final dictionary containing recommendations for each user.
     """
-    # initializing dictionary to hold recommendations for each user
-    recommendations_dict = {user_id: [] for user_id in user_mapping.keys()}
-    n_users = len(user_mapping)
+    users = score_dict.keys()
+    recs_dict = {}
 
-    # extracting recommendations for each user
-    for i in range(n_users):
-        for j in range(n_recs):
-            rec = recommendations[i * n_recs + j]
-            user_id = list(user_mapping.keys())[i]
-            recommendations_dict[user_id].append(rec)
-    
-    # creating final dictionary
-    final_dict = {recommendations_key: recommendations_dict}
+    for user in users:
+        scores = score_dict[user]
 
-    return final_dict
+        # sorting score dict by the scores in descending order
+        sorted_dict = dict(sorted(scores.items(), key=lambda item: item[1], reverse=True))
+        
+        # retrieving top n_recs items
+        recs = list(sorted_dict.keys())[:n_recs]
+
+        # saving recs to recs_dict with user as key
+        recs_dict[user] = recs
+
+    return recs_dict
 
 
 def format_embedding_dict(emb_dict: dict) -> dict:
