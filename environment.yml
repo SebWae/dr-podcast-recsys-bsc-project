@@ -9,6 +9,7 @@ dependencies:
   - aiohappyeyeballs=2.4.4=py310haa95532_0
   - aiohttp=3.11.10=py310h827c3e9_0
   - aiosignal=1.2.0=pyhd3eb1b0_0
+  - anyconfig=0.14.0=pyhd8ed1ab_0
   - arrow-cpp=19.0.0=h33d5241_2
   - async-timeout=5.0.1=py310haa95532_0
   - aws-c-auth=0.6.19=h2bbff1b_0
@@ -24,7 +25,9 @@ dependencies:
   - aws-checksums=0.1.13=h2bbff1b_0
   - aws-crt-cpp=0.18.16=hd77b12b_0
   - aws-sdk-cpp=1.11.212=h6a15179_0
+  - binpickle=0.3.4=pyhd8ed1ab_3
   - blas=1.0=mkl
+  - blosc=1.21.3=h6c2663c_0
   - boost-cpp=1.82.0=h59b6b97_2
   - bottleneck=1.4.2=py310hc99e966_0
   - brotli-python=1.0.9=py310h00ffb61_8
@@ -37,6 +40,7 @@ dependencies:
   - colorama=0.4.6=py310haa95532_0
   - contourpy=1.3.1=py310h214f63a_0
   - cramjam=2.9.1=py310haa69e8e_0
+  - csr=0.4.1=py310h9592aba_3
   - cycler=0.11.0=pyhd3eb1b0_0
   - datasets=3.3.2=py310haa95532_0
   - deprecated=1.2.13=py310haa95532_0
@@ -65,6 +69,7 @@ dependencies:
   - kiwisolver=1.4.8=py310h5da7b33_0
   - krb5=1.20.1=h5b6d351_0
   - lcms2=2.16=h62be587_1
+  - lenskit=0.14.4=pyhd8ed1ab_2
   - lerc=4.0.0=h5da7b33_0
   - libabseil=20250127.0=cxx17_h52369b4_0
   - libblas=3.9.0=1_h8933c1f_netlib
@@ -93,6 +98,7 @@ dependencies:
   - libwebp-base=1.3.2=h3d04722_1
   - libxml2=2.13.7=h866ff63_0
   - lightfm=1.17=py310h9b08ddd_2
+  - llvmlite=0.42.0=py310hf2fb9eb_0
   - lz4-c=1.9.4=hcfcfb64_0
   - m2w64-gcc-libgfortran=5.3.0=6
   - m2w64-gcc-libs=5.3.0=7
@@ -107,11 +113,14 @@ dependencies:
   - mpc=1.3.1=h827c3e9_0
   - mpfr=4.2.1=h56c3642_0
   - mpmath=1.3.0=py310haa95532_0
+  - msgpack-python=1.0.3=py310h59b6b97_0
   - msys2-conda-epoch=20160418=1
   - multidict=6.1.0=py310h827c3e9_0
   - multiprocess=0.70.15=py310haa95532_0
   - networkx=3.4.2=py310haa95532_0
   - nltk=3.9.1=py310haa95532_0
+  - numba=0.59.1=py310hd77b12b_0
+  - numcodecs=0.12.1=py310h3469f8a_0
   - numexpr=2.10.1=py310h4cd664f_0
   - numpy=1.24.3=py310hd02465a_0
   - openjpeg=2.5.2=h9b5d1b5_1
@@ -134,6 +143,7 @@ dependencies:
   - pyqt6-sip=13.9.1=py310h827c3e9_1
   - pysocks=1.7.1=pyh09c184e_7
   - python=3.10.16=h4607a30_1
+  - python-blosc=1.10.6=py310h4ed8f06_0
   - python-dateutil=2.9.0post0=py310haa95532_2
   - python-tzdata=2023.3=pyhd3eb1b0_0
   - python-xxhash=3.5.0=py310h827c3e9_0
@@ -152,6 +162,7 @@ dependencies:
   - safetensors=0.5.3=py310haa69e8e_0
   - scikit-learn=1.6.1=py310h585ebfc_0
   - scipy=1.10.1=py310h578b7cb_0
+  - seedbank=0.1.3=pyhd8ed1ab_0
   - sentence-transformers=4.1.0=pyhd8ed1ab_0
   - setuptools=75.8.0=py310haa95532_0
   - sip=6.10.0=py310h5da7b33_0
