@@ -81,23 +81,23 @@ def compute_diversity(recommendations: list,
     return avg_diversity
 
 
-def extract_recs(score_dict: dict,
+def extract_recs(scores_dict: dict,
                  n_recs: int) -> dict:
     """
     Extracts recommendations for each user from a dictionary of scores.
 
     Parameters:
-    - score_dict:   Dictionary of scores for each item for each user.
+    - scores_dict:   Dictionary of scores for each item for each user.
     - n_recs:       Number of recommendations per user.
 
     Returns:
     - recs_dict:    Final dictionary containing recommendations for each user.
     """
-    users = score_dict.keys()
+    users = scores_dict.keys()
     recs_dict = {}
 
     for user in users:
-        scores = score_dict[user]
+        scores = scores_dict[user]
 
         # sorting score dict by the scores in descending order
         sorted_dict = dict(sorted(scores.items(), key=lambda item: item[1], reverse=True))
