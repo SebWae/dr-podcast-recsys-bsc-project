@@ -57,6 +57,8 @@ VAL_DATA_PATH = "data\podcast_data_val.parquet"
 
 
 # for implementing recommenders
+EXPERIMENTS_CF_PATH = "results/cf_experiments.csv"
+EXPERIMENTS_HYBRID_PATH = "results/hybrid_experiments.csv"
 N_EPOCHS = 1000
 N_RECOMMENDATIONS = 10
 RANDOM_STATE = 250500
