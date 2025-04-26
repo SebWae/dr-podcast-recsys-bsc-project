@@ -1,3 +1,4 @@
+from collections import defaultdict
 import itertools
 import json
 import os
@@ -118,7 +119,7 @@ def format_embedding_dict(emb_dict: dict) -> dict:
     Parameters:
     - emb_dict:         Dictionary in the format {"id1": [embedding1], "id2": [embedding2], ...}
 
-    Returnes:
+    Returns:
     - reshaped_dict:    Dictionary in the format {"episodes": ["id1", "id2", ...], "feature1": [x_11, x_21, ...], "feature2": [x_12, x_22, ...], ...}
     """
     # input dict as dataframe
@@ -134,6 +135,36 @@ def format_embedding_dict(emb_dict: dict) -> dict:
     formatted_dict = reshaped_df.to_dict(orient="list")
 
     return formatted_dict
+
+
+def get_ratings_dict(data: pd.DataFrame,
+                     user_col: str,
+                     item_col: str,
+                     ratings_col: str) -> dict:
+    """
+    Constructs a dictionary of completion rates for every user and the items they have consumed.
+
+    Parameters:
+    - data: Dataframe containing the rated user-item interactions.
+    - user_col:         Name of the user column in the dataframe.
+    - item_col:         Name of the item column in the dataframe.
+    - ratings_col:      Name of the ratings column in the dataframe.
+
+    Returns:
+    - ratings_dict:     Dictionary containing ratings for rated items for each user.
+    """
+    ratings_dict = defaultdict(dict)
+
+    # iterating through the rows of the data to build the dictionary
+    for _, row in data.iterrows():
+        user = row[user_col]
+        prd = row[item_col]
+        completion_rate = row[ratings_col]
+        
+        # adding the rating to the dictionary
+        ratings_dict[user][prd] = completion_rate
+    
+    return ratings_dict
 
 
 def get_scores_all_items(model: LightFM, 
@@ -158,7 +189,7 @@ def get_scores_all_items(model: LightFM,
     scores_dict = {user_id: {item: 0 for item in item_list} for user_id in users}
 
     # loading utils dictionaries
-    with open("UTILS_PATH", "r") as file:
+    with open(UTILS_PATH, "r") as file:
         utils_dicts = json.load(file)
 
     # extracting dictionaries
