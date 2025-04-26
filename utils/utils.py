@@ -5,6 +5,7 @@ import os
 import sys
 from typing import Tuple
 
+from lenskit.algorithms.als import BiasedMF
 from lightfm import LightFM
 import numpy as np
 import pandas as pd
@@ -167,26 +168,24 @@ def get_ratings_dict(data: pd.DataFrame,
     return ratings_dict
 
 
-def get_scores_all_items(model: LightFM, 
-                         interaction_matrix: csr_matrix, 
-                         user_mapping: dict,
-                         item_mapping: dict,
-                         item_list: list) -> list:
+def get_cf_scores(model: BiasedMF, 
+                  items: list,
+                  users: list,
+                  item_mapping: dict) -> list:
     """
-    Retrieves a dictionary containing scores for every item for each user.
+    Retrieves a dictionary containing scores for relevant items for each user.
 
     Parameters:
-    - model:                Trained LightFM model.  
-    - interaction_matrix:   Sparse matrix of interactions in scr format.
-    - user_mapping:         Mapping of user IDs to indices 
-    - item_mapping:         Mapping of item indices to item IDs.
-    - item_list:            List of all items possible to recommend. 
+    - model:            Fitted BiasedMF model from lenskit.algorithms.als.  
+    - items:            List of items available for recommendation.
+    - users:            List of users to generate recommendations for. 
+    - item_mapping:     Mapping of item indices to item IDs.
 
     Returns:
-    - scores_dict:          Dictionary of scores for each episode for each user.
+    - scores_dict:      Dictionary of scores for relevant episodes for each user.
     """
-    users = user_mapping.keys()
-    scores_dict = {user_id: {item: 0 for item in item_list} for user_id in users}
+    # users = user_mapping.keys()
+    scores_dict = defaultdict(dict)
 
     # loading utils dictionaries
     with open(UTILS_PATH, "r") as file:
@@ -196,19 +195,16 @@ def get_scores_all_items(model: LightFM,
     show_episodes_dict = utils_dicts["show_episodes"]
     user_show_episodes_dict = utils_dicts["user_show_episodes"]
 
-    for user_id in users:
-        # retrieving the index for user_id
-        user_idx = user_mapping[user_id]
-
-        # retrieving scores for each show
-        scores = model.predict(user_idx, np.arange(interaction_matrix.shape[1]))
-        
+    for user in users:
+        # retrieving scores for user
+        scores = model.predict_for_user(user, items)
+       
         # normalizing the scores
         norm = np.linalg.norm(scores)
         scores = (np.array(scores) / norm).tolist()
 
         # dictionary of episodes user has listened to for each show
-        user_dict = user_show_episodes_dict[user_id]
+        user_dict = user_show_episodes_dict[user]
 
         for i, score in enumerate(scores):
             # name of show and its episodes in publication order
@@ -240,7 +236,7 @@ def get_scores_all_items(model: LightFM,
             else:
                 prd_to_recommend = episodes[0]
             
-            scores_dict[user_id][prd_to_recommend] = score
+            scores_dict[user][prd_to_recommend] = score
 
     return scores_dict
 
