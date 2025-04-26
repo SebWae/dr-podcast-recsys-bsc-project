@@ -31,20 +31,10 @@ test_df = pd.read_parquet(TEST_DATA_PATH)
 with open(RECOMMENDATIONS_PATH, "r") as file:
     data = json.load(file)
 
-completion_rate_dict = {}
-
-# iterating through the rows of the test_df to build the dictionary
-for _, row in test_df.iterrows():
-    user = row['user_id']
-    prd = row['prd_number']
-    completion_rate = row['completion_rate']
-    
-    # If the user_id is not already in the dictionary, add it with an empty dictionary
-    if user not in completion_rate_dict:
-        completion_rate_dict[user] = {}
-    
-    # Add the prd_number and completion_rate to the user's dictionary
-    completion_rate_dict[user][prd] = completion_rate
+completion_rate_dict = utils.get_ratings_dict(data=test_df,
+                                              user_col="user_id",
+                                              item_col="prd_number",
+                                              ratings_col="completion_rate")
 
 for recommender in tqdm(RECOMMENDERS):
     # retrieving relevant recommendations
