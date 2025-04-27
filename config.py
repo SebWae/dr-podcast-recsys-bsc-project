@@ -47,6 +47,7 @@ UTILS_PATH = "utils/utils.json"
 
 # for train-test splitting
 COLUMNS_TO_KEEP = ["user_id", "prd_number", "completion_rate"]
+COLUMNS_TO_KEEP_TRAIN = ["user_id", "prd_number", "date", "completion_rate"]
 MIN_PLAYS_PER_USER = 2
 MIN_USERS_PER_SHOW = 10
 SPLIT_DATE_TRAIN_VAL = "2024-10-21"
@@ -58,6 +59,7 @@ VAL_DATA_PATH = "data\podcast_data_val.parquet"
 
 # for implementing recommenders
 DAMPING = 5
+EMBEDDING_DIM = 384
 EXPERIMENTS_CF_PATH = "results/cf_experiments.csv"
 EXPERIMENTS_HYBRID_PATH = "results/hybrid_experiments.csv"
 N_COMPONENTS = 60
