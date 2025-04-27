@@ -22,7 +22,6 @@ VAR_RENAME_DICT = {"Date:Time (evar16)":           "date_time",
                    "Content Time Spent (revent1)": "content_time_spent",
                    }
 
-
 # for extracting metadata, embeddings and utils
 DESCRIPTION_VAR_RENAME_DICT = {"PRD_NUMBER":       "prd_number",
                                "PRD_SHORTDESCR":   "episode_description",
@@ -44,7 +43,6 @@ METADATA_COLUMNS = {"series_title":         "first",
 METADATA_PATH = "data\episode_metadata.parquet"
 UTILS_PATH = "utils/utils.json"
 
-
 # for train-test splitting
 COLUMNS_TO_KEEP = ["user_id", "prd_number", "completion_rate"]
 COLUMNS_TO_KEEP_TRAIN = ["user_id", "prd_number", "date", "completion_rate"]
@@ -55,7 +53,6 @@ SPLIT_DATE_VAL_TEST = "2024-11-11"
 TEST_DATA_PATH = "data\podcast_data_test.parquet"
 TRAIN_DATA_PATH = "data\podcast_data_train.parquet"
 VAL_DATA_PATH = "data\podcast_data_val.parquet"
-
 
 # for implementing recommenders
 DAMPING = 5
@@ -76,7 +73,7 @@ RECOMMENDATIONS_KEY_HYBRID = "hybrid_recommendations"
 RECOMMENDATIONS_PATH = "results/recommendations.json"
 RECOMMENDERS = ["cf_recommendations", "hybrid_recommendations"]
 REG = 0.05
-
+SCORES_PATH = "results/scores.json"
 
 # for evaluation
 EVALUATION_METRICS = ["hit_rate", "ndcg"]
