@@ -1,13 +1,12 @@
-# TODO: remove stopwords from episode descriptions and apply stemming
-# TODO: create embeddings for various level of metadata and weighting schemes
-
+from collections import defaultdict
+from datetime import datetime
+import json
 import os
 import sys
 
-from lightfm import LightFM
 import numpy as np
 import pandas as pd
-from scipy.sparse import csr_matrix, hstack
+from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
 
 # adding the parent directory to the Python path
@@ -15,113 +14,120 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 from config import (
     TRAIN_DATA_PATH,
-    TEST_DATA_PATH,
-    N_COMPONENTS,
-    RANDOM_STATE,
-    N_RECOMMENDATIONS,
-    N_EPOCHS,
-    EPSILON,
-    RECOMMENDATIONS_PATH,
+    METADATA_PATH,
     EMBEDDINGS_TITLE_PATH,
     EMBEDDINGS_DESCR_PATH,
     EMBEDDINGS_COMBI_PATH,
+    UTILS_PATH,
+    SPLIT_DATE_TRAIN_VAL,
+    EMBEDDING_DIM,
     RECOMMENDATIONS_KEY_CB_COMBI,
     RECOMMENDATIONS_KEY_CB_DESCR,
-    RECOMMENDATIONS_KEY_CB_TITLE
+    RECOMMENDATIONS_KEY_CB_TITLE,
+    CB_SCORES_PATH,
+    N_RECOMMENDATIONS,
+    RECOMMENDATIONS_PATH,
 )
 import utils.utils as utils
 
-# loading train data
+
+# loading train and metadata
+print("loading train data, metadata and embeddings.")
 train_df = pd.read_parquet(TRAIN_DATA_PATH)
+meta_df = pd.read_parquet(METADATA_PATH)
 
-# preparing the interaction matrix
-interaction_matrix = utils.prep_interaction_matrix(df=train_df,
-                                                   user_col="user_id",
-                                                   item_col="prd_number",
-                                                   rating_col="completion_rate",
-)
+# loading embeddings
+title_emb_df = pd.read_parquet(EMBEDDINGS_TITLE_PATH)
+descr_emb_df = pd.read_parquet(EMBEDDINGS_DESCR_PATH)
+combi_emb_df = pd.read_parquet(EMBEDDINGS_COMBI_PATH)
 
-# list of users
-user_list = sorted(train_df['user_id'].unique().tolist())
-n_users = len(user_list)
+# list of unique users in train data and unique items in metadata
+users = train_df["user_id"].unique()
+items = meta_df["prd_number"].unique()
 
-# loading test data
-test_df = pd.read_parquet(TEST_DATA_PATH)
+# loading utils dictionaries
+print(f"Loading utils dictionaries from {UTILS_PATH}")
+with open(UTILS_PATH, "r") as file:
+    utils_dicts = json.load(file)
 
-# finding new items
-train_items = set(train_df["prd_number"])
-test_items = set(test_df["prd_number"])
-new_items = test_items.difference(train_items)
-all_items = train_items.union(test_items)
-item_list = sorted(list(all_items))
+all_users_show_episodes_dict = utils_dicts["user_show_episodes"]
 
-# extra matrix of zeros for new items
-zero_matrix = np.zeros((n_users, len(new_items)))
-interaction_matrix_w_zeros = hstack([interaction_matrix, zero_matrix]).tocsr()
+# adding days since train-val split date as a column in the train_df
+print("Computing days since train-val date for each train interaction.")
+reference_date = datetime.strptime(SPLIT_DATE_TRAIN_VAL, "%Y-%m-%d")
+train_df["days_since"] = (reference_date - train_df["date"]).dt.days
 
-# user and item mappings
-user_mapping = {user: i for i, user in enumerate(user_list)}
-item_mapping = {i: item for i, item in enumerate(item_list)}
+# iterating over levels of metadata
+metadata_levels = [(title_emb_df, RECOMMENDATIONS_KEY_CB_TITLE), 
+                   (descr_emb_df, RECOMMENDATIONS_KEY_CB_DESCR), 
+                   (combi_emb_df, RECOMMENDATIONS_KEY_CB_COMBI)]
 
-# LightFM model
-cb_model = LightFM(loss="logistic", 
-                   no_components=N_COMPONENTS, 
-                   random_state=RANDOM_STATE)
+for emb_df, rec_key in tqdm(metadata_levels):
+    # initializing dictionary to store scores for each user
+    scores_dict = defaultdict(dict)
 
-# paths to embedding locations
-emb_paths = [EMBEDDINGS_TITLE_PATH, EMBEDDINGS_DESCR_PATH, EMBEDDINGS_COMBI_PATH]
-cb_keys = [RECOMMENDATIONS_KEY_CB_TITLE, RECOMMENDATIONS_KEY_CB_DESCR, RECOMMENDATIONS_KEY_CB_COMBI]
+    print(f"Generating recommendations for {rec_key}.")
+    # extracting embeddings and storing them in a dictionary
+    emb_dict = {}
+    for _, row in emb_df.iterrows():
+        prd_number = row["episode"]
+        embedding = row[1:].values.flatten()
+        emb_dict[prd_number] = embedding
 
-for path, key in zip(emb_paths, cb_keys):
-    print(f"\n Generating recommendations for {key}:")
-    # initializing recommendations
-    prev_recommendations = ["0" for _ in range(n_users * N_RECOMMENDATIONS)]
-    prev_diff = 0
+    # generate user profiles
+    print("Generating user profile from training data.")
 
-    # loading embeddings
-    emb_df = pd.read_parquet(path)
+    for user in users:
+        # initialize user profile (embedding)
+        user_profile = np.zeros(EMBEDDING_DIM)
 
-    # formatting the emb_df 
-    emb_df = emb_df.rename(columns={"episode": "prd_number"})
-    emb_dict = emb_df.to_dict(orient="list")
-    emb_df_formatted = pd.DataFrame(emb_dict)
+        # filter train_df on user
+        user_interactions = train_df[train_df["user_id"] == user]
 
-    # turning the embedding dataframe into an csr matrix
-    item_matrix = emb_df_formatted.drop(columns='prd_number').values
-    item_matrix_csr = csr_matrix(item_matrix)
+        # days since listened from train-val split date
+        total_days = sum(user_interactions["days_since"])
 
-    for epoch in tqdm(range(N_EPOCHS)):
-        print("\n Epoch", epoch + 1)
+        # computing weights
+        weights = user_interactions["days_since"].to_list()
+        weights = [weight / total_days for weight in weights].reverse()
 
-        # fitting the model
-        cb_model.fit_partial(interactions=interaction_matrix, item_features=item_matrix_csr)
+        for i, row in user_interactions.iterrows():
+            weight = weights[i]
+            prd_number = row["prd_number"]
+            embedding = emb_dict[prd_number]
+            embedding *= weight
+            user_profile += embedding
 
-        # getting the top N recommendations for all users
-        recommendations = utils.get_top_n_recommendations_all_users(model=cb_model, 
-                                                                    interaction_matrix=interaction_matrix, 
-                                                                    user_list=user_list, 
-                                                                    item_mapping=item_mapping, 
-                                                                    n=N_RECOMMENDATIONS,
-                                                                    item_matrix=item_matrix_csr)
+        # initializing dictionary to store user scores
+        user_scores = {}
+
+        # items consumed by user
+        user_show_episodes_dict = all_users_show_episodes_dict[user]
+        user_items = [item for sublist in user_show_episodes_dict.values() for item in sublist]
         
-        # computing the proportion of changed recommendations
-        diff_percentage = utils.compare_lists(prev_recommendations, recommendations)
-        print(f"{diff_percentage*100:.2f}% of the recommendations changed.", )
-
-        # comparing the diff_percentage with the previous epoch
-        change_diff_percentage = abs(diff_percentage - prev_diff)
-
-        # stopping if change_diff_percentage is less than EPSILON
-        if change_diff_percentage < EPSILON:
-            print("Stopping early")
-            print("Extracting recommendations")
-            recs_dict = utils.extract_recommendations(recommendations=recommendations,
-                                                    user_mapping=user_mapping,
-                                                    n_recs=N_RECOMMENDATIONS,
-                                                    recommendations_key=key)
-            print("Saving recommendations")
-            utils.save_dict_to_json(data_dict=recs_dict,
-                                    file_path=RECOMMENDATIONS_PATH)
-            break
+        for item in items:
+            if item in user_items:
+                cos_sim = -1
+            else:
+                embedding = emb_dict[item]
+                cos_sim = cosine_similarity(user_profile, embedding)
+            user_scores[item] = cos_sim
         
-        prev_recommendations = recommendations
+        # normalizing the user scores
+        values = np.array(list(user_scores.values()))
+        norm = np.linalg.norm(values)
+        normalized_user_scores = {key: value / norm for key, value in user_scores.items()}
+        
+        # adding user_scores to scores_dict
+        scores_dict[user] = normalized_user_scores
+
+    # saving scores
+    key_scores_dict = {rec_key: scores_dict}
+    utils.save_dict_to_json(data_dict=key_scores_dict, file_path=CB_SCORES_PATH)
+
+    # extract recommendations from scores
+    recs_dict = utils.extract_recs(scores_dict=scores_dict, n_recs=N_RECOMMENDATIONS)
+
+    # saving recommendations
+    recs_dict_key = {rec_key: recs_dict}
+    utils.save_dict_to_json(data_dict=recs_dict_key, file_path=RECOMMENDATIONS_PATH)
