@@ -39,17 +39,17 @@ Supervisor: Toine Bogers
 │   │
 │   ├── error_analysis.ipynb                <- error analysis of the results
 │   │
-│   ├── podcast_eda.ipynb                   <- main exploratory data analysis (EDA), e.g. summary statistics, distribution of variables, etc.
+│   ├── podcast_eda.ipynb                   <- main exploratory data analysis (EDA)
 │   │
-│   └── split_strategies.ipynb              <- assessing train-test splitting strategies (temporal user split vs. global user split)
+│   └── split_strategies.ipynb              <- assessing train-test splitting strategies
 │
 ├── embeddings                                   
 │   │
-│   ├── combined_embeddings.parquet         <- parquet file containing embeddings based on both episode titles and descriptions
+│   ├── combined_embeddings.parquet         <- embeddings based on both episode titles and descriptions
 │   │
-│   ├── descr_embeddings.parquet            <- parquet file containing embeddings based on episode descriptions
+│   ├── descr_embeddings.parquet            <- embeddings based on episode descriptions
 │   │
-│   └── title_embeddings.parquet            <- parquet file containing embeddings based on episode titles
+│   └── title_embeddings.parquet            <- embeddings based on episode titles
 │
 ├── references                                   
 │   │
