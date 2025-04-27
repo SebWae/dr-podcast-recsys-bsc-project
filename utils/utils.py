@@ -3,7 +3,7 @@ import itertools
 import json
 import os
 import sys
-from typing import Tuple
+from typing import Iterable, Tuple
 
 from lenskit.algorithms.als import BiasedMF
 from lightfm import LightFM
@@ -138,40 +138,10 @@ def format_embedding_dict(emb_dict: dict) -> dict:
     return formatted_dict
 
 
-def get_ratings_dict(data: pd.DataFrame,
-                     user_col: str,
-                     item_col: str,
-                     ratings_col: str) -> dict:
-    """
-    Constructs a dictionary of completion rates for every user and the items they have consumed.
-
-    Parameters:
-    - data: Dataframe containing the rated user-item interactions.
-    - user_col:         Name of the user column in the dataframe.
-    - item_col:         Name of the item column in the dataframe.
-    - ratings_col:      Name of the ratings column in the dataframe.
-
-    Returns:
-    - ratings_dict:     Dictionary containing ratings for rated items for each user.
-    """
-    ratings_dict = defaultdict(dict)
-
-    # iterating through the rows of the data to build the dictionary
-    for _, row in data.iterrows():
-        user = row[user_col]
-        prd = row[item_col]
-        completion_rate = row[ratings_col]
-        
-        # adding the rating to the dictionary
-        ratings_dict[user][prd] = completion_rate
-    
-    return ratings_dict
-
-
 def get_cf_scores(model: BiasedMF, 
                   items: list,
-                  users: list,
-                  item_mapping: dict) -> list:
+                  users: Iterable,
+                  item_mapping: dict) -> dict:
     """
     Retrieves a dictionary containing scores for relevant items for each user.
 
@@ -241,63 +211,84 @@ def get_cf_scores(model: BiasedMF,
     return scores_dict
 
 
-def prep_interaction_matrix(df: pd.DataFrame, 
-                            user_col: str, 
-                            item_col: str, 
-                            rating_col: str) -> csr_matrix:
+def get_hybrid_scores(scores_dict_1: dict,
+                      scores_dict_2: dict,
+                      users: Iterable,
+                      _lambda: int) -> dict:
     """
-    Prepares the interaction matrix from the df.
+    Retrieves a dictionary containing scores for relevant items for each user.
+    The scores are computed as a weighted average of the scores from scores_dict_1 and scores_dict_2.
 
     Parameters:
-    - df:                   Pandas DataFrame containing the data.
-    - user_col:             Column name for users.
-    - item_col:             Column name for items.
-    - rating_col:           Column name for ratings.
+    - scores_dict_1: Dictionary of scores for each item for each user from the first recommender.
+    - scores_dict_2: Dictionary of scores for each item for each user from the second recommender.
+    - users: Iterable containing all users.
+    - _lambda: Parameter controlling the weighting of scores with weights _lambda and (1 - _lambda).
 
     Returns:
-    - interaction_matrix:   Sparse matrix of interactions as a csr_matrix from scipy.sparse.
+    - scores_dict: Dictionary of scores for each item for each user. 
     """
-    # create the interaction matrix from the DataFrame
-    interaction_matrix = df.pivot(index=user_col, columns=item_col, values=rating_col)
+    # initializing scores_dict
+    scores_dict = defaultdict(dict)
 
-    # fill NaN values with 0 for missing user-item pairs
-    interaction_matrix.fillna(0, inplace=True)
-    matrix_values = interaction_matrix.values
+    for user in users:
+        # initializing dictionary to store scores for each user
+        user_scores = {}
 
-    # convert matrix to scr format
-    interaction_matrix = csr_matrix(matrix_values)
-    
-    return interaction_matrix
+        # user scores from cf and cb recommenders
+        user_cf_scores = scores_dict_1[user]
+        user_cb_scores = scores_dict_2[user]
+
+        # keys from each of the two dictionaries
+        cf_items = user_cf_scores.keys()
+        cb_items = user_cb_scores.keys()
+
+        # apply weighting by lambda if item both has a cf and a cb score
+        for item in cf_items & cb_items: 
+            user_scores[item] = _lambda * user_cf_scores[item] + (1 - _lambda) * user_cb_scores[item]
+
+        # retieve cf score if item only has a cf score
+        for item in cf_items - cb_items: 
+            user_scores[item] = user_cf_scores[item]
+
+        # retieve cb score if item only has a cb score
+        for item in cb_items - cf_items:  
+            user_scores[item] = user_cb_scores[item]
+        
+        # adding user_scores to scores_dict
+        scores_dict[user] = user_scores
+
+    return scores_dict
 
 
-def save_dict_to_json(data_dict: dict, file_path: str) -> None:
+def get_ratings_dict(data: pd.DataFrame,
+                     user_col: str,
+                     item_col: str,
+                     ratings_col: str) -> dict:
     """
-    Saves a dictionary to a JSON file.
+    Constructs a dictionary of completion rates for every user and the items they have consumed.
 
     Parameters:
-    - data_dict:    Dictionary containing the data to be saved.
-    - file_path:    Path to the JSON file (can include folder or just the filename).
+    - data: Dataframe containing the rated user-item interactions.
+    - user_col:         Name of the user column in the dataframe.
+    - item_col:         Name of the item column in the dataframe.
+    - ratings_col:      Name of the ratings column in the dataframe.
+
+    Returns:
+    - ratings_dict:     Dictionary containing ratings for rated items for each user.
     """
-    # directory name from the file path
-    folder = os.path.dirname(file_path)
+    ratings_dict = defaultdict(dict)
+
+    # iterating through the rows of the data to build the dictionary
+    for _, row in data.iterrows():
+        user = row[user_col]
+        prd = row[item_col]
+        completion_rate = row[ratings_col]
+        
+        # adding the rating to the dictionary
+        ratings_dict[user][prd] = completion_rate
     
-    # if there's a folder part in the file path, make sure it exists
-    if folder:
-        os.makedirs(folder, exist_ok=True)
-
-    # loading existing data if the file exists, otherwise initialize an empty dict
-    if os.path.exists(file_path):
-        with open(file_path, "r") as f:
-            data = json.load(f)
-    else:
-        data = {}
-
-    # updating the data with the new dictionary of recommendations
-    data.update(data_dict)
-
-    # writing the data back to the file
-    with open(file_path, "w") as f:
-        json.dump(data, f, indent=4)
+    return ratings_dict
 
 
 def permutation_test(dist1: dict, 
@@ -375,4 +366,62 @@ def permutation_test(dist1: dict,
     p_value = np.mean(np.array(permuted_kls) >= observed_kl)
 
     return observed_kl, p_value
+
+
+def prep_interaction_matrix(df: pd.DataFrame, 
+                            user_col: str, 
+                            item_col: str, 
+                            rating_col: str) -> csr_matrix:
+    """
+    Prepares the interaction matrix from the df.
+
+    Parameters:
+    - df:                   Pandas DataFrame containing the data.
+    - user_col:             Column name for users.
+    - item_col:             Column name for items.
+    - rating_col:           Column name for ratings.
+
+    Returns:
+    - interaction_matrix:   Sparse matrix of interactions as a csr_matrix from scipy.sparse.
+    """
+    # create the interaction matrix from the DataFrame
+    interaction_matrix = df.pivot(index=user_col, columns=item_col, values=rating_col)
+
+    # fill NaN values with 0 for missing user-item pairs
+    interaction_matrix.fillna(0, inplace=True)
+    matrix_values = interaction_matrix.values
+
+    # convert matrix to scr format
+    interaction_matrix = csr_matrix(matrix_values)
     
+    return interaction_matrix
+
+
+def save_dict_to_json(data_dict: dict, file_path: str) -> None:
+    """
+    Saves a dictionary to a JSON file.
+
+    Parameters:
+    - data_dict:    Dictionary containing the data to be saved.
+    - file_path:    Path to the JSON file (can include folder or just the filename).
+    """
+    # directory name from the file path
+    folder = os.path.dirname(file_path)
+    
+    # if there's a folder part in the file path, make sure it exists
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+
+    # loading existing data if the file exists, otherwise initialize an empty dict
+    if os.path.exists(file_path):
+        with open(file_path, "r") as f:
+            data = json.load(f)
+    else:
+        data = {}
+
+    # updating the data with the new dictionary of recommendations
+    data.update(data_dict)
+
+    # writing the data back to the file
+    with open(file_path, "w") as f:
+        json.dump(data, f, indent=4)
