@@ -1,124 +1,108 @@
+import csv
+import json
 import os
 import sys
 
-from lightfm import LightFM
 import numpy as np
 import pandas as pd
-from scipy.sparse import csr_matrix, hstack, identity
 from tqdm import tqdm
 
 # adding the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 from config import (
-    TRAIN_DATA_PATH,
-    TEST_DATA_PATH,
-    N_COMPONENTS,
-    RANDOM_STATE,
+    VAL_DATA_PATH,
+    SCORES_PATH,
+    RECOMMENDATIONS_KEY_CF,
+    RECOMMENDATIONS_KEY_CB_COMBI,
     N_RECOMMENDATIONS,
-    N_EPOCHS,
-    EPSILON,
-    RECOMMENDATIONS_KEY_HYBRID,
+    EXPERIMENTS_HYBRID_PATH,
+    LAMBDA,
     RECOMMENDATIONS_PATH,
-    EMBEDDINGS_COMBI_PATH
+    RECOMMENDATIONS_KEY_HYBRID,
 )
 import utils.utils as utils
 
-# loading the train data
-train_df = pd.read_parquet(TRAIN_DATA_PATH)
+# loading validation data
+print("Loading validation data.")
+val_df = pd.read_parquet(VAL_DATA_PATH)
 
-# preparing the interaction matrix
-interaction_matrix = utils.prep_interaction_matrix(df=train_df,
-                                                   user_col="user_id",
-                                                   item_col="prd_number",
-                                                   rating_col="completion_rate",
-)
+# loading scores from cf and cb recommender
+print(f"Loading utils dictionaries from {SCORES_PATH}.")
+with open(SCORES_PATH, "r") as file:
+    scores_dicts = json.load(file)
 
-# list of users
-user_list = sorted(train_df['user_id'].unique().tolist())
-n_users = len(user_list)
+cf_scores = scores_dicts[RECOMMENDATIONS_KEY_CF]
+cb_scores = scores_dicts[RECOMMENDATIONS_KEY_CB_COMBI]
 
-# loading test data
-test_df = pd.read_parquet(TEST_DATA_PATH)
+# all users
+cf_users = set(cf_scores.keys())
+cb_users = set(cb_scores.keys())
+users = cf_users.union(cb_users)
 
-# finding new items
-train_items = set(train_df["prd_number"])
-test_items = set(test_df["prd_number"])
-new_items = test_items.difference(train_items)
-all_items = train_items.union(test_items)
-item_list = sorted(list(all_items))
+# dictionary containing completion rates for each user and consumed item in the validation data
+print("Generating completion_rates_dict from validation data.")
+completion_rates_dict = utils.get_ratings_dict(data=val_df, 
+                                               user_col="user_id", 
+                                               item_col="prd_number", 
+                                               ratings_col="completion_rate") 
 
-# user and item mappings
-user_mapping = {user: i for i, user in enumerate(user_list)}
-item_mapping = {i: item for i, item in enumerate(item_list)}
+# hyperparameter tuning for _lambda (weighting hyperparameter)
+print("Performing hyperparameter tuning for weighting parameter lambda.")
+lambdas = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+print(f"Lambda values to test: {lambdas}.")
 
-# extra matrix of zeros for new items
-zero_matrix = np.zeros((n_users, len(new_items)))
-interaction_matrix_w_zeros = hstack([interaction_matrix, zero_matrix]).tocsr()
-
-# loading embeddings
-emb_df = pd.read_parquet("embeddings/one_feature.parquet")
-
-# formatting the emb_df 
-emb_df = emb_df.rename(columns={"episode": "prd_number"})
-emb_dict = emb_df.to_dict(orient="list")
-emb_df_formatted = pd.DataFrame(emb_dict)
-
-# turning the embedding dataframe into an csr matrix
-item_matrix = emb_df_formatted.drop(columns='prd_number').values
-item_matrix_csr = csr_matrix(item_matrix)
-
-# Number of items
-n_items = item_matrix_csr.shape[0]
-
-# Identity matrix for item IDs
-item_identities = identity(n_items, format='csr')
-
-# Combine identity matrix with feature matrix to get hybrid features
-item_features_hybrid = hstack([item_identities, item_matrix_csr]).tocsr()
-
-# LightFM model
-cb_model = LightFM(loss="logistic", 
-                   no_components=N_COMPONENTS, 
-                   random_state=RANDOM_STATE)
-
-# initializing recommendations
-prev_recommendations = ["0" for _ in range(n_users * N_RECOMMENDATIONS)]
-prev_diff = 0
-
-for epoch in tqdm(range(N_EPOCHS)):
-    print("\n Epoch", epoch + 1)
-
-    # fitting the model
-    cb_model.fit_partial(interactions=interaction_matrix_w_zeros, item_features=item_features_hybrid)
-
-    # getting the top N recommendations for all users
-    recommendations = utils.get_top_n_recommendations_all_users(model=cb_model, 
-                                                                interaction_matrix=interaction_matrix, 
-                                                                user_list=user_list, 
-                                                                item_mapping=item_mapping, 
-                                                                n=N_RECOMMENDATIONS,
-                                                                item_matrix=item_features_hybrid)
+for _lambda in tqdm(lambdas):
+    print(f"\nTesting lambda={_lambda}.")
+    hybrid_scores = utils.get_hybrid_scores(scores_dict_1=cf_scores,
+                                            scores_dict_2=cb_scores,
+                                            users=users,
+                                            _lambda=_lambda)
     
-    # computing the proportion of changed recommendations
-    diff_percentage = utils.compare_lists(prev_recommendations, recommendations)
-    print(f"{diff_percentage*100:.2f}% of the recommendations changed.", )
+    recs_dict = utils.extract_recs(scores_dict=hybrid_scores,
+                                   n_recs=N_RECOMMENDATIONS)
 
-    # comparing the diff_percentage with the previous epoch
-    change_diff_percentage = abs(diff_percentage - prev_diff)
+    # computing ndcg@10
+    ndcgs = []
+    for user_id, rec_items in recs_dict.items():
+        gain_dict = completion_rates_dict[user_id]
+        optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)[:N_RECOMMENDATIONS]
+        dcg = utils.compute_dcg(rec_items, gain_dict)
+        dcg_star = utils.compute_dcg(optimal_items, gain_dict)
+        ndcg_user = dcg / dcg_star 
+        ndcgs.append(ndcg_user)
 
-    # stopping if change_diff_percentage is less than EPSILON
-    if change_diff_percentage < EPSILON:
-        print("Stopping early")
-        print("Extracting recommendations")
-        recs_dict = utils.extract_recommendations(recommendations=recommendations,
-                                                  user_mapping=user_mapping,
-                                                  n_recs=N_RECOMMENDATIONS,
-                                                  recommendations_key=RECOMMENDATIONS_KEY_HYBRID)
-        print("Saving recommendations")
-        utils.save_dict_to_json(data_dict=recs_dict,
-                                file_path=RECOMMENDATIONS_PATH)
+    ndcg = np.mean(ndcgs)
+    print(f"ndcg@10: {ndcg:.10f}")
+
+    # stopping if ndcg@10 decreases compared to previous epoch 
+    if ndcg <= prev_ndcg:
+        print("ndcg@10 has decreased or is unchanged.")
+        print("Stopping early.")
+        print(f"Saving experiment results to {EXPERIMENTS_HYBRID_PATH}.")
+
+        # writing row to csv
+        row = [_lambda, prev_ndcg]
+        with open(EXPERIMENTS_HYBRID_PATH, mode="a", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(row)
+
         break
+
+    prev_ndcg = ndcg
+
+# generating recommendations from hybrid recommender with optimal lambda hyperparameter value
+print("Generating recommendations from hybrid recommender with optimal lambda hyperparameter value")
+hybrid_scores = utils.get_hybrid_scores(scores_dict_1=cf_scores,
+                                        scores_dict_2=cb_scores,
+                                        users=users,
+                                        _lambda=LAMBDA)
     
-    prev_recommendations = recommendations
-    prev_diff = diff_percentage
+hybrid_recs = utils.extract_recs(scores_dict=hybrid_scores,
+                                 n_recs=N_RECOMMENDATIONS)
+
+# saving recommendations
+print(f"Saving recommendations to {RECOMMENDATIONS_PATH}.")
+recs_dict_key = {RECOMMENDATIONS_KEY_HYBRID: hybrid_recs}
+utils.save_dict_to_json(data_dict=recs_dict_key, 
+                        file_path=RECOMMENDATIONS_PATH)
