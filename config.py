@@ -59,6 +59,7 @@ DAMPING = 5
 EMBEDDING_DIM = 384
 EXPERIMENTS_CF_PATH = "results/cf_experiments.csv"
 EXPERIMENTS_HYBRID_PATH = "results/hybrid_experiments.csv"
+LAMBDA = 0.6
 N_COMPONENTS = 60
 N_EPOCHS = 1000
 N_RECOMMENDATIONS = 10
