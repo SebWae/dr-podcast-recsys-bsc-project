@@ -161,7 +161,7 @@ for epochs in tqdm(range(1, N_EPOCHS+1)):
         ndcgs.append(ndcg_user)
 
     ndcg = np.mean(ndcgs)
-    print(f"ndcg@10: {ndcg:.4f}")
+    print(f"ndcg@10: {ndcg:.10f}")
 
     # saving result
     row = [epochs, ndcg]
