@@ -9,6 +9,7 @@ from config import (
     TRANSFORMED_DATA_PATH,
     SPLIT_DATE_TRAIN_VAL,
     SPLIT_DATE_VAL_TEST,
+    COLUMNS_TO_KEEP_TRAIN,
     COLUMNS_TO_KEEP,
     TRAIN_DATA_PATH,
     VAL_DATA_PATH,
@@ -25,7 +26,7 @@ int_val_df = transformed_df[(transformed_df["date"] >= SPLIT_DATE_TRAIN_VAL) & (
 int_test_df = transformed_df[transformed_df["date"] >= SPLIT_DATE_VAL_TEST]
 
 # only keeping relevant columns
-train_df = int_train_df[COLUMNS_TO_KEEP]
+train_df = int_train_df[COLUMNS_TO_KEEP_TRAIN]
 val_df = int_val_df[COLUMNS_TO_KEEP]
 test_df = int_test_df[COLUMNS_TO_KEEP]
 
