@@ -78,7 +78,11 @@ for n_components, damping, reg in tqdm(list(product(n_components_values, damping
         print(f"\n Epoch {epochs}:")
 
         # initializing BiasedMF model
-        mf = BiasedMF(features=n_components, damping=damping, reg=reg, iterations=epochs, rng_spec=RANDOM_STATE)
+        mf = BiasedMF(features=n_components, 
+                      damping=damping, 
+                      reg=reg, 
+                      iterations=epochs, 
+                      rng_spec=RANDOM_STATE)
 
         # fitting the model
         mf.fit(ratings_df)
@@ -138,7 +142,11 @@ for n_components, damping, reg in tqdm(list(product(n_components_values, damping
         print(f"\n Epoch {epochs}:")
 
         # initializing BiasedMF model
-        mf = BiasedMF(features=n_components, damping=damping, reg=reg, iterations=epochs, rng_spec=RANDOM_STATE)
+        mf = BiasedMF(features=n_components, 
+                      damping=damping, 
+                      reg=reg, 
+                      iterations=epochs, 
+                      rng_spec=RANDOM_STATE)
 
         # fitting the model
         mf.fit(ratings_df)
