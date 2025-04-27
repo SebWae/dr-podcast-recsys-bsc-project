@@ -89,7 +89,7 @@ def extract_recs(scores_dict: dict,
     Extracts recommendations for each user from a dictionary of scores.
 
     Parameters:
-    - scores_dict:   Dictionary of scores for each item for each user.
+    - scores_dict:  Dictionary of scores for each item for each user.
     - n_recs:       Number of recommendations per user.
 
     Returns:
