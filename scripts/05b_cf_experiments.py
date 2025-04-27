@@ -63,9 +63,9 @@ completion_rates_dict = utils.get_ratings_dict(data=val_df,
                                                ratings_col="completion_rate") 
 
 # initial hyperparameter values to test
-n_components_values = [20, 30, 40, 50]
+n_components_values = [50, 100, 150]
 damping_values = [1, 5, 10]
-reg_values = [0.01, 0.05, 0.1]
+reg_values = [0.05, 0.1, 0.15]
 
 # performing initial hyperparameter experiments for cf recommender
 print("Performing initial hyperparameter experiments.")
@@ -127,9 +127,9 @@ for n_components, damping, reg in tqdm(list(product(n_components_values, damping
 
 
 # enhanced hyperparameter values to test
-n_components_values = [75, 100, 150, 200]
+n_components_values = [200, 250, 300]
 damping_values = [20, 30, 40]
-reg_values = [0.0025, 0.005, 0.01, 0.015]
+reg_values = [0.0025, 0.005, 0.01, 0.025]
 
 # performing initial hyperparameter experiments for cf recommender
 print("Performing enhanced hyperparameter experiments.")
