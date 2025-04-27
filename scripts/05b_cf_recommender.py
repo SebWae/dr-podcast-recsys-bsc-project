@@ -53,7 +53,7 @@ ratings_df = grouped_df.rename(columns={"user_id": "user",
                                         "cf_rating": "rating"})
 
 # list of users and items
-user_list = sorted(train_df['user_id'].unique().tolist())
+user_list = sorted(train_df['user_id'].unique())
 item_list = sorted(train_w_meta['series_title'].unique().tolist())
 
 # mapping indices to shows
@@ -77,10 +77,10 @@ for epochs in tqdm(range(1, N_EPOCHS+1)):
     mf.fit(ratings_df)
 
     # getting scores for each item for each user
-    episode_scores = utils.get_cf_scores_lenskit(model=mf, 
-                                                    items=item_list,
-                                                    users=user_list,
-                                                    item_mapping=show_mapping)
+    episode_scores = utils.get_cf_scores(model=mf, 
+                                         items=item_list,
+                                         users=user_list,
+                                         item_mapping=show_mapping)
 
     recs_dict = utils.extract_recs(scores_dict=episode_scores,
                                     n_recs=N_RECOMMENDATIONS)
