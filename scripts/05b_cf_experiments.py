@@ -16,6 +16,7 @@ from config import (
     VAL_DATA_PATH,
     METADATA_PATH,
     N_EPOCHS,
+    RANDOM_STATE,
     EXPERIMENTS_CF_PATH,
     N_RECOMMENDATIONS,
 )
@@ -77,7 +78,7 @@ for n_components, damping, reg in tqdm(list(product(n_components_values, damping
         print(f"\n Epoch {epochs}:")
 
         # initializing BiasedMF model
-        mf = BiasedMF(features=n_components, damping=damping, reg=reg, iterations=epochs)
+        mf = BiasedMF(features=n_components, damping=damping, reg=reg, iterations=epochs, rng_spec=RANDOM_STATE)
 
         # fitting the model
         mf.fit(ratings_df)
@@ -122,9 +123,9 @@ for n_components, damping, reg in tqdm(list(product(n_components_values, damping
 
 
 # enhanced hyperparameter values to test
-n_components_values = [60, 80, 100]
-damping_values = [10, 15, 20]
-reg_values = [0.005, 0.01, 0.15, 0.02]
+n_components_values = [75, 100, 150, 200]
+damping_values = [20, 30, 40]
+reg_values = [0.0025, 0.005, 0.01, 0.015]
 
 # performing initial hyperparameter experiments for cf recommender
 print("Performing enhanced hyperparameter experiments.")
@@ -137,7 +138,7 @@ for n_components, damping, reg in tqdm(list(product(n_components_values, damping
         print(f"\n Epoch {epochs}:")
 
         # initializing BiasedMF model
-        mf = BiasedMF(features=n_components, damping=damping, reg=reg, iterations=epochs)
+        mf = BiasedMF(features=n_components, damping=damping, reg=reg, iterations=epochs, rng_spec=RANDOM_STATE)
 
         # fitting the model
         mf.fit(ratings_df)
