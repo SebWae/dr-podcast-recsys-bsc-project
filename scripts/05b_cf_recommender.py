@@ -1,5 +1,4 @@
 import csv
-from itertools import product
 import os
 import sys
 
@@ -16,13 +15,12 @@ from config import (
     VAL_DATA_PATH,
     METADATA_PATH,
     N_EPOCHS,
-    EXPERIMENTS_CF_PATH,
     N_RECOMMENDATIONS,
     N_COMPONENTS,
     DAMPING,
     REG,
-    RANDOM_STATE,
     OPTIMAL_CF_PATH,
+    SCORES_PATH,
     RECOMMENDATIONS_KEY_CF,
     RECOMMENDATIONS_PATH,
 )
@@ -68,69 +66,6 @@ completion_rates_dict = utils.get_ratings_dict(data=val_df,
                                                item_col="prd_number", 
                                                ratings_col="completion_rate") 
 
-# values for no_components to test
-n_components_values = [10, 20, 30, 40, 50]
-damping_values = [1, 5, 10]
-reg_values = [0.01, 0.05, 0.1]
-
-# performing hyperparameter experiments for cf recommender
-print("Performing hyperparameter experiments.")
-print(f"Testing values: n_components={n_components_values}, damping={damping_values}, reg={reg_values}")
-
-for n_components, damping, reg in product(n_components_values, damping_values, reg_values):
-    print(f"\nTesting combination: features={n_components}, damping={damping}, reg={reg}")
-    prev_ndcg = 0
-    for epochs in tqdm(range(1, N_EPOCHS+1)):
-        print(f"\n Epoch {epochs}:")
-
-        # initializing BiasedMF model
-        mf = BiasedMF(features=N_COMPONENTS, 
-                      damping=DAMPING, 
-                      reg=REG, 
-                      iterations=epochs, 
-                      rng_spec=RANDOM_STATE)
-
-        # fitting the model
-        mf.fit(ratings_df)
-
-        # getting scores for each item for each user
-        episode_scores = utils.get_cf_scores(model=mf, 
-                                             items=item_list,
-                                             users=user_list,
-                                             item_mapping=show_mapping)
-
-        recs_dict = utils.extract_recs(scores_dict=episode_scores,
-                                       n_recs=N_RECOMMENDATIONS)
-
-        # computing ndcg@10
-        ndcgs = []
-        for user_id, rec_items in recs_dict.items():
-            gain_dict = completion_rates_dict[user_id]
-            optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)[:N_RECOMMENDATIONS]
-            dcg = utils.compute_dcg(rec_items, gain_dict)
-            dcg_star = utils.compute_dcg(optimal_items, gain_dict)
-            ndcg_user = dcg / dcg_star 
-            ndcgs.append(ndcg_user)
-
-        ndcg = np.mean(ndcgs)
-        print(f"ndcg@10: {ndcg:.10f}")
-
-        # stopping if ndcg@10 decreases compared to previous epoch 
-        if ndcg <= prev_ndcg:
-            print("ndcg@10 has decreased or is unchanged.")
-            print("Stopping early.")
-            print(f"Saving experiment results to {EXPERIMENTS_CF_PATH}.")
-
-            # writing row to csv
-            row = [n_components, damping, reg, prev_ndcg]
-            with open(EXPERIMENTS_CF_PATH, mode="a", newline="") as file:
-                writer = csv.writer(file)
-                writer.writerow(row)
-
-            break
-
-        prev_ndcg = ndcg
-
 # generating recommendations from mf model using optimal hyperparameters
 for epochs in tqdm(range(1, N_EPOCHS+1)):
     print(f"\n Epoch {epochs}:")
@@ -166,20 +101,26 @@ for epochs in tqdm(range(1, N_EPOCHS+1)):
     # saving result
     row = [epochs, ndcg]
     with open(OPTIMAL_CF_PATH, mode="a", newline="") as file:
-                writer = csv.writer(file)
-                writer.writerow(row)
+        writer = csv.writer(file)
+        writer.writerow(row)
 
     # stopping if ndcg@10 decreases compared to previous epoch 
     if ndcg <= prev_ndcg:
         print("ndcg@10 has decreased or is unchanged.")
         print("Stopping early.")
 
+        # saving scores
+        print(f"Saving scores to {SCORES_PATH}.")
+        scores_dict_key = {RECOMMENDATIONS_KEY_CF: prev_scores}
+        utils.save_dict_to_json(data_dict=scores_dict_key, file_path=SCORES_PATH)
+
         # saving recommendations
         print(f"Saving recommendations to {RECOMMENDATIONS_PATH}.")
-        final_recs_dict = {RECOMMENDATIONS_KEY_CF: prev_recs}
-        utils.save_dict_to_json(data_dict=final_recs_dict, 
+        recs_dict_key = {RECOMMENDATIONS_KEY_CF: prev_recs}
+        utils.save_dict_to_json(data_dict=recs_dict_key, 
                                 file_path=RECOMMENDATIONS_PATH)
         break
 
     prev_ndcg = ndcg
     prev_recs = recs_dict
+    prev_scores = episode_scores
