@@ -75,8 +75,7 @@ for emb_df, rec_key in tqdm(metadata_levels):
         emb_dict[prd_number] = embedding
 
     # generate user profiles
-    print("Generating user profile from training data.")
-
+    print("Generating user profile and recommendations for each user.")
     for user in users:
         # initialize user profile (embedding)
         user_profile = np.zeros(EMBEDDING_DIM)
@@ -106,9 +105,8 @@ for emb_df, rec_key in tqdm(metadata_levels):
         user_items = [item for sublist in user_show_episodes_dict.values() for item in sublist]
         
         for item in items:
-            if item in user_items:
-                cos_sim = -1
-            else:
+            # only computing scores for non-consumed items
+            if item not in user_items:
                 embedding = emb_dict[item]
                 cos_sim = cosine_similarity(user_profile, embedding)
             user_scores[item] = cos_sim
