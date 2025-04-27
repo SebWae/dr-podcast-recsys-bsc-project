@@ -24,7 +24,7 @@ from config import (
     RECOMMENDATIONS_KEY_CB_COMBI,
     RECOMMENDATIONS_KEY_CB_DESCR,
     RECOMMENDATIONS_KEY_CB_TITLE,
-    CB_SCORES_PATH,
+    SCORES_PATH,
     N_RECOMMENDATIONS,
     RECOMMENDATIONS_PATH,
 )
@@ -121,7 +121,7 @@ for emb_df, rec_key in tqdm(metadata_levels):
 
     # saving scores
     key_scores_dict = {rec_key: scores_dict}
-    utils.save_dict_to_json(data_dict=key_scores_dict, file_path=CB_SCORES_PATH)
+    utils.save_dict_to_json(data_dict=key_scores_dict, file_path=SCORES_PATH)
 
     # extract recommendations from scores
     recs_dict = utils.extract_recs(scores_dict=scores_dict, n_recs=N_RECOMMENDATIONS)
