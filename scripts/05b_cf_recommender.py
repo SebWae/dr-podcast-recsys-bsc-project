@@ -21,6 +21,7 @@ from config import (
     N_COMPONENTS,
     DAMPING,
     REG,
+    RANDOM_STATE,
     OPTIMAL_CF_PATH,
     RECOMMENDATIONS_KEY_CF,
     RECOMMENDATIONS_PATH,
@@ -83,16 +84,20 @@ for n_components, damping, reg in product(n_components_values, damping_values, r
         print(f"\n Epoch {epochs}:")
 
         # initializing BiasedMF model
-        mf = BiasedMF(features=n_components, damping=damping, reg=reg, iterations=epochs)
+        mf = BiasedMF(features=N_COMPONENTS, 
+                      damping=DAMPING, 
+                      reg=REG, 
+                      iterations=epochs, 
+                      rng_spec=RANDOM_STATE)
 
         # fitting the model
         mf.fit(ratings_df)
 
         # getting scores for each item for each user
-        episode_scores = utils.get_cf_scores_lenskit(model=mf, 
-                                                     items=item_list,
-                                                     users=user_list,
-                                                     item_mapping=show_mapping)
+        episode_scores = utils.get_cf_scores(model=mf, 
+                                             items=item_list,
+                                             users=user_list,
+                                             item_mapping=show_mapping)
 
         recs_dict = utils.extract_recs(scores_dict=episode_scores,
                                        n_recs=N_RECOMMENDATIONS)
