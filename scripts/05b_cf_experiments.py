@@ -190,13 +190,77 @@ completion_rates_dict = utils.get_ratings_dict(data=val_df,
 #         prev_ndcg = ndcg
 
 
-# enhanced hyperparameter values (v2) to test
-n_components_values = [400, 500, 600]
-damping_values = [50, 60, 70]
-reg_values = [0.001, 0.002, 0.003]
+# # enhanced hyperparameter values (v2) to test
+# n_components_values = [400, 500, 600]
+# damping_values = [50, 60, 70]
+# reg_values = [0.001, 0.002, 0.003]
 
-# performing enhanced hyperparameter experiments (v2) for cf recommender
-print("Performing enhanced hyperparameter experiments.")
+# # performing enhanced hyperparameter experiments (v2) for cf recommender
+# print("Performing enhanced hyperparameter experiments (v2).")
+# print(f"Testing values: n_components={n_components_values}, damping={damping_values}, reg={reg_values}")
+
+# for n_components, damping, reg in tqdm(list(product(n_components_values, damping_values, reg_values))):
+#     print(f"\nTesting combination: features={n_components}, damping={damping}, reg={reg}")
+#     prev_ndcg = 0
+#     for epochs in range(1, N_EPOCHS+1):
+#         print(f"\n Epoch {epochs}:")
+
+#         # initializing BiasedMF model
+#         mf = BiasedMF(features=n_components, 
+#                       damping=damping, 
+#                       reg=reg, 
+#                       iterations=epochs, 
+#                       rng_spec=RANDOM_STATE)
+
+#         # fitting the model
+#         mf.fit(ratings_df)
+
+#         # getting scores for each item for each user
+#         episode_scores = utils.get_cf_scores(model=mf, 
+#                                              items=item_list,
+#                                              users=user_list,
+#                                              item_mapping=show_mapping)
+
+#         recs_dict = utils.extract_recs(scores_dict=episode_scores,
+#                                        n_recs=N_RECOMMENDATIONS)
+
+#         # computing ndcg@10
+#         ndcgs = []
+#         for user_id, rec_items in recs_dict.items():
+#             gain_dict = completion_rates_dict[user_id]
+#             optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)[:N_RECOMMENDATIONS]
+#             dcg = utils.compute_dcg(rec_items, gain_dict)
+#             dcg_star = utils.compute_dcg(optimal_items, gain_dict)
+#             ndcg_user = dcg / dcg_star 
+#             ndcgs.append(ndcg_user)
+
+#         ndcg = np.mean(ndcgs)
+#         print(f"ndcg@10: {ndcg:.10f}")
+
+#         # stopping if ndcg@10 decreases compared to previous epoch 
+#         if ndcg <= prev_ndcg:
+#             print("ndcg@10 has decreased or is unchanged.")
+#             print("Stopping early.")
+#             print(f"Saving experiment results to {EXPERIMENTS_CF_PATH}.")
+
+#             # writing row to csv
+#             row = [n_components, damping, reg, prev_ndcg]
+#             with open(EXPERIMENTS_CF_PATH, mode="a", newline="") as file:
+#                 writer = csv.writer(file)
+#                 writer.writerow(row)
+
+#             break
+
+#         prev_ndcg = ndcg
+
+
+# enhanced hyperparameter values (v3) to test
+n_components_values = [700, 800, 900]
+damping_values = [80, 100, 120]
+reg_values = [0.0001, 0.00025, 0.0005]
+
+# performing enhanced hyperparameter experiments (v3) for cf recommender
+print("Performing enhanced hyperparameter experiments (v3).")
 print(f"Testing values: n_components={n_components_values}, damping={damping_values}, reg={reg_values}")
 
 for n_components, damping, reg in tqdm(list(product(n_components_values, damping_values, reg_values))):
