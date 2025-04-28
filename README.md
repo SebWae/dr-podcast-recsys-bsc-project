@@ -6,11 +6,11 @@ The goal of the project is to implement, analyze and compare the following types
 - [Content-based](scripts/05c_cb_recommender.py)
 - [Hybrid recommender (weighted)](scripts/05e_hybrid_recommender.py)
 
-The recommenders are being compared to a [popularity-based baseline recommender](scripts/05a_baseline_recommender.py). 
+The recommenders are being compared to a [popularity-based baseline recommender](scripts/05a_baseline_recommender.py) and are only based on user interactions from [DR LYD](https://www.dr.dk/lyd) (app and web).  
 
 In collaboration with DR (Danmarks Radio). 
 
-Supervisor: Toine Bogers
+Supervisor: @toinebogers
 
 
 ## Project Structure
@@ -101,7 +101,9 @@ Supervisor: Toine Bogers
 │   │
 │   ├── 05d_cb_recommender.py               <- content-based recommenders
 │   │
-│   ├── 05e_hybrid_recommender.py           <- hybrid recommender
+│   ├── 05e_hybrid_experiments.py           <- hyperparameter tuning for hybrid recommender
+│   │
+│   ├── 05f_hybrid_recommender.py           <- hybrid recommender
 │   │
 │   └── 06_evaluation.py                    <- evaluating recommender systems
 │
@@ -116,6 +118,8 @@ Supervisor: Toine Bogers
 ├── config.py                               <- configuration file storing variables used in the scripts
 │
 ├── environment.yml                         <- environment file used to create a virtual environment for running the code
+│
+├── pipeline.py                             <- pipeline to run multiple scripts
 │  
 └── README.md                               <- project description and how to run the code
 ```
@@ -134,3 +138,27 @@ Activate the environment by running:
 ```
 conda activate dr-podcast-recsys
 ```
+
+Run the full pipeline by running:
+```
+python pipeline.py
+```
+
+The following scripts are not a part of the pipeline: 
+- `05b_cf_experiments.py`
+- `05e_hybrid_experiments.py`
+
+To run the [CF experiments](scripts/05b_cf_experiments.py):
+```
+python scripts/05b_cf_experiments.py --n_comp_vals x_1,x_2,x_3 --damping_vals y_1,y_2,y_3 --reg_vals z_1,z_2,z_3
+```
+where the `n_comp_vals` must be integers, while `damping_vals` and `reg_vals` are floats. 
+
+Similarly, to run the [Hybrid experiments](scripts/05e_hybrid_experiments.py):
+```
+python scripts/05e_hybrid_experiments.py --lambda_vals x_1,x_2,x_3
+```
+where the `lambda_vals` are floats.
+
+All possible combinations of the hyperparameter values will be tested and evaluated in terms of ndcg at 10. 
+It is possible to add any desired number of values for each hyperparameter.
