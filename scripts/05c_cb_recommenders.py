@@ -17,13 +17,13 @@ from config import (
     METADATA_PATH,
     EMBEDDINGS_TITLE_PATH,
     EMBEDDINGS_DESCR_PATH,
-    EMBEDDINGS_COMBI_PATH,
     UTILS_PATH,
     SPLIT_DATE_TRAIN_VAL,
-    EMBEDDING_DIM,
-    RECOMMENDATIONS_KEY_CB_COMBI,
-    RECOMMENDATIONS_KEY_CB_DESCR,
     RECOMMENDATIONS_KEY_CB_TITLE,
+    RECOMMENDATIONS_KEY_CB_DESCR,
+    RECOMMENDATIONS_KEY_CB_COMBI,
+    LAMBDA_CB,
+    EMBEDDING_DIM,
     SCORES_PATH,
     N_RECOMMENDATIONS,
     RECOMMENDATIONS_PATH,
@@ -39,7 +39,6 @@ meta_df = pd.read_parquet(METADATA_PATH)
 # loading embeddings
 title_emb_df = pd.read_parquet(EMBEDDINGS_TITLE_PATH)
 descr_emb_df = pd.read_parquet(EMBEDDINGS_DESCR_PATH)
-combi_emb_df = pd.read_parquet(EMBEDDINGS_COMBI_PATH)
 
 # list of unique users in train data and unique items in metadata
 users = train_df["user_id"].unique()
@@ -60,7 +59,7 @@ train_df["days_since"] = (reference_date - train_df["date"]).dt.days
 # iterating over levels of metadata
 metadata_levels = [(title_emb_df, RECOMMENDATIONS_KEY_CB_TITLE), 
                    (descr_emb_df, RECOMMENDATIONS_KEY_CB_DESCR), 
-                   (combi_emb_df, RECOMMENDATIONS_KEY_CB_COMBI)]
+                   (title_emb_df, RECOMMENDATIONS_KEY_CB_COMBI)]
 
 for emb_df, rec_key in tqdm(metadata_levels):
     # initializing dictionary to store scores for each user
@@ -71,7 +70,12 @@ for emb_df, rec_key in tqdm(metadata_levels):
     emb_dict = {}
     for _, row in emb_df.iterrows():
         prd_number = row["episode"]
-        embedding = row[1:].values.flatten()
+        if rec_key == RECOMMENDATIONS_KEY_CB_COMBI:
+            title_embedding = row[1:].values.flatten()
+            descr_embedding = descr_emb_df[descr_emb_df["episode"] == prd_number].iloc[:, 1:].values.flatten()
+            embedding = LAMBDA_CB * title_embedding + (1 - LAMBDA_CB) * descr_embedding
+        else:
+            embedding = row[1:].values.flatten()
         emb_dict[prd_number] = embedding
 
     # generate user profiles
