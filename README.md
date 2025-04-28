@@ -10,7 +10,7 @@ The recommenders are being compared to a [popularity-based baseline recommender]
 
 In collaboration with DR (Danmarks Radio). 
 
-Supervisor: @toinebogers
+Supervisor: [Toine Bogers](https://github.com/toinebogers)
 
 
 ## Project Structure
@@ -139,12 +139,13 @@ Activate the environment by running:
 conda activate dr-podcast-recsys
 ```
 
-Run the full pipeline by running:
+To run the full pipeline:
 ```
 python pipeline.py
 ```
 
-The following scripts are not a part of the pipeline: 
+## Hyperparameter tuning
+The following scripts are used for hyperparameter tuning and are not a part of [the pipeline](pipeline.py): 
 - `05b_cf_experiments.py`
 - `05e_hybrid_experiments.py`
 
@@ -160,5 +161,5 @@ python scripts/05e_hybrid_experiments.py --lambda_vals x_1,x_2,x_3
 ```
 where the `lambda_vals` are floats.
 
-All possible combinations of the hyperparameter values will be tested and evaluated in terms of ndcg at 10. 
+All possible combinations of the hyperparameter values will be tested and evaluated in terms of `ndcg@10`.  
 It is possible to add any desired number of values for each hyperparameter.
