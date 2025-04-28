@@ -1,3 +1,4 @@
+from collections import defaultdict
 import os
 import sys
 
@@ -25,9 +26,7 @@ nltk.download('stopwords')
 
 
 # dictionaries to hold embeddings
-embedding_dicts = {0: {},
-                   1: {},
-                   2: {}}
+embedding_dicts = defaultdict(dict)
 
 # sentence transformer model used to obtain embeddings
 model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
@@ -48,8 +47,7 @@ for _, row in tqdm(meta_df.iterrows(), total=len(meta_df)):
     prd_number = row["prd_number"]
     episode_title = row.get("episode_title", "") or ""
     episode_description = row.get("episode_description", "") or ""
-    title_and_descr = episode_title + " " + episode_description
-    texts = [episode_title, episode_description, title_and_descr]
+    texts = [episode_title, episode_description]
 
     for i, text in enumerate(texts):
         # tokenizing the text 
@@ -78,7 +76,7 @@ for _, row in tqdm(meta_df.iterrows(), total=len(meta_df)):
         embedding_dicts[i][prd_number] = embedding
 
 # paths to embedding locations
-emb_paths = [EMBEDDINGS_TITLE_PATH, EMBEDDINGS_DESCR_PATH, EMBEDDINGS_COMBI_PATH]
+emb_paths = [EMBEDDINGS_TITLE_PATH, EMBEDDINGS_DESCR_PATH]
 
 # saving embeddings
 print("Saving embeddings.")
