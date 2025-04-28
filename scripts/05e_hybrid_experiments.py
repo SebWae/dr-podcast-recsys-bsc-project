@@ -1,3 +1,4 @@
+import argparse
 import csv
 import json
 import os
@@ -17,11 +18,18 @@ from config import (
     RECOMMENDATIONS_KEY_CB_COMBI,
     N_RECOMMENDATIONS,
     EXPERIMENTS_HYBRID_PATH,
-    LAMBDA,
-    RECOMMENDATIONS_PATH,
-    RECOMMENDATIONS_KEY_HYBRID,
 )
 import utils.utils as utils
+
+
+# argument parser for input parameters
+print("Parsing the input arguments.")
+parser = argparse.ArgumentParser(description="Run hybrid recommender experiments with inputs for the lambda hyperparameter.")
+parser.add_argument("--lambda_vals", type=str, required=True, help="Comma-separated sequence of lambda values: x,y,z")
+args = parser.parse_args()
+
+# parsing the input arguments
+lambdas = [int(x) for x in args.lambda_vals(",")]
 
 # loading validation data
 print("Loading validation data.")
@@ -49,7 +57,6 @@ completion_rates_dict = utils.get_ratings_dict(data=val_df,
 
 # hyperparameter tuning for _lambda (weighting hyperparameter)
 print("Performing hyperparameter tuning for weighting parameter lambda.")
-lambdas = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 print(f"Lambda values to test: {lambdas}.")
 
 for _lambda in tqdm(lambdas):
@@ -90,19 +97,3 @@ for _lambda in tqdm(lambdas):
         break
 
     prev_ndcg = ndcg
-
-# generating recommendations from hybrid recommender with optimal lambda hyperparameter value
-print("Generating recommendations from hybrid recommender with optimal lambda hyperparameter value")
-hybrid_scores = utils.get_hybrid_scores(scores_dict_1=cf_scores,
-                                        scores_dict_2=cb_scores,
-                                        users=users,
-                                        _lambda=LAMBDA)
-    
-hybrid_recs = utils.extract_recs(scores_dict=hybrid_scores,
-                                 n_recs=N_RECOMMENDATIONS)
-
-# saving recommendations
-print(f"Saving recommendations to {RECOMMENDATIONS_PATH}.")
-recs_dict_key = {RECOMMENDATIONS_KEY_HYBRID: hybrid_recs}
-utils.save_dict_to_json(data_dict=recs_dict_key, 
-                        file_path=RECOMMENDATIONS_PATH)
