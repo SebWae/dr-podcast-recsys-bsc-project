@@ -6,7 +6,6 @@ import sys
 from typing import Iterable, Tuple
 
 from lenskit.algorithms.als import BiasedMF
-from lightfm import LightFM
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
