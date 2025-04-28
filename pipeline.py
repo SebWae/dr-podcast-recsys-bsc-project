@@ -8,9 +8,9 @@ scripts = [
     "scripts/03b_extract_embeddings.py",
     "scripts/04_train_test.py",
     "scripts/05a_baseline_recommender.py",
-    "scripts/05c_cf_recommender.py",
-    "scripts/05d_cb_recommender.py",
-    "scripts/05f_hybrid_recommender.py",
+    "scripts/05b_cf_recommender.py",
+    "scripts/05c_cb_recommenders.py",
+    "scripts/05d_hybrid_recommender.py",
     "scripts/06_evaluation.py"
 ]
 
