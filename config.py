@@ -26,7 +26,6 @@ VAR_RENAME_DICT = {"Date:Time (evar16)":           "date_time",
 DESCRIPTION_VAR_RENAME_DICT = {"PRD_NUMBER":       "prd_number",
                                "PRD_SHORTDESCR":   "episode_description",
                                }
-EMBEDDINGS_COMBI_PATH = "embeddings/combined_embeddings.parquet"
 EMBEDDINGS_DESCR_PATH = "embeddings/descr_embeddings.parquet"
 EMBEDDINGS_TITLE_PATH = "embeddings/title_embeddings.parquet"
 EPISODE_DESCRIPTION_PATH = "data\episode_descriptions.parquet"
@@ -57,9 +56,11 @@ VAL_DATA_PATH = "data\podcast_data_val.parquet"
 # for implementing recommenders
 DAMPING = 5
 EMBEDDING_DIM = 384
-EXPERIMENTS_CF_PATH = "results/cf_experiments.csv"
-EXPERIMENTS_HYBRID_PATH = "results/hybrid_experiments.csv"
-LAMBDA = 0.6
+EXPERIMENTS_CB_PATH = "experiments/cb_combi_experiment_results.csv"
+EXPERIMENTS_CF_PATH = "experiments/cf_experiment_results.csv"
+EXPERIMENTS_HYBRID_PATH = "experiments/hybrid_experiment_results.csv"
+LAMBDA_CB = 0.6
+LAMBDA_HYBRID = 0.6
 N_COMPONENTS = 60
 N_EPOCHS = 1000
 N_RECOMMENDATIONS = 10
