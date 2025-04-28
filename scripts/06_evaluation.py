@@ -13,6 +13,7 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 from config import (
     TRAIN_DATA_PATH,
     TEST_DATA_PATH,
+    EMBEDDINGS_COMBI_PATH,
     RECOMMENDATIONS_PATH,
     RECOMMENDERS,
     USER_EVAL_PATH,
@@ -21,11 +22,12 @@ from config import (
 import utils.utils as utils
 
 
-# importing training data
+# loading train and test data
 train_df = pd.read_parquet(TRAIN_DATA_PATH)
-
-# importing test data
 test_df = pd.read_parquet(TEST_DATA_PATH)
+
+# loading embeddings
+emb_df = pd.read_parquet(EMBEDDINGS_COMBI_PATH)
 
 # Open and load the JSON file
 with open(RECOMMENDATIONS_PATH, "r") as file:
@@ -49,8 +51,9 @@ for recommender in tqdm(RECOMMENDERS):
 
     for level in eval_levels:
         # initializing dictionaries to store metrics per user
-        hit_dict = {user_id: 0 for user_id in recommendations.keys()}
+        hit_dict = defaultdict(int)
         ndcg_dict = hit_dict.copy()
+        diversity_dict = hit_dict.copy()
 
         for user_id, rec_items in recommendations.items():
             # slicing rec_items according to level
@@ -61,21 +64,26 @@ for recommender in tqdm(RECOMMENDERS):
             correct_recs = true_items.intersection(rec_items)
             n_correct_recs = len(correct_recs)
             if n_correct_recs > 0:
-                hit_dict[user_id] += 1
+                hit_dict[user_id] = 1
 
             # computing NDCG for each user
             gain_dict = completion_rate_dict[user_id]
             optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)[:level]
             dcg = utils.compute_dcg(rec_items, gain_dict)
             dcg_star = utils.compute_dcg(optimal_items, gain_dict)
-            ndcg = dcg / dcg_star 
-            ndcg_dict[user_id] = ndcg
+            ndcg_user = dcg / dcg_star 
+            ndcg_dict[user_id] = ndcg_user
 
-        # adding hit_dict to user_dict
+            # computing diversity for each user
+            diversity_user = utils.compute_diversity(recommendations=rec_items, 
+                                                item_features=emb_df, 
+                                                item_id_name="episode")
+            diversity_dict[user_id] = diversity_user
+
+        # adding metric dictionaries to user_dict
         user_dict[level]["hit_rate"] = hit_dict
-        
-        # adding ndcg_dict to user_dict
         user_dict[level]["ndcg"] = ndcg_dict
+        user_dict[level]["diversity"] = diversity_dict
 
         # calculating global hit rate
         hit_rate = np.mean(list(hit_dict.values()))
@@ -84,6 +92,10 @@ for recommender in tqdm(RECOMMENDERS):
         # calculating global ndcg
         ndcg = np.mean(list(ndcg_dict.values()))
         recommender_dict[level]["ndcg"] = ndcg
+
+        # calculating global diversity
+        diversity = np.mean(list(diversity_dict.values()))
+        recommender_dict[level]["diversity"] = diversity
 
     # final dictionaries
     final_user_dict = {recommender: user_dict}
