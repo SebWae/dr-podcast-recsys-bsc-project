@@ -53,15 +53,15 @@ Supervisor: [Toine Bogers](https://github.com/toinebogers)
 │
 ├── experiments         
 │   │
-│   ├── cb_combi_experiment_results.csv     <- ndcg@10 for different values of the weighting hyperparameter lambda                    
+│   ├── cb_combi_experiments_results.csv    <- ndcg@10 for different values of the weighting hyperparameter lambda                    
 │   │
 │   ├── cb_combi_experiments.py             <- hyperparameter tuning for cb combi recommender
 │   │
-│   ├── cf_experiment_results.csv           <- ndcg@10 for different values of hyperparameters                    
+│   ├── cf_experiments_results.csv          <- ndcg@10 for different values of hyperparameters                    
 │   │
 │   ├── cf_experiments.py                   <- hyperparameter tuning for cf recommender
 │   │
-│   ├── hybrid_experiment_results.csv       <- ndcg@10 for different values of the weighting hyperparameter lambda
+│   ├── hybrid_experiments_results.csv      <- ndcg@10 for different values of the weighting hyperparameter lambda
 │   │
 │   └── hybrid_experiments.py               <- hyperparameter tuning for hybrid recommender
 │
@@ -155,17 +155,17 @@ The following scripts are used for hyperparameter tuning and are not a part of [
 - `05b_cf_experiments.py`
 - `05e_hybrid_experiments.py`
 
-To run the [CF experiments](scripts/05b_cf_experiments.py):
+To run the [CF experiments](experiments/cf_experiments.py):
 ```
-python scripts/05b_cf_experiments.py --n_comp_vals x_1,x_2,x_3 --damping_vals y_1,y_2,y_3 --reg_vals z_1,z_2,z_3
+python experiments/cf_experiments.py --n_comp_vals x_1,x_2,x_3 --damping_vals y_1,y_2,y_3 --reg_vals z_1,z_2,z_3
 ```
 where the `n_comp_vals` must be integers, while `damping_vals` and `reg_vals` are floats. 
 
-Similarly, to run the [Hybrid experiments](scripts/05e_hybrid_experiments.py):
+Similarly, to run the [Content-based experiments](experiments/cb_combi_experiments.py):
 ```
-python scripts/05e_hybrid_experiments.py --lambda_vals x_1,x_2,x_3
+python experiments/cb_combi_experiments.py --lambda_vals x_1,x_2,x_3
 ```
-where the `lambda_vals` are floats.
+where the `lambda_vals` are floats. This is the same for [Hybrid experiments](experiments/hybrid_experiments.py), just substitute the filename.
 
 All possible combinations of the hyperparameter values will be tested and evaluated in terms of `ndcg@10`.  
 It is possible to add any desired number of values for each hyperparameter.
