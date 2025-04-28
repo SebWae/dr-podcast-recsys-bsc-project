@@ -97,7 +97,6 @@ dependencies:
   - libuv=1.48.0=h827c3e9_0
   - libwebp-base=1.3.2=h3d04722_1
   - libxml2=2.13.7=h866ff63_0
-  - lightfm=1.17=py310h9b08ddd_2
   - llvmlite=0.42.0=py310hf2fb9eb_0
   - lz4-c=1.9.4=hcfcfb64_0
   - m2w64-gcc-libgfortran=5.3.0=6
