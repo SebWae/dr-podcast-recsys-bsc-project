@@ -17,13 +17,11 @@ from config import (
     METADATA_PATH,
     EMBEDDINGS_TITLE_PATH,
     EMBEDDINGS_DESCR_PATH,
-    EMBEDDINGS_COMBI_PATH,
 )
 import utils.utils as utils
 
 # downloading stopwords
 nltk.download('stopwords')
-
 
 # dictionaries to hold embeddings
 embedding_dicts = defaultdict(dict)
