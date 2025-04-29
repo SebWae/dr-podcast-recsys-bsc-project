@@ -56,9 +56,9 @@ VAL_DATA_PATH = "data\podcast_data_val.parquet"
 # for implementing recommenders
 DAMPING = 5
 EMBEDDING_DIM = 384
-EXPERIMENTS_CB_PATH = "experiments/cb_combi_experiment_results.csv"
-EXPERIMENTS_CF_PATH = "experiments/cf_experiment_results.csv"
-EXPERIMENTS_HYBRID_PATH = "experiments/hybrid_experiment_results.csv"
+EXPERIMENTS_CB_PATH = "experiments/cb_combi_experiments_results.csv"
+EXPERIMENTS_CF_PATH = "experiments/cf_experiments_results.csv"
+EXPERIMENTS_HYBRID_PATH = "experiments/hybrid_experiments_results.csv"
 LAMBDA_CB = 0.6
 LAMBDA_HYBRID = 0.6
 N_COMPONENTS = 60
