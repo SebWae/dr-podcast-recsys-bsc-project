@@ -14,6 +14,7 @@ from config import (
     TEST_DATA_PATH,
     METADATA_PATH,
     EMBEDDINGS_DESCR_PATH,
+    N_RECOMMENDATIONS,
     SPLIT_DATE_VAL_TEST,
     USER_EVAL_PATH,
     RECOMMENDER_EVAL_PATH,
@@ -28,6 +29,7 @@ import utils.utils as utils
 # thus, the baseline recommender will be evaluated directly in this script
 
 # loading train, test and metadata
+print("Loading data and embeddings.")
 train_df = pd.read_parquet(TRAIN_DATA_PATH)
 test_df = pd.read_parquet(TEST_DATA_PATH)
 meta_df = pd.read_parquet(METADATA_PATH)
@@ -38,13 +40,15 @@ emb_df = pd.read_parquet(EMBEDDINGS_DESCR_PATH)
 # left joining the metadata onto the train data
 train_w_meta = pd.merge(train_df, meta_df, on="prd_number", how="left")
 
-# identifying the top 10 shows
+# identifying the top shows
+print(f"Identifying the top {N_RECOMMENDATIONS} shows.")
 show_counts = train_w_meta.groupby("series_title")["user_id"].nunique()
-top_10_shows = show_counts.sort_values(ascending=False)[:10].index.tolist()
+top_shows = show_counts.sort_values(ascending=False)[:N_RECOMMENDATIONS].index.tolist()
 
-# finding most recent episode for each top 10 show after val-test split date
+# finding most recent episode for each top show after val-test split date
+print("Generating recommendations")
 recommendations = []
-for show in top_10_shows:
+for show in tqdm(top_shows):
     show_filtered = meta_df[(meta_df["series_title"] == show) & (meta_df["pub_date"] >= SPLIT_DATE_VAL_TEST)]
     shows_after_split_date = len(show_filtered)
 
@@ -55,19 +59,12 @@ for show in top_10_shows:
     first_prd_number = show_filtered_sorted.iloc[0]["prd_number"]
     recommendations.append(first_prd_number)
 
-# iterating through the rows of the test_df to build dictionary of completion rates
-completion_rate_dict = {}
-
-for _, row in test_df.iterrows():
-    user = row['user_id']
-    prd = row['prd_number']
-    completion_rate = row['completion_rate']
-    
-    # adding new users with an empty dictionary
-    if user not in completion_rate_dict:
-        completion_rate_dict[user] = {}
-    
-    completion_rate_dict[user][prd] = completion_rate
+# constructing the completion rate dictionary
+print("Constructing completion rate dictionary.")
+completion_rate_dict = utils.get_ratings_dict(data=test_df,
+                                              user_col="user_id",
+                                              item_col="prd_number",
+                                              ratings_col="completion_rate")
 
 # dictionaries to store evaluation metrics for each recommender
 recommender_dict = defaultdict(dict)
@@ -76,6 +73,7 @@ user_dict = defaultdict(dict)
 # evaluation levels (@2, @6, and @10)
 eval_levels = [2, 6, 10]
 
+print("Evaluating baseline recommender.")
 for level in tqdm(eval_levels):
     # initializing dictionaries to store metrics per user
     hit_dict = {user_id: 0 for user_id in completion_rate_dict.keys()}
@@ -121,6 +119,7 @@ for level in tqdm(eval_levels):
     recommender_dict[level]["diversity"] = diversity
 
 # final dictionaries
+print("Saving results.")
 final_user_dict = {"pop_baseline": user_dict}
 final_recommender_dict = {"pop_baseline": recommender_dict}
 
