@@ -13,7 +13,7 @@ from config import (
     TRAIN_DATA_PATH,
     TEST_DATA_PATH,
     METADATA_PATH,
-    EMBEDDINGS_COMBI_PATH,
+    EMBEDDINGS_DESCR_PATH,
     SPLIT_DATE_VAL_TEST,
     USER_EVAL_PATH,
     RECOMMENDER_EVAL_PATH,
@@ -33,14 +33,14 @@ test_df = pd.read_parquet(TEST_DATA_PATH)
 meta_df = pd.read_parquet(METADATA_PATH)
 
 # loading embeddings
-emb_df = pd.read_parquet(EMBEDDINGS_COMBI_PATH)
+emb_df = pd.read_parquet(EMBEDDINGS_DESCR_PATH)
 
 # left joining the metadata onto the train data
 train_w_meta = pd.merge(train_df, meta_df, on="prd_number", how="left")
 
 # identifying the top 10 shows
-show_counts = train_w_meta.groupby("series_title").size().reset_index(name="count")
-top_10_shows = show_counts.nlargest(10, "count")["series_title"].tolist()
+show_counts = train_w_meta.groupby("series_title")["user_id"].nunique()
+top_10_shows = show_counts.sort_values(ascending=False)[:10].index.tolist()
 
 # finding most recent episode for each top 10 show after val-test split date
 recommendations = []
