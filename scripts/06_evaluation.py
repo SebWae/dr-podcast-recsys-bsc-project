@@ -33,6 +33,7 @@ emb_df = pd.read_parquet(EMBEDDINGS_COMBI_PATH)
 with open(RECOMMENDATIONS_PATH, "r") as file:
     data = json.load(file)
 
+# constructing the completion rate dictionary
 completion_rate_dict = utils.get_ratings_dict(data=test_df,
                                               user_col="user_id",
                                               item_col="prd_number",
