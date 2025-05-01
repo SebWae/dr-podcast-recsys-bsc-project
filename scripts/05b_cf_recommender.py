@@ -19,6 +19,7 @@ from config import (
     N_COMPONENTS,
     DAMPING,
     REG,
+    RANDOM_STATE,
     OPTIMAL_CF_PATH,
     SCORES_PATH,
     RECOMMENDATIONS_KEY_CF,
@@ -71,7 +72,11 @@ for epochs in tqdm(range(1, N_EPOCHS+1)):
     print(f"\n Epoch {epochs}:")
 
     # initializing BiasedMF model
-    mf = BiasedMF(features=N_COMPONENTS, damping=DAMPING, reg=REG, iterations=epochs)
+    mf = BiasedMF(features=N_COMPONENTS, 
+                  iterations=epochs,
+                  damping=DAMPING, 
+                  reg=REG, 
+                  rng_spec=RANDOM_STATE)
 
     # fitting the model
     mf.fit(ratings_df)

@@ -88,9 +88,9 @@ for n_components, damping, reg in tqdm(list(product(n_components_values, damping
 
         # initializing BiasedMF model
         mf = BiasedMF(features=n_components, 
+                      iterations=epochs,
+                      reg=reg,  
                       damping=damping, 
-                      reg=reg, 
-                      iterations=epochs, 
                       rng_spec=RANDOM_STATE)
 
         # fitting the model
