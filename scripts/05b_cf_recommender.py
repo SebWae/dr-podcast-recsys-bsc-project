@@ -17,7 +17,6 @@ from config import (
     N_EPOCHS,
     N_RECOMMENDATIONS,
     N_COMPONENTS,
-    DAMPING,
     REG,
     RANDOM_STATE,
     OPTIMAL_CF_PATH,
@@ -74,8 +73,8 @@ for epochs in tqdm(range(1, N_EPOCHS+1)):
     # initializing BiasedMF model
     mf = BiasedMF(features=N_COMPONENTS, 
                   iterations=epochs,
-                  damping=DAMPING, 
                   reg=REG, 
+                  bias=False,
                   rng_spec=RANDOM_STATE)
 
     # fitting the model
