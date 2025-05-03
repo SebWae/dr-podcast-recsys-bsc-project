@@ -295,7 +295,7 @@ def get_user_profile(emb_size: int,
                      time_col: str, 
                      item_col: str,
                      emb_dict: dict,
-                     wght_method="inverse") -> np.ndarray:
+                     wght_scheme="inverse") -> np.ndarray:
     """
     Function to build user profiles as a numpy array for a content-based recommender.
 
@@ -304,7 +304,7 @@ def get_user_profile(emb_size: int,
     user_int:       Dataframe containing the interactions of the user to build a profile for.
     time_col:       Name of the column containing the temporal data indicating how long time since an interaction took place.
     emb_df:         Dictionary containing the embeddings for any item. 
-    wght_method:    Method to weight the interactions, must be one of 'inverse' or 'linear'.
+    wght_scheme:    Method to weight the interactions, must be one of 'inverse' or 'linear'.
 
     Returns:
     user_profile:   The resulting user profile as a numpy array. 
@@ -316,9 +316,9 @@ def get_user_profile(emb_size: int,
     time_list = user_int[time_col].to_numpy() 
     
     # initial weights for each weighting method
-    if wght_method == "inverse":
+    if wght_scheme == "inverse":
         weights = 1 / time_list
-    elif wght_method == "linear":
+    elif wght_scheme == "linear":
         max_time = max(time_list)
         weights = max_time - time_list + 1
     else:
