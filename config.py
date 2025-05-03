@@ -1,10 +1,11 @@
 # for filtering and transforming data
 END_DATE = "2024-12-01 23:59:59"
-FILTERED_DATA_PATH = "data\podcast_data_filtered.parquet"  
+FILTERED_DATA_PATH = "data/podcast_data_filtered.parquet"  
+INT_FILTERED_DATA_PATH = "data/podcast_data_int_filtered.parquet"
 MIN_CONTENT_TIME_SPENT = 60  
-RAW_DATA_PATH = "data\podcast_data_raw.parquet"
+RAW_DATA_PATH = "data/podcast_data_raw.parquet"
 START_DATE = "2024-09-02 00:00:00"
-TRANSFORMED_DATA_PATH = "data\podcast_data_transformed.parquet"
+TRANSFORMED_DATA_PATH = "data/podcast_data_transformed.parquet"
 VAR_RENAME_DICT = {"Date:Time (evar16)":           "date_time",
                    "UserID Visit (evar95)":        "user_id",
                    "Production Number (evar35)":   "prd_number",
@@ -28,7 +29,7 @@ DESCRIPTION_VAR_RENAME_DICT = {"PRD_NUMBER":       "prd_number",
                                }
 EMBEDDINGS_DESCR_PATH = "embeddings/descr_embeddings.parquet"
 EMBEDDINGS_TITLE_PATH = "embeddings/title_embeddings.parquet"
-EPISODE_DESCRIPTION_PATH = "data\episode_descriptions.parquet"
+EPISODE_DESCRIPTION_PATH = "data/episode_descriptions.parquet"
 METADATA_COLUMNS = {"series_title":         "first",
                     "unique_title":         "first",
                     "pub_date":             "first",
@@ -39,7 +40,7 @@ METADATA_COLUMNS = {"series_title":         "first",
                     "category":             "first",
                     "episode_description":  "first",
                     }
-METADATA_PATH = "data\episode_metadata.parquet"
+METADATA_PATH = "data/episode_metadata.parquet"
 UTILS_PATH = "utils/utils.json"
 
 # for train-test splitting
@@ -49,9 +50,9 @@ MIN_PLAYS_PER_USER = 2
 MIN_USERS_PER_SHOW = 10
 SPLIT_DATE_TRAIN_VAL = "2024-10-21"
 SPLIT_DATE_VAL_TEST = "2024-11-11"
-TEST_DATA_PATH = "data\podcast_data_test.parquet"
-TRAIN_DATA_PATH = "data\podcast_data_train.parquet"
-VAL_DATA_PATH = "data\podcast_data_val.parquet"
+TEST_DATA_PATH = "data/podcast_data_test.parquet"
+TRAIN_DATA_PATH = "data/podcast_data_train.parquet"
+VAL_DATA_PATH = "data/podcast_data_val.parquet"
 
 # for implementing recommenders
 EMBEDDING_DIM = 384
