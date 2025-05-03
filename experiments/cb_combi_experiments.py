@@ -115,8 +115,10 @@ for _lambda in tqdm(lambdas):
         for item in items:
             # only computing scores for non-consumed items
             if item not in user_items:
-                embedding = emb_dict[item]
-                cos_sim = cosine_similarity(user_profile, embedding)
+                embedding = np.array(emb_dict[item], dtype=np.float64)
+                user_profile_rshpd = user_profile.reshape(1, -1)
+                embedding_rshpd = embedding.reshape(1, -1)
+                cos_sim = cosine_similarity(user_profile_rshpd, embedding_rshpd)[0][0]
             user_scores[item] = cos_sim
         
         # normalizing the user scores
