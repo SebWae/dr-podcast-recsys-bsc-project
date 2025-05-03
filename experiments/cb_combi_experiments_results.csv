@@ -1,1 +1,2 @@
-lambda, ndcg@10
+lambda, ndcg@10, wght_scheme
+0.05,0.01632965098913002,inverse
