@@ -29,11 +29,20 @@ print("Parsing the input arguments.")
 parser = argparse.ArgumentParser(description="Run collaborative filtering experiments with hyperparameter inputs.")
 parser.add_argument("--n_comp_vals", type=str, required=True, help="Comma-separated sequence of n_components values: x,y,z")
 parser.add_argument("--reg_vals", type=str, required=True, help="Comma-separated sequence of regularization values: x,y,z")
+parser.add_argument("--damping_vals", type=str, required=False, help="Comma-separated sequence of damping values: x,y,z")
+parser.add_argument("--bias", type=int, required=True, help="0 for no bias terms, 1 for including bias terms")
 args = parser.parse_args()
 
 # parsing the input arguments
 n_components_values = [int(x) for x in args.n_comp_vals.split(",")]
 reg_values = [float(x) for x in args.reg_vals.split(",")]
+
+if args.damping_vals is not None:
+    damping_values = [float(x) for x in args.damping_vals.split(",")]
+else:
+    damping_values = [None] 
+
+bias_value = bool(args.bias)
 
 # loading train, validation and metadata
 print("Loading data.")
@@ -76,20 +85,30 @@ completion_rates_dict = utils.get_ratings_dict(data=val_df,
 
 # performing hyperparameter experiments for cf recommender
 print("Performing hyperparameter experiments.")
-print(f"Testing values: n_components={n_components_values}, reg={reg_values}")
+print(f"Testing values: n_components={n_components_values}, reg={reg_values}, damping={damping_values}, bias={bias_value}")
 
-for n_components, reg in tqdm(list(product(n_components_values, reg_values))):
-    print(f"\nTesting combination: features={n_components}, reg={reg}")
+for n_components, reg, damping in tqdm(list(product(n_components_values, reg_values, damping_values))):
+    if bias_value:
+        print(f"\nTesting combination: features={n_components}, reg={reg}, damping={damping}")
+    else:
+        print(f"\nTesting combination: features={n_components}, reg={reg}")
     prev_ndcg = 0
     for epochs in range(1, N_EPOCHS+1):
         print(f"\n Epoch {epochs}:")
 
         # initializing BiasedMF model
-        mf = BiasedMF(features=n_components,  
-                      iterations=epochs, 
-                      reg=reg, 
-                      bias=False,
-                      rng_spec=RANDOM_STATE)
+        if bias_value:
+            mf = BiasedMF(features=n_components,  
+                          iterations=epochs, 
+                          reg=reg,
+                          damping=damping, 
+                          rng_spec=RANDOM_STATE)
+        else:
+            mf = BiasedMF(features=n_components,  
+                          iterations=epochs, 
+                          reg=reg,
+                          bias=bias_value,
+                          rng_spec=RANDOM_STATE)
 
         # fitting the model
         mf.fit(ratings_df)
@@ -123,7 +142,10 @@ for n_components, reg in tqdm(list(product(n_components_values, reg_values))):
             print(f"Saving experiment results to {EXPERIMENTS_CF_PATH}.")
 
             # writing row to csv
-            row = [n_components, reg, prev_ndcg]
+            if bias_value:
+                row = [n_components, damping, reg, prev_ndcg]
+            else:
+                row = [n_components, "-", reg, prev_ndcg]
             with open(EXPERIMENTS_CF_PATH, mode="a", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(row)
