@@ -329,9 +329,17 @@ def get_user_profile(emb_size: int,
 
     # iterating through the user interactions to build profile
     for i, row in user_int.iterrows():
+
+        # normalizing the weight
         weight = weights[i] / wght_total
+
+        # retrieving the item id
         item_id = row[item_col]
-        embedding = emb_dict[item_id]
+
+        # retrieving the embedding and converting it to a numpy array
+        embedding = np.array(emb_dict[item_id], dtype=np.float64)
+
+        # applying the weight to the embedding and adding it to the user profile
         embedding *= weight
         user_profile += embedding
 
