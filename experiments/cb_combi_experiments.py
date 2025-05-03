@@ -79,12 +79,13 @@ print("Performing hyperparameter tuning for weighting parameter lambda.")
 print(f"Lambda values to test: {lambdas}.")
 print(f"Weighting method: {wght_method}")
 
-for _lambda in tqdm(lambdas):
+for _lambda in lambdas:
     print(f"\nTesting lambda={_lambda}.")
     # initializing dictionary to store scores for each user
     scores_dict = defaultdict(dict)
 
     # extracting embeddings and storing them in a dictionary
+    print("Extracting combi embeddings from the title and descriptions embeddings.")
     emb_dict = {}
     for _, row in title_emb_df.iterrows():
         prd_number = row["episode"]
@@ -93,9 +94,12 @@ for _lambda in tqdm(lambdas):
         embedding = _lambda * title_embedding + (1 - _lambda) * descr_embedding
         emb_dict[prd_number] = embedding
 
+    # item embeddings as numpy array
+    item_embeddings = np.array([emb_dict[item] for item in items], dtype=np.float64)
+
     # generate user profiles
     print("Generating user profile and recommendations for each user.")
-    for user in users:
+    for user in tqdm(users):
         # initialize user profile (embedding)
         user_interactions = train_df[train_df["user_id"] == user].reset_index()
         user_profile = utils.get_user_profile(emb_size=EMBEDDING_DIM,
@@ -105,28 +109,28 @@ for _lambda in tqdm(lambdas):
                                               emb_dict=emb_dict,
                                               wght_method=wght_method)
 
-        # initializing dictionary to store user scores
-        user_scores = {}
+        # reshaping the user profile to a 2D numpy array
+        user_profile_rshpd = user_profile.reshape(1, -1)
 
-        # items consumed by user
+        # items consumed by the user
         user_show_episodes_dict = all_users_show_episodes_dict[user]
-        user_items = [item for sublist in user_show_episodes_dict.values() for item in sublist]
-        
-        for item in items:
-            # only computing scores for non-consumed items
+        user_items = {item for sublist in user_show_episodes_dict.values() for item in sublist}
+
+        # computing all cosine similarities at once for all items
+        cos_sim = cosine_similarity(user_profile_rshpd, item_embeddings).flatten()
+
+        # filtering out items already consumed by the user
+        user_scores = {}
+        for idx, item in enumerate(items):
             if item not in user_items:
-                embedding = np.array(emb_dict[item], dtype=np.float64)
-                user_profile_rshpd = user_profile.reshape(1, -1)
-                embedding_rshpd = embedding.reshape(1, -1)
-                cos_sim = cosine_similarity(user_profile_rshpd, embedding_rshpd)[0][0]
-            user_scores[item] = cos_sim
-        
+                user_scores[item] = cos_sim[idx]
+
         # normalizing the user scores
         values = np.array(list(user_scores.values()))
         norm = np.linalg.norm(values)
         normalized_user_scores = {key: value / norm for key, value in user_scores.items()}
-        
-        # adding user_scores to scores_dict
+
+        # storing the results
         scores_dict[user] = normalized_user_scores
 
     # extract recommendations from scores

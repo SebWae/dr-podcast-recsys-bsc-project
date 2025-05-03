@@ -24,6 +24,7 @@ from config import (
     RECOMMENDATIONS_KEY_CB_COMBI,
     LAMBDA_CB,
     EMBEDDING_DIM,
+    WGHT_METHOD,
     SCORES_PATH,
     N_RECOMMENDATIONS,
     RECOMMENDATIONS_PATH,
@@ -78,49 +79,43 @@ for emb_df, rec_key in tqdm(metadata_levels):
             embedding = row[1:].values.flatten()
         emb_dict[prd_number] = embedding
 
+    # item embeddings as numpy array
+    item_embeddings = np.array([emb_dict[item] for item in items], dtype=np.float64)
+
     # generate user profiles
     print("Generating user profile and recommendations for each user.")
     for user in users:
         # initialize user profile (embedding)
-        user_profile = np.zeros(EMBEDDING_DIM)
+        user_interactions = train_df[train_df["user_id"] == user].reset_index()
+        user_profile = utils.get_user_profile(emb_size=EMBEDDING_DIM,
+                                              user_int=user_interactions,
+                                              time_col="days_since",
+                                              item_col="prd_number",
+                                              emb_dict=emb_dict,
+                                              wght_method=WGHT_METHOD)
 
-        # filter train_df on user
-        user_interactions = train_df[train_df["user_id"] == user]
+        # reshaping the user profile to a 2D numpy array
+        user_profile_rshpd = user_profile.reshape(1, -1)
 
-        # days since listened from train-val split date
-        total_days = sum(user_interactions["days_since"])
-
-        # computing weights
-        weights = user_interactions["days_since"].to_list()
-        weights = [weight / total_days for weight in weights].reverse()
-
-        for i, row in user_interactions.iterrows():
-            weight = weights[i]
-            prd_number = row["prd_number"]
-            embedding = emb_dict[prd_number]
-            embedding *= weight
-            user_profile += embedding
-
-        # initializing dictionary to store user scores
-        user_scores = {}
-
-        # items consumed by user
+        # items consumed by the user
         user_show_episodes_dict = all_users_show_episodes_dict[user]
-        user_items = [item for sublist in user_show_episodes_dict.values() for item in sublist]
-        
-        for item in items:
-            # only computing scores for non-consumed items
+        user_items = {item for sublist in user_show_episodes_dict.values() for item in sublist}
+
+        # computing all cosine similarities at once for all items
+        cos_sim = cosine_similarity(user_profile_rshpd, item_embeddings).flatten()
+
+        # filtering out items already consumed by the user
+        user_scores = {}
+        for idx, item in enumerate(items):
             if item not in user_items:
-                embedding = emb_dict[item]
-                cos_sim = cosine_similarity(user_profile, embedding)
-            user_scores[item] = cos_sim
-        
+                user_scores[item] = cos_sim[idx]
+
         # normalizing the user scores
         values = np.array(list(user_scores.values()))
         norm = np.linalg.norm(values)
         normalized_user_scores = {key: value / norm for key, value in user_scores.items()}
-        
-        # adding user_scores to scores_dict
+
+        # storing the results
         scores_dict[user] = normalized_user_scores
 
     # saving scores
