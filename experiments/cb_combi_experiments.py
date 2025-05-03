@@ -33,12 +33,12 @@ import utils.utils as utils
 print("Parsing the input arguments.")
 parser = argparse.ArgumentParser(description="Run content-based combi experiments with inputs for the lambda hyperparameter.")
 parser.add_argument("--lambda_vals", type=str, required=True, help="Comma-separated sequence of lambda values: x,y,z")
-parser.add_argument("--wght_method", type=str, required=True, help="String, one of 'inverse' or 'linear'")
+parser.add_argument("--wght_scheme", type=str, required=True, help="String, one of 'inverse' or 'linear'")
 args = parser.parse_args()
 
 # parsing the input arguments
 lambdas = [float(x) for x in args.lambda_vals.split(",")]
-wght_method = args.wght_method
+wght_scheme = args.wght_method
 
 # loading data and embeddings
 print("Loading data and embeddings.")
@@ -77,7 +77,7 @@ completion_rates_dict = utils.get_ratings_dict(data=val_df,
 # hyperparameter tuning for _lambda (weighting hyperparameter)
 print("Performing hyperparameter tuning for weighting parameter lambda.")
 print(f"Lambda values to test: {lambdas}.")
-print(f"Weighting method: {wght_method}")
+print(f"Weighting method: {wght_scheme}")
 
 for _lambda in lambdas:
     print(f"\nTesting lambda={_lambda}.")
@@ -107,7 +107,7 @@ for _lambda in lambdas:
                                               time_col="days_since",
                                               item_col="prd_number",
                                               emb_dict=emb_dict,
-                                              wght_method=wght_method)
+                                              wght_method=wght_scheme)
 
         # reshaping the user profile to a 2D numpy array
         user_profile_rshpd = user_profile.reshape(1, -1)
@@ -152,7 +152,7 @@ for _lambda in lambdas:
     # saving experiment result
     print(f"Saving experiment results to {EXPERIMENTS_CB_PATH}.")
 
-    row = [_lambda, ndcg]
+    row = [_lambda, ndcg, wght_scheme]
     with open(EXPERIMENTS_CB_PATH, mode="a", newline="") as file:
         writer = csv.writer(file)
         writer.writerow(row)
