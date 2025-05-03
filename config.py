@@ -76,6 +76,7 @@ RECOMMENDATIONS_PATH = "results/recommendations.json"
 RECOMMENDERS = ["cf_recommendations", "hybrid_recommendations"]
 REG = 0.05
 SCORES_PATH = "results/scores.json"
+WGHT_METHOD = "inverse"
 
 # for evaluation
 EVALUATION_METRICS = ["hit_rate", "ndcg"]
