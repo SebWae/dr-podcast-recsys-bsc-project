@@ -14,8 +14,9 @@ from config import (
     SPLIT_DATE_TRAIN_VAL,
     SPLIT_DATE_VAL_TEST,
     MIN_PLAYS_PER_USER,
-    FILTERED_DATA_PATH,
     MIN_USERS_PER_SHOW,
+    INT_FILTERED_DATA_PATH,
+    FILTERED_DATA_PATH,
 )
 
 
@@ -87,6 +88,9 @@ show_grp_df = cts_grp_df.groupby('series_title')['user_id'].nunique()
 # filtering away shows listened to by less than 10 unique users
 filtered_df = filtered_df[filtered_df['series_title']
                           .isin(show_grp_df[show_grp_df >= MIN_USERS_PER_SHOW].index)]
+
+# saving intermediary filtered data
+filtered_df.to_parquet(INT_FILTERED_DATA_PATH, index=False)
 
 # formatting split dates as datetime
 print("Filtering on train, val and test period (filtering task 7/7)")
