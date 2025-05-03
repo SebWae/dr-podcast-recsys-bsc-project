@@ -97,7 +97,7 @@ for _lambda in tqdm(lambdas):
     print("Generating user profile and recommendations for each user.")
     for user in users:
         # initialize user profile (embedding)
-        user_interactions = train_df[train_df["user_id"] == user]
+        user_interactions = train_df[train_df["user_id"] == user].reset_index()
         user_profile = utils.get_user_profile(emb_size=EMBEDDING_DIM,
                                               user_int=user_interactions,
                                               time_col="days_since",
