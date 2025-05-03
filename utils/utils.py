@@ -290,6 +290,54 @@ def get_ratings_dict(data: pd.DataFrame,
     return ratings_dict
 
 
+def get_user_profile(emb_size: int, 
+                     user_int: pd.DataFrame, 
+                     time_col: str, 
+                     item_col: str,
+                     emb_dict: dict,
+                     wght_method="inverse") -> np.ndarray:
+    """
+    Function to build user profiles as a numpy array for a content-based recommender.
+
+    Parameter:
+    emb_size:       Dimension of embeddings and the user profile. 
+    user_int:       Dataframe containing the interactions of the user to build a profile for.
+    time_col:       Name of the column containing the temporal data indicating how long time since an interaction took place.
+    emb_df:         Dictionary containing the embeddings for any item. 
+    wght_method:    Method to weight the interactions, must be one of 'inverse' or 'linear'.
+
+    Returns:
+    user_profile:   The resulting user profile as a numpy array. 
+    """
+    # initialize user profile (embedding)
+    user_profile = np.zeros(emb_size)
+
+    # time column to list
+    time_list = user_int[time_col].to_list()
+
+    # initial weights for each weighting method
+    if wght_method == "inverse":
+        weights = [1 / time for time in time_list]
+    elif wght_method == "linear":
+        max_time = max(time_list)
+        weights = [max_time - time + 1 for time in time_list]
+    else:
+        raise ValueError("The wght_method should be one of 'inverse' or 'linear'.")
+
+    # sum of weights list for normalization
+    wght_total = sum(weights)
+
+    # iterating through the user interactions to build profile
+    for i, row in user_int.iterrows():
+        weight = weights[i] / wght_total
+        item_id = row[item_col]
+        embedding = emb_dict[item_id]
+        embedding *= weight
+        user_profile += embedding
+
+    return user_profile
+
+
 def permutation_test(dist1: dict, 
                      dist2: dict, 
                      N=1000, 
