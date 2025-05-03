@@ -312,36 +312,27 @@ def get_user_profile(emb_size: int,
     # initialize user profile (embedding)
     user_profile = np.zeros(emb_size)
 
-    # time column to list
-    time_list = user_int[time_col].to_list()
-
+    # time column to numpy array
+    time_list = user_int[time_col].to_numpy() 
+    
     # initial weights for each weighting method
     if wght_method == "inverse":
-        weights = [1 / time for time in time_list]
+        weights = 1 / time_list
     elif wght_method == "linear":
         max_time = max(time_list)
-        weights = [max_time - time + 1 for time in time_list]
+        weights = max_time - time_list + 1
     else:
         raise ValueError("The wght_method should be one of 'inverse' or 'linear'.")
 
-    # sum of weights list for normalization
-    wght_total = sum(weights)
+    # normalizing the weights
+    weight_total = np.sum(weights)
 
-    # iterating through the user interactions to build profile
-    for i, row in user_int.iterrows():
+    # retrieving embeddings for items consumed by user
+    item_ids = user_int[item_col].to_numpy()
+    embeddings = np.array([emb_dict[item_id] for item_id in item_ids], dtype=np.float64)
 
-        # normalizing the weight
-        weight = weights[i] / wght_total
-
-        # retrieving the item id
-        item_id = row[item_col]
-
-        # retrieving the embedding and converting it to a numpy array
-        embedding = np.array(emb_dict[item_id], dtype=np.float64)
-
-        # applying the weight to the embedding and adding it to the user profile
-        embedding *= weight
-        user_profile += embedding
+    # applying weights to embeddings and accumulate to user profile
+    user_profile += np.sum(embeddings * (weights[:, np.newaxis] / weight_total), axis=0)
 
     return user_profile
 
