@@ -62,7 +62,7 @@ metadata_levels = [(title_emb_df, RECOMMENDATIONS_KEY_CB_TITLE),
                    (descr_emb_df, RECOMMENDATIONS_KEY_CB_DESCR), 
                    (title_emb_df, RECOMMENDATIONS_KEY_CB_COMBI)]
 
-for emb_df, rec_key in tqdm(metadata_levels):
+for emb_df, rec_key in metadata_levels:
     # initializing dictionary to store scores for each user
     scores_dict = defaultdict(dict)
 
@@ -84,7 +84,7 @@ for emb_df, rec_key in tqdm(metadata_levels):
 
     # generate user profiles
     print("Generating user profile and recommendations for each user.")
-    for user in users:
+    for user in tqdm(users):
         # initialize user profile (embedding)
         user_interactions = train_df[train_df["user_id"] == user].reset_index()
         user_profile = utils.get_user_profile(emb_size=EMBEDDING_DIM,
