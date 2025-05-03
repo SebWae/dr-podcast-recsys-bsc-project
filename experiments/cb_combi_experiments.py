@@ -33,13 +33,15 @@ import utils.utils as utils
 print("Parsing the input arguments.")
 parser = argparse.ArgumentParser(description="Run content-based combi experiments with inputs for the lambda hyperparameter.")
 parser.add_argument("--lambda_vals", type=str, required=True, help="Comma-separated sequence of lambda values: x,y,z")
+parser.add_argument("--wght_method", type=str, required=True, help="String, one of 'inverse' or 'linear'")
 args = parser.parse_args()
 
 # parsing the input arguments
-lambdas = [int(x) for x in args.lambda_vals(",")]
+lambdas = [float(x) for x in args.lambda_vals.split(",")]
+wght_method = args.wght_method
 
 # loading data and embeddings
-print("loading data and embeddings.")
+print("Loading data and embeddings.")
 train_df = pd.read_parquet(TRAIN_DATA_PATH)
 val_df = pd.read_parquet(VAL_DATA_PATH)
 meta_df = pd.read_parquet(METADATA_PATH)
@@ -55,6 +57,7 @@ items = meta_df["prd_number"].unique()
 # adding days since train-val split date as a column in the train_df
 print("Computing days since train-val date for each train interaction.")
 reference_date = datetime.strptime(SPLIT_DATE_TRAIN_VAL, "%Y-%m-%d")
+train_df["date"] = pd.to_datetime(train_df["date"])
 train_df["days_since"] = (reference_date - train_df["date"]).dt.days
 
 # loading utils dictionaries
@@ -74,6 +77,7 @@ completion_rates_dict = utils.get_ratings_dict(data=val_df,
 # hyperparameter tuning for _lambda (weighting hyperparameter)
 print("Performing hyperparameter tuning for weighting parameter lambda.")
 print(f"Lambda values to test: {lambdas}.")
+print(f"Weighting method: {wght_method}")
 
 for _lambda in tqdm(lambdas):
     print(f"\nTesting lambda={_lambda}.")
@@ -93,24 +97,13 @@ for _lambda in tqdm(lambdas):
     print("Generating user profile and recommendations for each user.")
     for user in users:
         # initialize user profile (embedding)
-        user_profile = np.zeros(EMBEDDING_DIM)
-
-        # filter train_df on user
         user_interactions = train_df[train_df["user_id"] == user]
-
-        # days since listened from train-val split date
-        total_days = sum(user_interactions["days_since"])
-
-        # computing weights
-        weights = user_interactions["days_since"].to_list()
-        weights = [weight / total_days for weight in weights].reverse()
-
-        for i, row in user_interactions.iterrows():
-            weight = weights[i]
-            prd_number = row["prd_number"]
-            embedding = emb_dict[prd_number]
-            embedding *= weight
-            user_profile += embedding
+        user_profile = utils.get_user_profile(emb_size=EMBEDDING_DIM,
+                                              user_int=user_interactions,
+                                              time_col="days_since",
+                                              item_col="prd_number",
+                                              emb_dict=emb_dict,
+                                              wght_method=wght_method)
 
         # initializing dictionary to store user scores
         user_scores = {}
