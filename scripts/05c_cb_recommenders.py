@@ -106,7 +106,7 @@ for level in metadata_levels.values():
                                               time_col="days_since",
                                               item_col="prd_number",
                                               emb_dict=emb_dict,
-                                              wght_method=WGHT_METHOD)
+                                              wght_scheme=WGHT_METHOD)
 
         # reshaping the user profile to a 2D numpy array
         user_profile_rshpd = user_profile.reshape(1, -1)
