@@ -161,13 +161,18 @@ To run the [CF experiments](experiments/cf_experiments.py):
 ```
 python experiments/cf_experiments.py --n_comp_vals x_1,x_2,x_3 --damping_vals y_1,y_2,y_3 --reg_vals z_1,z_2,z_3 --bias 1
 ```
-where the `n_comp_vals` must be integers, while `damping_vals` and `reg_vals` are floats. The `bias` argument is an integer equal to either 0 or 1 indicating whether or not to train the model with bias terms. When `bias=0` the `damping_vals` does not need to be specified. 
+where the `n_comp_vals` must be integers, while `damping_vals` and `reg_vals` are floats. The `bias` argument is an integer equal to 0 or 1 indicating whether or not to train the model with bias terms. When `bias=0` the `damping_vals` does not need to be specified. 
 
 To run the [Content-based experiments](experiments/cb_combi_experiments.py):
 ```
-python experiments/cb_combi_experiments.py --lambda_vals x_1,x_2,x_3
+python experiments/cb_combi_experiments.py --lambda_vals x_1,x_2,x_3 --wght_scheme linear
 ```
-where the `lambda_vals` are floats. This is the same for [Hybrid experiments](experiments/hybrid_experiments.py), just substitute the filename.
+where the `lambda_vals` are floats and the `wght_scheme` is a string equal to `linear` or `inverse`.
+
+To run the [Hybrid experiments](experiments/hybrid_experiments.py):
+```
+python experiments/hybrid_experiments.py --lambda_vals x_1,x_2,x_3 
+```
 
 All possible combinations of the hyperparameter values will be tested and evaluated in terms of `ndcg@10`.  
 It is possible to add any desired number of values for each hyperparameter.
