@@ -22,11 +22,8 @@ from config import (
 import utils.utils as utils
 
 
-# loading train and test data
-train_df = pd.read_parquet(TRAIN_DATA_PATH)
+# loading test data and embeddings
 test_df = pd.read_parquet(TEST_DATA_PATH)
-
-# loading embeddings
 emb_df = pd.read_parquet(EMBEDDINGS_DESCR_PATH)
 
 # Open and load the JSON file
@@ -59,9 +56,10 @@ for recommender in tqdm(RECOMMENDERS):
         diversity_dict = hit_dict.copy()
 
         for user_id, rec_items in recommendations.items():
+            # print(user_id)
             # slicing rec_items according to level
             rec_items = rec_items[:level]
-
+            
             # computing hit-rate (binary) for each user
             true_items = set(completion_rate_dict[user_id].keys())
             correct_recs = true_items.intersection(rec_items)
@@ -71,7 +69,9 @@ for recommender in tqdm(RECOMMENDERS):
 
             # computing NDCG for each user
             gain_dict = completion_rate_dict[user_id]
+            # print(gain_dict)
             optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)[:level]
+            # print(optimal_items)
             dcg = utils.compute_dcg(rec_items, gain_dict)
             dcg_star = utils.compute_dcg(optimal_items, gain_dict)
             ndcg_user = dcg / dcg_star 
