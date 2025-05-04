@@ -61,7 +61,7 @@ EXPERIMENTS_CF_PATH = "experiments/cf_experiments_results.csv"
 EXPERIMENTS_HYBRID_PATH = "experiments/hybrid_experiments_results.csv"
 LAMBDA_CB = 0.6
 LAMBDA_HYBRID = 0.6
-N_COMPONENTS = 60
+N_COMPONENTS = 960
 N_EPOCHS = 1000
 N_RECOMMENDATIONS = 10
 OPTIMAL_CF_PATH = "results/cf_optimal.csv"
@@ -74,7 +74,7 @@ RECOMMENDATIONS_KEY_CF = "cf_recommendations"
 RECOMMENDATIONS_KEY_HYBRID = "hybrid_recommendations"
 RECOMMENDATIONS_PATH = "results/recommendations.json"
 RECOMMENDERS = ["cf_recommendations", "hybrid_recommendations"]
-REG = 0.05
+REG = 0.005
 SCORES_PATH = "results/scores.json"
 WGHT_METHOD = "inverse"
 
