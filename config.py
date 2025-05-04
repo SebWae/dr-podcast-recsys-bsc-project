@@ -75,7 +75,10 @@ RECOMMENDATIONS_KEY_HYBRID = "hybrid_recommendations"
 RECOMMENDATIONS_PATH = "results/recommendations.json"
 RECOMMENDERS = ["cf_recommendations", "hybrid_recommendations"]
 REG = 0.005
-SCORES_PATH = "results/scores.json"
+SCORES_PATH_CF = "results/cf_scores.parquet"
+SCORES_PATH_CB_COMBI = "results/cb_combi_scores.parquet"
+SCORES_PATH_CB_DESCR = "results/cb_descr_scores.parquet"
+SCORES_PATH_CB_TITLE = "results/cb_title_scores.parquet"
 WGHT_METHOD = "inverse"
 
 # for evaluation

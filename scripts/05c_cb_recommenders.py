@@ -22,10 +22,12 @@ from config import (
     RECOMMENDATIONS_KEY_CB_TITLE,
     RECOMMENDATIONS_KEY_CB_DESCR,
     RECOMMENDATIONS_KEY_CB_COMBI,
+    SCORES_PATH_CB_COMBI,
+    SCORES_PATH_CB_DESCR,
+    SCORES_PATH_CB_TITLE,
     LAMBDA_CB,
     EMBEDDING_DIM,
     WGHT_METHOD,
-    SCORES_PATH,
     N_RECOMMENDATIONS,
     RECOMMENDATIONS_PATH,
 )
@@ -58,11 +60,23 @@ reference_date = datetime.strptime(SPLIT_DATE_TRAIN_VAL, "%Y-%m-%d")
 train_df["days_since"] = (reference_date - train_df["date"]).dt.days
 
 # iterating over levels of metadata
-metadata_levels = [(title_emb_df, RECOMMENDATIONS_KEY_CB_TITLE), 
-                   (descr_emb_df, RECOMMENDATIONS_KEY_CB_DESCR), 
-                   (title_emb_df, RECOMMENDATIONS_KEY_CB_COMBI)]
+metadata_levels = {"title": {"emb_df": title_emb_df,
+                             "rec_key": RECOMMENDATIONS_KEY_CB_TITLE,
+                             "scores_path": SCORES_PATH_CB_TITLE},
+                    "descr": {"emb_df": descr_emb_df,
+                             "rec_key": RECOMMENDATIONS_KEY_CB_DESCR,
+                             "scores_path": SCORES_PATH_CB_DESCR},
+                    "combi": {"emb_df": title_emb_df,
+                             "rec_key": RECOMMENDATIONS_KEY_CB_COMBI,
+                             "scores_path": SCORES_PATH_CB_COMBI}
+                    }
 
-for emb_df, rec_key in metadata_levels:
+for level in metadata_levels.values():
+    # unpacking values from sub dictionary
+    emb_df = level["emb_df"]
+    rec_key = level["rec_key"]
+    scores_path = level["scores_path"]
+
     # initializing dictionary to store scores for each user
     scores_dict = defaultdict(dict)
 
@@ -118,9 +132,9 @@ for emb_df, rec_key in metadata_levels:
         # storing the results
         scores_dict[user] = normalized_user_scores
 
-    # saving scores
-    key_scores_dict = {rec_key: scores_dict}
-    utils.save_dict_to_json(data_dict=key_scores_dict, file_path=SCORES_PATH)
+    # saving scores to parquet
+    scores_df = pd.DataFrame(scores_dict)
+    scores_df.to_parquet(scores_path)
 
     # extract recommendations from scores
     recs_dict = utils.extract_recs(scores_dict=scores_dict, n_recs=N_RECOMMENDATIONS)

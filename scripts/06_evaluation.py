@@ -13,7 +13,7 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 from config import (
     TRAIN_DATA_PATH,
     TEST_DATA_PATH,
-    EMBEDDINGS_COMBI_PATH,
+    EMBEDDINGS_DESCR_PATH,
     RECOMMENDATIONS_PATH,
     RECOMMENDERS,
     USER_EVAL_PATH,
@@ -27,7 +27,7 @@ train_df = pd.read_parquet(TRAIN_DATA_PATH)
 test_df = pd.read_parquet(TEST_DATA_PATH)
 
 # loading embeddings
-emb_df = pd.read_parquet(EMBEDDINGS_COMBI_PATH)
+emb_df = pd.read_parquet(EMBEDDINGS_DESCR_PATH)
 
 # Open and load the JSON file
 with open(RECOMMENDATIONS_PATH, "r") as file:
@@ -40,6 +40,7 @@ completion_rate_dict = utils.get_ratings_dict(data=test_df,
                                               ratings_col="completion_rate")
 
 for recommender in tqdm(RECOMMENDERS):
+    print(f"\nEvaluating the {recommender}.")
     # retrieving relevant recommendations
     recommendations = data[recommender]
 
@@ -51,6 +52,7 @@ for recommender in tqdm(RECOMMENDERS):
     eval_levels = [2, 6, 10]    
 
     for level in eval_levels:
+        print(f"Evaluation @{level}.")
         # initializing dictionaries to store metrics per user
         hit_dict = defaultdict(int)
         ndcg_dict = hit_dict.copy()
@@ -77,8 +79,8 @@ for recommender in tqdm(RECOMMENDERS):
 
             # computing diversity for each user
             diversity_user = utils.compute_diversity(recommendations=rec_items, 
-                                                item_features=emb_df, 
-                                                item_id_name="episode")
+                                                     item_features=emb_df, 
+                                                     item_id_name="episode")
             diversity_dict[user_id] = diversity_user
 
         # adding metric dictionaries to user_dict
@@ -99,6 +101,7 @@ for recommender in tqdm(RECOMMENDERS):
         recommender_dict[level]["diversity"] = diversity
 
     # final dictionaries
+    print("Saving evaluation results.")
     final_user_dict = {recommender: user_dict}
     final_recommender_dict = {recommender: recommender_dict}
 

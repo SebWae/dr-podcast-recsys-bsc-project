@@ -20,7 +20,7 @@ from config import (
     REG,
     RANDOM_STATE,
     OPTIMAL_CF_PATH,
-    SCORES_PATH,
+    SCORES_PATH_CF,
     RECOMMENDATIONS_KEY_CF,
     RECOMMENDATIONS_PATH,
 )
@@ -67,6 +67,8 @@ completion_rates_dict = utils.get_ratings_dict(data=val_df,
                                                ratings_col="completion_rate") 
 
 # generating recommendations from mf model using optimal hyperparameters
+prev_ndcg = 0
+
 for epochs in tqdm(range(1, N_EPOCHS+1)):
     print(f"\n Epoch {epochs}:")
 
@@ -114,9 +116,9 @@ for epochs in tqdm(range(1, N_EPOCHS+1)):
         print("Stopping early.")
 
         # saving scores
-        print(f"Saving scores to {SCORES_PATH}.")
-        scores_dict_key = {RECOMMENDATIONS_KEY_CF: prev_scores}
-        utils.save_dict_to_json(data_dict=scores_dict_key, file_path=SCORES_PATH)
+        print(f"Saving scores to {SCORES_PATH_CF}.")
+        scores_df = pd.DataFrame(prev_scores)
+        scores_df.to_parquet(SCORES_PATH_CF)
 
         # saving recommendations
         print(f"Saving recommendations to {RECOMMENDATIONS_PATH}.")
