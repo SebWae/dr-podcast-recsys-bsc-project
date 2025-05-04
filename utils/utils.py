@@ -153,7 +153,6 @@ def get_cf_scores(model: BiasedMF,
     Returns:
     - scores_dict:      Dictionary of scores for relevant episodes for each user.
     """
-    # users = user_mapping.keys()
     scores_dict = defaultdict(dict)
 
     # loading utils dictionaries
