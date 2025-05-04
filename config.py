@@ -58,7 +58,6 @@ VAL_DATA_PATH = "data/podcast_data_val.parquet"
 EMBEDDING_DIM = 384
 EXPERIMENTS_CB_PATH = "experiments/cb_combi_experiments_results.csv"
 EXPERIMENTS_CF_PATH = "experiments/cf_experiments_results.csv"
-EXPERIMENTS_CF_PATH_BIAS = "experiments/cf_experiments_results_bias.csv"
 EXPERIMENTS_HYBRID_PATH = "experiments/hybrid_experiments_results.csv"
 LAMBDA_CB = 0.6
 LAMBDA_HYBRID = 0.6
