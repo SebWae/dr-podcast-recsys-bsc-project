@@ -157,16 +157,11 @@ The following scripts are used for hyperparameter tuning and are not a part of [
 - `experiments/cf_experiments.py`
 - `experiments/hybrid_experiments.py`
 
-To run the [CF experiments with bias terms](experiments/cf_experiments_bias.py):
+To run the [CF experiments](experiments/cf_experiments.py):
 ```
-python experiments/cf_experiments_bias.py --n_comp_vals x_1,x_2,x_3 --damping_vals y_1,y_2,y_3 --reg_vals z_1,z_2,z_3
+python experiments/cf_experiments.py --n_comp_vals x_1,x_2,x_3 --damping_vals y_1,y_2,y_3 --reg_vals z_1,z_2,z_3 --bias 1
 ```
-where the `n_comp_vals` must be integers, while `damping_vals` and `reg_vals` are floats.  
-
-To run the [CF experiments without bias terms](experiments/cf_experiments.py):
-```
-python experiments/cf_experiments.py --n_comp_vals x_1,x_2,x_3 --reg_vals z_1,z_2,z_3
-```
+where the `n_comp_vals` must be integers, while `damping_vals` and `reg_vals` are floats. The `bias` argument is an integer equal to either 0 or 1 indicating whether or not to train the model with bias terms. When `bias=0` the `damping_vals` does not need to be specified. 
 
 To run the [Content-based experiments](experiments/cb_combi_experiments.py):
 ```
