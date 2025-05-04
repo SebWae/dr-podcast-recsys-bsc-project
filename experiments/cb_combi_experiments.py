@@ -38,7 +38,7 @@ args = parser.parse_args()
 
 # parsing the input arguments
 lambdas = [float(x) for x in args.lambda_vals.split(",")]
-wght_scheme = args.wght_method
+wght_scheme = args.wght_scheme
 
 # loading data and embeddings
 print("Loading data and embeddings.")
@@ -107,7 +107,7 @@ for _lambda in lambdas:
                                               time_col="days_since",
                                               item_col="prd_number",
                                               emb_dict=emb_dict,
-                                              wght_method=wght_scheme)
+                                              wght_scheme=wght_scheme)
 
         # reshaping the user profile to a 2D numpy array
         user_profile_rshpd = user_profile.reshape(1, -1)
