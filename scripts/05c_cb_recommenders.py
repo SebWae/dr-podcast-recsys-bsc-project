@@ -17,6 +17,7 @@ from config import (
     METADATA_PATH,
     EMBEDDINGS_TITLE_PATH,
     EMBEDDINGS_DESCR_PATH,
+    EMBEDDINGS_COMBI_PATH,
     UTILS_PATH,
     SPLIT_DATE_TRAIN_VAL,
     RECOMMENDATIONS_KEY_CB_TITLE,
@@ -25,7 +26,6 @@ from config import (
     SCORES_PATH_CB_COMBI,
     SCORES_PATH_CB_DESCR,
     SCORES_PATH_CB_TITLE,
-    LAMBDA_CB,
     EMBEDDING_DIM,
     WGHT_METHOD,
     N_RECOMMENDATIONS,
@@ -42,6 +42,7 @@ meta_df = pd.read_parquet(METADATA_PATH)
 # loading embeddings
 title_emb_df = pd.read_parquet(EMBEDDINGS_TITLE_PATH)
 descr_emb_df = pd.read_parquet(EMBEDDINGS_DESCR_PATH)
+combi_emb_df = pd.read_parquet(EMBEDDINGS_COMBI_PATH)
 
 # list of unique users in train data and unique items in metadata
 users = train_df["user_id"].unique()
@@ -57,6 +58,7 @@ all_users_show_episodes_dict = utils_dicts["user_show_episodes"]
 # adding days since train-val split date as a column in the train_df
 print("Computing days since train-val date for each train interaction.")
 reference_date = datetime.strptime(SPLIT_DATE_TRAIN_VAL, "%Y-%m-%d")
+train_df["date"] = pd.to_datetime(train_df["date"])
 train_df["days_since"] = (reference_date - train_df["date"]).dt.days
 
 # iterating over levels of metadata
@@ -66,7 +68,7 @@ metadata_levels = {"title": {"emb_df": title_emb_df,
                     "descr": {"emb_df": descr_emb_df,
                              "rec_key": RECOMMENDATIONS_KEY_CB_DESCR,
                              "scores_path": SCORES_PATH_CB_DESCR},
-                    "combi": {"emb_df": title_emb_df,
+                    "combi": {"emb_df": combi_emb_df,
                              "rec_key": RECOMMENDATIONS_KEY_CB_COMBI,
                              "scores_path": SCORES_PATH_CB_COMBI}
                     }
@@ -85,12 +87,7 @@ for level in metadata_levels.values():
     emb_dict = {}
     for _, row in emb_df.iterrows():
         prd_number = row["episode"]
-        if rec_key == RECOMMENDATIONS_KEY_CB_COMBI:
-            title_embedding = row[1:].values.flatten()
-            descr_embedding = descr_emb_df[descr_emb_df["episode"] == prd_number].iloc[:, 1:].values.flatten()
-            embedding = LAMBDA_CB * title_embedding + (1 - LAMBDA_CB) * descr_embedding
-        else:
-            embedding = row[1:].values.flatten()
+        embedding = row[1:].values.flatten()
         emb_dict[prd_number] = embedding
 
     # item embeddings as numpy array
