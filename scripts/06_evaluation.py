@@ -15,6 +15,8 @@ from config import (
     TEST_DATA_PATH,
     EMBEDDINGS_DESCR_PATH,
     RECOMMENDATIONS_PATH,
+    EMBEDDING_DIM,
+    WGHT_METHOD,
     RECOMMENDERS,
     USER_EVAL_PATH,
     RECOMMENDER_EVAL_PATH,
@@ -22,20 +24,47 @@ from config import (
 import utils.utils as utils
 
 
-# loading test data and embeddings
+# loading training data, test data and embeddings
+print("Loading data and embeddings.")
+train_df = pd.read_parquet(TRAIN_DATA_PATH)
 test_df = pd.read_parquet(TEST_DATA_PATH)
 emb_df = pd.read_parquet(EMBEDDINGS_DESCR_PATH)
 
-# Open and load the JSON file
+# loading recommendations
+print("Loading recommendations.")
 with open(RECOMMENDATIONS_PATH, "r") as file:
     data = json.load(file)
 
 # constructing the completion rate dictionary
+print("Constructing completion rate dictionary.")
 completion_rate_dict = utils.get_ratings_dict(data=test_df,
                                               user_col="user_id",
                                               item_col="prd_number",
                                               ratings_col="completion_rate")
 
+# construction dictionary containing embeddings
+print("Constructing dictionary containing embeddings.")
+emb_dict = {}
+for _, row in tqdm(emb_df.iterrows()):
+    prd_number = row["episode"]
+    embedding = row[1:].values.flatten()
+    emb_dict[prd_number] = embedding
+
+# constructing user profiles
+print("Constructing user profiles.")
+user_profiles = {}
+users = test_df["user_id"].unique()
+for user in tqdm(users):
+    user_interactions = train_df[train_df["user_id"] == user].reset_index()
+    user_profile = utils.get_user_profile(emb_size=EMBEDDING_DIM,
+                                                user_int=user_interactions,
+                                                time_col="days_since",
+                                                item_col="prd_number",
+                                                emb_dict=emb_dict,
+                                                wght_scheme=WGHT_METHOD)
+    user_profiles[user] = user_profile
+
+# iterating over the recommenders to evaluate them
 for recommender in tqdm(RECOMMENDERS):
     print(f"\nEvaluating the {recommender}.")
     # retrieving relevant recommendations
@@ -56,7 +85,6 @@ for recommender in tqdm(RECOMMENDERS):
         diversity_dict = hit_dict.copy()
 
         for user_id, rec_items in recommendations.items():
-            # print(user_id)
             # slicing rec_items according to level
             rec_items = rec_items[:level]
             
@@ -69,18 +97,17 @@ for recommender in tqdm(RECOMMENDERS):
 
             # computing NDCG for each user
             gain_dict = completion_rate_dict[user_id]
-            # print(gain_dict)
             optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)[:level]
-            # print(optimal_items)
             dcg = utils.compute_dcg(rec_items, gain_dict)
             dcg_star = utils.compute_dcg(optimal_items, gain_dict)
             ndcg_user = dcg / dcg_star 
             ndcg_dict[user_id] = ndcg_user
 
             # computing diversity for each user
+            user_profile = user_profiles[user_id]
             diversity_user = utils.compute_diversity(recommendations=rec_items, 
-                                                     item_features=emb_df, 
-                                                     item_id_name="episode")
+                                                     emb_dict=emb_dict, 
+                                                     user_profile=user_profile)
             diversity_dict[user_id] = diversity_user
 
         # adding metric dictionaries to user_dict
