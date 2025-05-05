@@ -27,6 +27,7 @@ VAR_RENAME_DICT = {"Date:Time (evar16)":           "date_time",
 DESCRIPTION_VAR_RENAME_DICT = {"PRD_NUMBER":       "prd_number",
                                "PRD_SHORTDESCR":   "episode_description",
                                }
+EMBEDDINGS_COMBI_PATH = "embeddings/combi_embeddings.parquet"
 EMBEDDINGS_DESCR_PATH = "embeddings/descr_embeddings.parquet"
 EMBEDDINGS_TITLE_PATH = "embeddings/title_embeddings.parquet"
 EPISODE_DESCRIPTION_PATH = "data/episode_descriptions.parquet"
