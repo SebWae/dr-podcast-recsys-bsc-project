@@ -10,380 +10,380 @@
  And as far as I can tell, it’s both recommendations for entire series and also individual episodes
  
  MJ: 
- Ja, så man kan sige, jeg kan jo tage dig igennem der hvor vi bruger, vores anbefalingensystem. 
- Man kan sondre lidt imellem, i starten med hvad er en anbefaling egentlig? 
- Så man kan sige, i forhold til en eller anden form for adfærd. 
- Så der er noget, hvor der sidder nogle redaktører og sammensætter nogle lister, som er statiske for alle. 
- Det er jo ikke anbefalinger i den her forstand. 
- Så er der f.eks. det modul, som du vil møde, som det andet modul, hvis du taler app, jeg tager udgangspunkt i app allerede, så hvis der er noget andet i forhold til web, så må du spørge. 
- Det andet modul er det her adfærdsdrevne, "Dine genveje". 
- Det er ikke noget af et anbefalingensystem, det har vi selv bygget, og det er ikke anbefalinger i den forstand, at det er sådan avanceret algoritmisk, men det kigger bare på din adfærd. 
- Så f.eks. her peger jeg ned på "Dine genveje" modulet, hvor jeg har haft en lytning på "Tiden", serien "Tiden". 
- Så kommer der sådan en markering af, at der er en ny episode af "Tiden". 
- Det er jo også en eller anden form for anbefaling. 
- Det er i hvert fald en markering af, at du har haft noget adfærd. 
- Vi vil gerne gøre dig opmærksom på, at der er en ny episode, og det gør systemet automatisk. 
- Og så er der den her med anbefalingssystemer og algoritmer. 
- Og det har vi i forskellige steder. 
- Det mest prominente sted er faktisk relativt skjult. 
- Så trykker jeg på player. 
- Så trykker jeg på kø. 
- Og det man så ser, når man er i køen, det er, at man kan se, at først så har jeg sat en afspilning i gang af en episode, det er "En livsfarlig hemmelighed". 
- Hvis jeg sad og satte noget i køen, så ville det være i det næste level, hvor der står "næste i køen", det har jeg så ikke. 
- Men det vil så være det, der vil blive afspillet som det næste. 
- Hvis du ikke har noget i køen, så er det næste i den her autoplay-sekvens. 
- Det vil være, hvis der er en nyere episode i samme serie, som jeg er i gang med. 
- Det er der i det her tilfælde, så vil det være den. 
- Hvis ikke A, altså køen, hvis ikke B, episode, så har vi en anbefalingsealgoritme, et anbefalingssystem, der udvælger en anbefaling til dig, i det her tilfælde "Et giftigt hensyn", som er klart den mest brugte anbefalingsretning, kan man sige, i DR LYD produktet. 
- Det er en algoritme, der ikke kigger på dig som bruger. 
- Derfor må vi også godt sende ud til alle, for det kræver ikke et præferencesamtykke, fordi det er ikke noget, der kigger på dit forbrug, på din smagsprofil. 
- Det kigger ud på andre brugere, så den siger, andre brugere, der lytter til "Livsfarlig hemmelighed", hvad har de størst præference for? 
- Og derfra sender vi så det ind som en anbefaling. 
- Så den kæder indholdsstarten sammen med andre brugere, ikke dig. 
- Det er det, vi kalder en kollaborativ samarbejdsalgoritme. 
- Og man kan sige, at det er sådan en af de her algoritme- og anbefalesystemer. 
- Så er det den ene skole/type af anbefalinger, hvor man kobler indholdet sammen med andre brugere. 
+ Yes, so you could say, I can take you through where we use our recommendation system.
+ You can start by distinguishing a bit between what a recommendation actually is.
+ So, you could say, in relation to some kind of behavior.
+ There are things where editors sit and create lists that are static for everyone.
+ Those aren’t recommendations in this sense.
+ Then there’s, for example, the module that you’ll encounter — the second module, if we’re talking about the app. I'm using the app as the basis here, so if there's something else regarding the web, you’ll have to ask.
+ The second module is the behavior-driven one, "Your Shortcuts."
+ It’s not really a recommendation system — we built it ourselves — and it's not recommendations in the sense of something algorithmically advanced, but it just looks at your behavior.
+ For example, I’m pointing down at the "Your Shortcuts" module, where I’ve previously listened to “Tiden,” the series “Tiden.”
+ Then there’s a marker showing that there’s a new episode of “Tiden.”
+ That’s also a kind of recommendation — at least it’s an indication that you’ve shown some behavior.
+ We want to make you aware that there’s a new episode, and the system does that automatically.
+ And then there’s the part about recommendation systems and algorithms.
+ We have that in different places.
+ The most prominent one is actually fairly hidden.
+ So I press the player.
+ Then I press the queue.
+ And what you see when you're in the queue is that first I’ve started playing an episode — it’s “A Deadly Secret.”
+ If I had added something to the queue, it would show up as “next in the queue,” but I haven’t.
+ That would be what plays next.
+ If you don’t have anything in the queue, the next thing in this autoplay sequence will be:
+ If there's a newer episode in the same series I’m currently listening to, that would play next — and in this case, there is.
+ If not A (the queue), and not B (a new episode), then we have a recommendation algorithm — a recommendation system — that selects a recommendation for you.
+ In this case, it's “A Toxic Consideration,” which is clearly the most used recommendation direction in the DR LYD product.
+ It’s an algorithm that doesn’t look at you as a user.
+ That’s why we’re allowed to send it to everyone — it doesn’t require consent for preferences, because it’s not based on your consumption or taste profile.
+ It looks at other users instead.
+ So it says: “Other users who listen to ‘A Deadly Secret,’ what do they prefer most?”
+ And then we serve that as a recommendation.
+ So it links the content start to other users, not to you.
+ That’s what we call a collaborative filtering algorithm.
+ And you could say, that’s one of those algorithmic recommendation systems.
+ That’s one type/school of recommendations — where you connect content with other users.
  
  SW: 
- Er det udelukkende baseret på den episode man lytter til lige nu? 
+ Is it solely based on the episode you're listening to right now?
  
  MJ: 
- Ja, så da man genererer, du kan selv lege med det. 
- Så hvis nu jeg klikker på "Giftigt hensyn" her. 
- Ja, så fordi jeg ikke har afspillet noget, lad os lige se om vi kan... 
- Så hvis nu vi tager og starter "Chris og chokoladefabrikken" her. 
- Så anbefaler den sørme "Korfix og Kaffe". 
- Og den anbefaler så igen "Snooze". 
- Og den anbefaler osv. 
+ Yes, so when it generates — you can play around with it yourself.
+ So if I click on “A Toxic Consideration” here...
+ Yes, and because I haven’t played anything yet — let’s just see if we can...
+ So if we go ahead and start “Chris and the Chocolate Factory” here, then it actually recommends “Korfix and Coffee.”
+ And then it recommends “Snooze” again.
+ And then it recommends, and so on.
  
  SW: 
- Så man får sådan en hel kæde?
+ So you get a whole chain?
 
  MJ: 
- Ja. 
- Så det er jo hele tiden det nye i forhold til de brugere der lytter, hvad lytter de også mest til? 
- Så det er en popularitetsalgoritme. 
- Og grunden til at vi vælger den her i et autoplay setup, det er at det er en usynlig anbefaling, som automatisk starter op, og derfor prøver vi at sigte efter noget, der er relativt sikkert eller populært. 
- Det gør alt andet lige, at vi rammer en rimelig god anbefaling, uden at være en den mest spot-on. 
- Det vil det være i mange tilfælde, men du kan også komme ud i afkroge af vores katalog, hvor der måske ikke er så mange lytninger. 
- Og så vil det alt andet lige også være mere... 
- Det er klart, jo færere brugerne der lytter til noget, jo færere er der så også at spørge om, hvad de så også lytter til. 
- Og så vil anbefalingen være mindre robust. 
- Så det er klart, når vi spørger op på nogle af vores rigtig store titler, "Sara & Monopolet", "Genstart", "Tyran" osv., så kan vi være nogenlunde sikre på, at vi fanger nogenlunde, hvad andre så også lytter til. 
- Derfor vil vi også typisk få nogle ret pæne anbefalinger. 
- Vi kan prøve at starte et afsnit af "Tyran". 
- Hvor vi så får "Ministermord". 
- "Tyran" handler om nogle fæle fyre, der styrede lande med hård hånd, og her får du så en historisk podcast om mordet på John F. Kennedy. 
- Det er jo faktisk ret solidt anbefalet, kan man sige. 
- Så det er en af mine anbefalinger, vi er ret glad for, og sådan er det med de fleste. 
- Så den vil jeg fremhæve som en meget markant og vigtig anbefaling, som i virkeligheden gerne skulle opleves meget friktionsfri og bidende. 
- Det mimer jo på mange måder, i virkeligheden på det man kalder for flow for live, altså radiokanaler der sender dig imellem. 
- Hvis du er på P1, så har du startet med et program, og det sender dig automatisk over i et andet, fordi du bare stadig hører P1. 
- Her gør vi det bare unikt på hver titel, så det er bare en meget mere avanceret og sofistikeret kanalkuratering, kan man nærmest sige. 
- Det bliver nærmest din egen kanal, med 1000-vis af variationer, afhængig af, hvilke programmer du vil tage med. 
+ Yes.
+ So it's always based on what’s new in relation to the users who are listening — what else are they listening to the most?
+ So it’s a popularity algorithm.
+ And the reason we use it in an autoplay setup is that it’s an invisible recommendation, which starts automatically, and that’s why we try to aim for something that is relatively safe or popular.
+ That, all things considered, gives us a fairly good recommendation — even if it’s not the most spot-on.
+ In many cases, it will be, but you can also end up in the corners of our catalog, where there might not be that many listeners.
+ And then, all things being equal, it will also be more...
+ It’s clear: the fewer users who listen to something, the fewer there are to ask what else they listen to.
+ And then the recommendation will be less robust.
+ So naturally, when we look at some of our really big titles — "Sara & Monopolet", "Genstart", "Tyran", etc. — we can be fairly certain that we’re capturing roughly what other people are also listening to.
+ That’s why we typically get some pretty solid recommendations.
+ We can try starting an episode of "Tyran".
+ Then we get "Ministermord".
+ "Tyran" is about some nasty guys who ruled countries with a heavy hand, and here you then get a historical podcast about the murder of John F. Kennedy.
+ That’s actually a pretty solid recommendation, you could say.
+ So that’s one of the recommendations we’re quite happy with — and it’s like that with most of them.
+ So I would highlight that as a very significant and important recommendation — which ideally should feel very seamless and compelling.
+ In many ways, it actually mimics what’s called “flow” in live radio — like when a radio channel transitions you from one program to another.
+ If you’re on P1, you start with one program, and it automatically sends you into the next, just because you’re still listening to P1.
+ Here, we do the same, but uniquely for each title — so it’s just a much more advanced and sophisticated kind of channel curation, you might say.
+ It basically becomes your own personal channel, with thousands of variations, depending on which programs you choose to include.
  
  SW: 
- Vil den altid anbefale nyeste episode? 
+ Will it always recommend the newest episode?
  
- MJ: Ja. 
+ MJ:
+ Yes.
  
  SW: 
- I den mest populære serie? 
+ Of the most popular show?
  
  MJ: 
- Ja. 
- Øh... 
- Hvis det er lukkede serier, som f.eks. "Tyran", hvor det er en lukket fortælling, så vil den, fordi det er noget med, hvordan feetsene vender, så i "Tyran" ville man starte med afsnit 1. 
- Altid. 
- I den nyeste sæson. 
- Fordi du vil, få en dårlig oplevelse, af at blive kaste ind i afsnit 3. 
- Så det prøver vi ligesom at sørge for, at du ikke kommer ind i, i de største mulige omfang, ikke kommer ind i en fortælling der er i gang. 
- Jeg vil gerne have den startet fra den rigtige ende, men fortløbende formater som "Sara & Monopolet" og "Genstart", der er det det nyeste absolut, fordi det er ikke afhængigt af, at du har lyttet til noget foregående. 
- Så kan jeg sige, at hvis man går ind på en serieside, det gør man ved at klikke på et sådan et item her. 
- Nu er jeg inde på en serieside, og der er der sådan en tab ved siden af episoder, der hedder "anbefalinger", hvis jeg klikker der, så får jeg en en relateret anbefalingsrække. 
- Den er heller ikke brugervendt. 
- Eller, den er slet ikke brugervendt. 
- Den anden var andre brugere. 
- Den her retter indholdet mod andet indhold. 
- Så det er rent metadata. 
- Det er gammeldags tagging i virkeligheden, som vi kender fra websites. 
- Hvis du klikker på den her, så er der de her ting, der er optagget til.
- Så det er forskellige måder, det er optagget på. 
- Men det skulle gerne gøre, at man ser, at det man er inde på, den indholdsside du er inde på, og så hovedseriesiden du er kommet ind på, der skulle indholdet gerne give mening i forhold til det. 
- Så jeg er i et scenarie, hvor jeg måske er kommet ind på den her serie-side, hov der ikke er nye episoder i den her serie, som jeg lige har lyttet. 
- Hvad kan jeg få tiden til at gå med i mellemtiden? 
- Det kunne være at konsumere noget, der minder om det. 
- Og det er så det, vi prøver at præsentere her. 
- Og fordi det er indhold til indhold, kan vi også vise det til alle brugere. 
- Det kræver heller ikke en præference samtykke, fordi det er bare indhold, der kriger på indhold. 
- Så det er helt klassisk up-tagging. 
+ Yes.
+ Uh…
+ If it’s closed series, like “Tyran”, where it’s a closed narrative, then — because of how the feeds are structured — in “Tyran” you would always start with episode 1.
+ Always.
+ Of the newest season.
+ Because you’d have a poor experience if you were dropped into episode 3.
+ So we try to make sure, as much as possible, that you don’t enter a story that’s already in progress.
+ I want it to start from the right end.
+ But for ongoing formats like “Sara & Monopolet” and “Genstart”, it’s always the newest episode, because it doesn’t depend on whether you’ve listened to anything previously.
+ I can also say: if you go into a series page — you do that by clicking on an item like this — now I’m on a series page, and there’s a tab next to “Episodes” called “Recommendations.”
+ If I click there, I get a row of related recommendations.
+ That one also isn’t user-specific.
+ Or rather — it’s not user-specific at all.
+ The other one was based on other users.
+ This one links content to other content.
+ So it’s purely metadata.
+ It’s old-fashioned tagging, really — like we know it from websites.
+ If you click on this, these are the things it has been tagged with.
+ So it’s tagged in various ways.
+ But ideally, that should help ensure that the content you see — the content page you’re on and the main series page you’ve landed on — the content should make sense in relation to that.
+ So I’m in a scenario where maybe I’ve landed on a series page, and oh — there are no new episodes in the series I just listened to.
+ What can I do in the meantime?
+ It could be consuming something similar.
+ And that’s what we try to present here.
+ And because it’s content-to-content, we can show it to all users.
+ That also doesn’t require consent for preferences, because it’s just content pointing to content.
+ So it’s classic top-level tagging.
  
  SW: 
- Det vil se ens ud for alle brugerne? 
+ It will look the same for all users?
  
  MJ: 
- Ja, og er jo så heller ikke dynamisk. 
- Hvis vi skal kigge på noget, der er dynamisk, så kan man scrolle ned til den her række, der hedder "Anbefalet til dig". 
- Den vil kun være vist, hvis man ikke har sagt nej til præferencer. 
- Så vil den her "Anbefalet til dig" blive vist. 
- Den bliver genereret ud fra vores anbefalingssystem, som danner dig, der gerne vil have anbefalinger, og derfor ikke har sagt nej til præferencesamtykke. 
- Der laver vi en smagsprofil, hvor der er nogle forskellige taggings på hver serie, som har nogle forskellige vægte, som så går ind og tilføjer sig til. 
- Så hvis jeg lytter til f.eks. et afsnit af "Tyran", så vil der være nogle vægte eller nogle forskellige features. 
- Det kan være, at den handler om 2. verdenskrig, historie, diktatorer, et eller andet. 
- Det er tagget op. 
- Så er der sådan et feature-hierarki, hvor jo mere, hovedreglen er jo mere specifikke. 
- Det vil sige, at 2. verdenskrig er mere specifikt end historie, så 2. verdenskrig vil få en højere vægt. 
- Og det vil sige, at du har tillagt din smagsprofil, som så hele tiden vil være i en organisk udvikling, som gerne skulle udvikle sig sammen med dig. 
- Så hvis du lige pludselig ophører med at høre den her type podcast om historie, men begynder mere at lytte til livsstil, så vil din smagsprofil med tiden blive mere tilsmagt den type vægtede features. 
- Og så vil der så komme anbefalinger på baggrund af. 
- Det er et eksempel på en samtykkekrævende anbefaling, fordi den kigger på dig og din adfærd over tid. 
- Den tager også mere forbehold for eller tager mere udgangspunkt i de nyeste lytninger, og med tiden vil nogle af de ældre lytninger aftage i værdien i dannelsen af smagsprofilen. 
- Så man hele tiden prøver at kigge på, hvad er relevant for dig lige nu. 
- Vi har jo ikke det der juleindhold, fordi du var begejstret for det i december, så det skulle gerne være, sådan at man oplever, at den er relevant. 
- Det er de tre primære typer af anbefalinger, kan man sige, bag vores anbefalingssystem. 
- Så er der gradueringer af det, men det er de tre grundlæggende måder. 
- Så er der den relaterede, som er den nummer to, som binder indhold til indhold. 
- Så er der den kollaborative, der binder indhold til andre brugere. 
- Og så er der den sidste, den egentlig personaliserede, hvor den kigger på din adfærd og kobler den med indhold. 
- Så det er sådan tre meget grundlæggende typer af anbefalinger. 
+ Yes, and it’s also not dynamic.
+ If we look at something that is dynamic, you can scroll down to the row called “Recommended for you.”
+ That will only be shown if you haven’t declined preference settings.
+ So this “Recommended for you” row will appear only if you’ve agreed to preferences.
+ It’s generated from our recommendation system, which identifies you as someone who wants recommendations and therefore hasn’t opted out of preference consent.
+ We then create a taste profile, where each series has various tags with different weights, which contribute to that profile.
+ So, for example, if I listen to an episode of “Tyran,” there will be certain weights or features.
+ It could be about World War II, history, dictators — something like that.
+ It’s all tagged.
+ Then there’s a feature hierarchy, where the rule of thumb is: the more specific, the higher the weight.
+ So World War II is more specific than history, meaning it gets a higher weight.
+ That means it’s added to your taste profile, which is meant to be in constant, organic development — ideally evolving along with you.
+ So if you suddenly stop listening to history podcasts and start listening more to lifestyle content, your taste profile will gradually shift to favor those kinds of weighted features.
+ And then recommendations will be made based on that.
+ This is an example of a recommendation that requires consent, because it looks at you and your behavior over time.
+ It also puts more emphasis on your recent listens, and over time, older listens will lose influence in shaping your taste profile.
+ So the system is always trying to determine what’s relevant for you right now.
+ We don’t keep showing Christmas content just because you loved it back in December — it’s meant to feel relevant.
+ Those are the three main types of recommendations behind our system.
+ There are gradations of each, of course, but these are the three basic approaches:
+ The related one, which links content to other content.
+ The collaborative one, which links content based on what other users listen to.
+ And the personalized one, which looks at your behavior and links that to content.
+ So those are the three fundamental types of recommendations.
  
  SW: 
- Den sidste du nævnte, "Anbefalet til dig", vil den også anbefale aktuelle serier, som har udgivet nye episoder?
+ The last one you mentioned, “Recommended for you” — will it also recommend current series that have released new episodes?
  
  MJ: 
- Ja, altså den vil sådan set være, være ligeglad med, altså man kan sige, årsagen til at vi bruger sådan en er jo at, i takt med medieudviklingen, hvor vi er gået væk fra at sidde og kigge på desktop computer, hvor der er meget plads til at udstille indhold, så er vi gået til at have mindre og mindre skærme, og det vil sige sådan rent, hvis man skal, altså det handler om at være et udstillingsvindue.
- Men det er klart, at hvis man har meget mindre butikker, så er det pludselig også plads til færre varer. 
- Og så skal man være kreativ med, hvordan man får udnyttet pladsen. 
- Og hvis vi ikke havde de her systemer, så ville man ofte vælge at tage de største serier, for det ville være dem, der er relevante for flest, så vil vi plastre det til over hele. 
- Vi ville have alt det store og populære. 
- Og det vil være imod, hvad public service handler om. 
- Det handler også om at udfordre dig med noget indhold du ikke lige vidste eksisterede, eller er det mest populære. 
- Også gerne fra vores katalog. 
- Det vi gør, det er, at den kan mere pare dig med det mest relevante indhold. 
- Uagtet hvornår det så er lavet. 
- Kvalitetssikring sker så igennem, at det er stadigvæk publiceret, så det sidder der nogle publiceringsredaktører og siger, at det er stadigvæk et godt stykke indhold. 
- Men det blev lavet for tre år siden. 
- Men det er en måde, at en dokumentar for tre år siden kan finde frem til dig som bruger. 
- Og det ville være ellers meget svært for dig at finde den i et enormt stort katalog, fordi du ikke ved, hvad du skulle lede efter. 
- Så det er en af måderne, hvor man kan udnytte den sparsomme plads, der er. 
- Ved at sige, at her er det faktisk unikt til den enkelte. 
- Så vi sørger for at hive det frem fra arkivet, der passer til dig. 
+ Yes, it actually doesn’t really care — I mean, you could say, the reason we use such a system is that, with media development, we've moved away from sitting in front of desktop computers where there’s lots of space to display content.
+ Now we’re dealing with smaller and smaller screens, so in a way, it’s about functioning as a display window.
+ But obviously, with smaller “shops,” there’s also room for fewer “products.”
+ So we have to be creative with how we use that space.
+ And if we didn’t have these systems, we’d often just end up showcasing the biggest series — because those are relevant to the most people — and we’d plaster that all over the place.
+ It would all be big and popular content.
+ And that goes against what public service is about.
+ Public service is also about challenging you with content you didn’t know existed — or that isn’t the most popular.
+ Also content from our archive.
+ What we’re doing is creating a better match between you and the most relevant content — regardless of when it was made.
+ Quality control is still in place — because it’s still published, and publishing editors ensure it’s still good content.
+ Even if it was made three years ago.
+ So this is a way for a documentary from three years ago to reach you as a user.
+ Which would otherwise be very difficult in such a huge catalog — especially if you don’t even know what you’re looking for.
+ So this is one of the ways to make use of the limited space we have —
+ By saying: this recommendation is actually unique to the individual.
+ We make sure to bring forward content from the archive that’s relevant to you.
  
  SW: 
- Så du vil sige, at hver synlig anbefaling har hver sin funktion? 
+ So would you say that each visible recommendation serves its own purpose?
  
  MJ: 
- Ja, helt bestemt. 
- Vi vælger det ud fra hvad er behovet her. 
- Man kan vende tilbage til, at der er en del med den her autoplay-anbefaling, hvor sådan nogle kommercielle aktører som Spotify bruger en algoritme, der handler meget om din vane. 
- De bruger noget der hedder en don't miss algoritme, som afspiller noget af det indhold du allerede er i gang med. 
- Og det er sikkert en rigtig god ide, men det gør også at man ikke udvider horisonten for brugeren gennem den her metode. 
- Vi vælger ganske vist en popularitetsalgoritme, men stadigvæk en der ikke kigger i det du allerede er i gang med. 
- Hvis du kigger væk fra det og siger, at det behøver vi ikke at forholde os til, fordi det har vi jo allerede opdaget, så vil vi faktisk gerne bruge den her mulighed til at vise dig noget nyt, vi tror du kunne være interesseret i. 
- På den måde får vi også store dele af kataloget ventileret igennem sådan en liste. 
- Og på den måde er en algoritme med til at løfte en public service opgave. 
- Og også bare for at sige, at man kan bruge de anbefalingssystemer i et kommercielt hensyn, hvor det handler om ren fastholdelse og en public service kontekst, hvor det også handler om nyopdagelse og brede indholdet ud i at prøve at præsentere nyt indhold. 
- Så det vil bare sige, at man kan bruge det på forskellige måder til forskellige former. 
+ Yes, absolutely.
+ We choose based on what the need is in that context.
+ You can go back to the point about the autoplay recommendation — where commercial actors like Spotify use an algorithm that’s heavily based on your habits.
+ They use something called a “don’t miss” algorithm, which plays content you’re already engaging with.
+ And that’s probably a really good idea, but it also means the user’s horizon isn’t being expanded through that method.
+ We do use a popularity algorithm, but it’s still one that doesn’t look at what you’re already consuming.
+ If you look away from that and say, “we don’t need to deal with what’s already been discovered,” then we actually want to use this opportunity to show you something new we think you might be interested in.
+ That way, we also get a large part of the catalog circulated through such a list.
+ And in that sense, an algorithm helps fulfill a public service mission.
+ And just to say — recommendation systems can be used in a commercial context, where the goal is pure retention, and in a public service context, where the goal is also discovery and broadening the content offering by trying to present new material.
+ So it just shows that these systems can be used in different ways for different purposes.
  
  SW: 
- Det vil sige, at public service aspektet er vigtigere end at gøre anbefalingerne meget personaliseret?
+ Does that mean the public service aspect is more important than making the recommendations highly personalized?
  
  MJ: 
- Jeg ved ikke, om det er enten eller, men det er klart, at man må stille sig, hvorfor har vi DR LYD, når der er Spotify og Apple? 
- Der skal vi jo kunne tilbyde at være noget andet. 
- Og også ville dig noget som bruger, og ikke kun bare overlade dig til dig selv. 
- Derfor har vi også en meget mere aktiv kuratering, det jo er den anden side af mønten. 
- Det er jo ikke kun anbefalingssystemer, langt fra. 
- Størstedelen af DR LYD er jo, det er også vigtigt at sige i forhold til de forskellige anbefalingssystemer, det er jo rigtige mennesker og redaktører, jeg er selv en af dem, der sidder og styrer dem og tilrettelægger dem, så de opfylder det behov og formål, vi har. 
- Og så er der jo et, langt de fleste dele af præsentationslaget inde i DR LYD er jo rent kurateret, hvor det er mennesker, der sidder og har valgt at fremhæve noget. 
- Så det er jo sådan et samfundspil, men det er klart, at den frihed, som DR giver i at ikke skulle have betalende kunder, det er der også en forpligtelse i forhold til at gøre noget andet med, end hvad de komercielle aktører gør. 
+ I don’t know if it’s either-or, but it’s clear that we have to ask ourselves: why do we have DR LYD when Spotify and Apple exist?
+ We have to be able to offer something different.
+ And also have a real intent toward you as a user — not just leave you entirely to yourself.
+ That’s why we have a much more active curation — that’s the other side of the coin.
+ It’s not just recommendation systems — far from it.
+ The majority of DR LYD — and this is important to mention when talking about the different recommendation systems — is made up of real people and editors. I’m one of those who manage and organize them to meet the needs and goals we have.
+ And in fact, most of the presentation layer within DR LYD is fully curated, where people have chosen what to highlight.
+ So it’s a mix, but clearly, the freedom DR has by not needing paying customers also carries an obligation to do things differently than the commercial players
  
  SW: 
- Hvad er definitionen af "Udvalgte favoritter", er det nogle serier som nogle redaktører har valgt? 
+ What’s the definition of "Selected Favorites" — are those series chosen by editors? 
  
  MJ: 
- Det er et sammensat modul. 
- Det er sådan, at det er en automatiseret topliste kombineret med kurateret udvalg. 
- Så det er faktisk en... men begge dele er... altså der er ikke noget af det, der på den måde er en maskin-anbefaling, men det ene kommer automatiseret ud, frem og kigger på rene afspilninger. 
- Så det er jo sådan en liste, der er blandet af meget populært nu og her, for ligesom at sige, for at tage udgangspunkt i det her, at vi også gerne vil have noget, danskerne er fælles om og samles om. 
- Der er nogle fælles titler, vi kigger på. 
- Men der er også nogle vi trykker igennem redaktionelt, hvor det kan være, at det er den næste titel, vi gerne vil have vi samles om. 
- Derfor har vi fået eller produceret den, for at se om den kan blive stor. 
- Fordi vi tror, at vi kun kan. 
- Så det er ligesom de to behov der er, der er på spil i det. 
+ It’s a composite module.
+ It works like this: it’s an automated top list combined with a curated selection.
+ So it’s actually a... well, both parts are... that is, none of it is what you’d call machine-generated recommendations, but one part is generated automatically and simply looks at pure play counts.
+ So it’s a list that’s a mix of what’s very popular right now — to reflect the idea that we also want content that Danes can gather around and share as a common experience.
+ There are some common titles we look at.
+ But there are also some that we push editorially — where it might be the next title we want people to gather around.
+ That’s why we’ve chosen or produced it — to see if it can become big.
+ Because we believe it has the potential.
+ So those are the two needs at play here.
  
  SW: 
- Jeg tror også, at jeg er lidt mere nysgerrighed på, hvordan anbefalinger sammenligner en serie med en anden serie. 
- Du snakkede noget om tagging? 
- Er det noget, der foregår manuelt, eller automatisk? 
+ I think I’m also a bit more curious about how recommendations compare one series to another.
+ You mentioned something about tagging?
+ Is that done manually or automatically? 
  
  MJ: 
- Det foregår primært ganske manuelt. 
- Det er sådan, at vi har et datamanagement-team i Danmarks Radio, der sidder og ser på, når en ny titel bliver afleveret. 
- Så sidder de og kigger på, det kan være både episode og serie, men hvis vi tager udgangspunkt i en ny serie, så sidder de og kigger på titlen, hvad er billedet, læser selv beskrivelsen. 
- Lytter også gerne noget af det. 
- Og ud fra det så har de så et taggingsystem af standardiserede tags, så der er en en ensartethed til ting, vi kan finde i den anden, hvor de så sidder og påhæfter med emneord, og også med en overordnet genre og en subgenre, og de har tilsammen, det bliver så overført til vores anbefalingssystem. 
- Der sidder jo beregningen, kan man sige, på baggrunden her. 
- Så det er... Det kunne sagtens være på sigt, at noget af det kan automatiseres i større grad. 
- Man kunne sagtens forestille sig, at det er hvad andre gør. 
- F.eks. transskribere en lydfil, og derud fra finder jeg relevante emneord som jeg kan på-tagge. 
- Der er vi ikke lige nu. 
- Ved ikke, om vi skal være det. 
- Så i Danmarks Radio er det levende mennesker, der sidder og kvalitetssikrerer og selv laver den her up-tagging, som så lægges ind i anbefalingssystemet, der så oversætter det til, der så laver matematikken der ultimativt bestemmer, skal være den artikel eller den artikel. 
+ It is primarily done quite manually.
+ We have a data management team at Danmarks Radio who look at a new title when it is submitted.
+ They sit and examine it, whether it’s an episode or a series, but if we start with a new series, they look at the title, the image, and read the description themselves.
+ They also listen to some of it.
+ Based on that, they have a tagging system with standardized tags, so there is consistency to things we can find in the others, where they attach keywords, as well as a main genre and a subgenre, and this is then transferred to our recommendation system.
+ That’s where the calculation, so to speak, happens in the background.
+ So it could easily be, in the future, that some of this could be automated more.
+ One could certainly imagine that this is what others do.
+ For example, transcribing an audio file, and from there, I find relevant keywords that I can tag.
+ We’re not there yet.
+ I’m not sure if we should be.
+ So at Danmarks Radio, it’s live humans who quality check and manually do this up-tagging, which is then added to the recommendation system, which then translates it into the system that does the math to ultimately decide which article or content should be recommended.
  
  SW: 
- Okay. 
- Jeg tænker lige umiddelbart, at det kunne være noget, jeg kunne undersøge. 
- Jeg har tænkt mig at lave et anbefalingssystem på transkriptioner. 
- Hvis jeg kan få transkriptionerne ud.
+ Okay.
+ I’m thinking right now that this might be something I could investigate.
+ I plan to create a recommendation system based on transcriptions.
+ If I can get the transcriptions out.
  
  MJ: 
- Ja, altså der er jo et hold i DR på det. 
- Jeg kan sagtens sætte dig i forbindelse med, hvordan man sidder med den bestemmelse. 
+ Yes, there is a team at DR working on that.
+ I can certainly put you in touch with the people who manage that process. 
  
  SW: 
- Ja, dem, der laver transkriptionerne? 
+ Yes, the people who create the transcriptions?
  
  MJ: 
- Ja, og dem der har lavet forsøgene bag ved. 
+ Yes, and the people who have done the experiments behind it. 
  
  SW: 
- Jeg ved at jeg kan hente dem manuelt inde fra Mediarkiet, men nu har jeg data for 3 måneder, og der er blevet lyttet til et eller andet, 20.000 forskellige episoder og jeg kan ikke gå ind og downloade manuelt for så mange episoder. 
+ I know I can retrieve them manually from Mediarkiet, but I now have data for 3 months, and there have been listens to something like 20,000 different episodes, and I can’t go in and manually download so many episodes.
  
  MJ: 
- Nej, det er måske mere til det. 
- Men der er to forskellige teams, der har lavet forsøgene i forhold til de der transkriptioner og lave emneord. 
- Så det kan jeg sagtens sætte dig i forbindelse med. 
+ No, that’s probably not practical for that.
+ But there are two different teams that have done experiments regarding those transcriptions and creating keywords.
+ I can definitely put you in touch with them.
  
  SW: 
- Jeg kunne godt forestille mig, at der er en gevinst ved det, men jeg ved ikke, at den er stor nok, for det kræver altså noget ekstra at finde et emneord på en automatiseret måde. 
+ I can imagine there’s a gain from it, but I don’t know if it’s big enough because it really requires something extra to find a keyword in an automated way.
  
  MJ: 
- Altså, det jeg ved, der er nogle af udfordringerne, det er, AI bliver jo hele tiden klogere, bedre, så det er jo en udvikling, der bare går en vej, som det ser ud lige nu. 
- Men lige nu, når vi tester, kan de have svært ved at vægte, hvad der egentlig er vigtigt i den her tekst. 
- De kan godt lave nogle ord, men så er Lars Lykke måske nævnt i en bisætning, men ikke er et tonangivende emne for serien. 
- Jeg har rappet nævnet hurtigt tre gange, men det er stadigvæk ikke vigtigt for det, der egentlig er talt om. 
- Så kan man hurtigt få en bias, der ikke skal være der. 
- Så det der med at få dem til at lave den rigtige vægtning, tror jeg stadigvæk er en udfordring. 
- Så er der nogle andre forsøg med, at man kan få transkriptionen til at blive til en tekst. 
- Og på baggrund af den tekst kan man så lave en opmærkning manuelt. 
- Og det er også et sprog, hvor man kan sige, at man kommer halvdelen af vejen. 
- Fordi det kan være en anden type tekst end den der måske er. 
- Altså de tekster der er meget mere baseret på i dag, er jo nogle der er skrevet ordrigt. 
- En seriebeskrivelse der ligesom skal få brugeren til at afgøre om jeg vil lytte til deres indhold eller ej. 
- Det er ikke sikkert at det er den samme tekst der er lige så god til at få en dataopmærkningsspecialist til at opmærke et stykke indhold på den bedst mulige måde. 
- Det kan godt være to forskellige tekster. 
- Så det kan være det der. 
- Det ved jeg også man kan teste. 
+ Well, what I know is that one of the challenges is that AI is constantly getting smarter and better, so it’s a development that’s moving in one direction, as it looks right now.
+ But right now, when we test, they can have difficulty weighing what is really important in the text.
+ They can generate some words, but Lars Løkke might be mentioned in a subordinate clause, but it’s not a dominant topic for the series.
+ I’ve mentioned the name quickly three times, but it’s still not important for what’s actually being discussed.
+ So you can quickly get a bias that shouldn’t be there.
+ So, getting them to do the right weighting, I think, is still a challenge.
+ There are also other attempts to turn the transcription into text.
+ And based on that text, you can manually label it.
+ And that’s also a language where you could say you’re halfway there.
+ Because it might be a different type of text than what might be needed.
+ I mean, the texts that are much more based on today are ones that are written elaborately.
+ A series description that’s supposed to make the user decide whether they want to listen to the content or not.
+ It’s not certain that the same text is just as good for a data labeling specialist to label the content in the best possible way.
+ They might be two different texts.
+ So that could be the issue.
+ I know that can also be tested. 
  
  SW: 
- Ja. 
- Vi kan lige se hvad jeg ellers har af spørgsmål nu. 
- Jo, der hvor vi. 
- Alle albefalingsalgoritmerne, er det nogle vi selv har udviklet eller er det nogle vi får udefra? 
+ Yes.
+ Let’s just see what other questions I have now.
+ Yes, where we…
+ All the recommendation algorithms, are they ones we’ve developed ourselves, or are they ones we get from external sources?
  
  MJ: 
- Det er en 3.parts ekstern leverandør. 
- For nærværende er der ikke planer om selv. 
- Det er altid en afvejning det her med. 
- I andre nordiske lande har man selv arbejdet med det. 
- Det har måske gjort, ulempen ved det er at det kan tage lang tid at komme i gang. 
- Der har vi et ret fint niveau på anbefalinger. 
- Ulempen er jo selvfølgelig altid, at det kan være tungere at lave ændringer eller teste justeringer, fordi vi ikke selv ejer interfaces. 
- Vi kan ikke selv bestemme, hvordan det er udtrykt. 
- Det er selvfølgelig en dialog, vi har. 
- Vi får lavet udviklingen specielrettet. 
- Så det er jo også det her med, skal vi selv have specialister, der kan lave den her slags systemer, eller er det bedre at købe den service hos nogle der er specialister i det. 
- Men lige nu er det et 3. partssystem. 
+ It’s a third-party external provider.
+ Currently, there are no plans to do it ourselves.
+ It’s always a trade-off.
+ In other Nordic countries, they have worked on it themselves.
+ It might have worked, but the downside is that it can take a long time to get started.
+ We have a pretty good level of recommendations.
+ The downside, of course, is that it can be harder to make changes or test adjustments because we don’t own the interfaces ourselves.
+ We can’t determine how it’s expressed ourselves.
+ It’s obviously a dialogue we have.
+ We get the development done tailored to us.
+ So, it’s also about whether we should have specialists who can create these types of systems ourselves or if it’s better to buy the service from specialists.
+ But right now, it’s a third-party system.
  
  SW: 
- Men I har stor indlydelse på, hvordan det I vil have kommer til at se ud? 
+ But you have a lot of influence over how you want it to look?
  
  MJ: 
- Ja, vi har jo løbende udviklingstid, og det er os selv, der suverænt bestemmer, hvordan vi bruger systemet, og hvordan det møder vores brugere. 
- Så man kan sige, at på den måde har vi fuldt afhængighed, men det er klart, Vi har ejerskabet over den data, vi deler med dem. 
- De oversættelser af metadata, der sker gennem dem, har vi også ejerskabet over. 
- Så på den måde, skulle vi finde på noget andet en dag, kan man tage det videre. 
- Så på den måde er værdikæden sikret. 
- Så det er det. 
+ Yes, we have ongoing development time, and we are the ones who decide how we use the system and how it interacts with our users.
+ So, in that sense, we have full control, but of course, we own the data we share with them.
+ We also own the metadata translations that happen through them.
+ So, in that way, if we decide to do something else someday, we can take it further.
+ So, in that sense, the value chain is secured.
+ So, that’s it.
  
  SW: 
- Jeg tror, at det sidste spørgsmål er, hvordan anbefalingsalgoritmen er påvirket af obligatorisk login og om man kunne forestille sig, at man har en brugerprofil på tværs af platforme, hvor man både kigger på, hvad man laver på DRTV og dr.dk? 
+ I think the last question is how the recommendation algorithm is affected by mandatory login and whether it's possible to imagine having a user profile across platforms, where we look at what you do on DRTV and dr.dk?
  
  MJ: 
- Helt klart, altså man kan sige, der er jo kun obligatorisk login på TV. 
- Og vores anbefalingssystem og data taler endnu ikke sammen på tværs. 
- Men perspektivet er jo rigtigt, det du siger. 
- Altså man kan sige, lige nu, altså det der jo skulle være en af de store fordele for brugerne, ved login, er jo at lige nu leverer vi meget en silo-oplevelse for brugeren. 
- Det vil sige, at i DR LYD gør vi det bedste for dig, der nu er inde i DR LYD. 
- På DRTV gør de det bedste for dem, der lige nu er inde i DRTV, og på dr.dk gør de lige nu det bedste for dem, der er på dr.dk. 
- Vi tænker sådan set ikke på tværs. 
- Men sådan er livet lige nu. 
- Jeg hører selv radio om morgenen, så browser jeg lidt, mens jeg er på toilet på arbejdet, og så ser jeg nyhederne på TV om aftenen. 
- Så det er jo sådan et menneskeliv ser ud. 
- Og derfor kan man sige, at vores anbefaling i dag er jo handicappet af, at vi ligesom kan se dig i en af brugssituationerne. 
- Så man kan sige, at det at lære dig mere som en hel bruger, vil også kunne gøre, at vi kan tilbyde dig en meget bedre oplevelse. 
- Fordi det kan gøre, at du foretrækker kun at lytte til aktualitetsstof. 
- På LYD, når du startede med DRTV med at se en film, og så tror jeg DRTV-systemet ikke nødvendigvis, at du er interesseret i aktualitet. 
- Men hvis vi nu havde den viden, om at du faktisk er storforbruger af de her emner herovre, så ville man kunne få noget interessant fremover på DRTV til dig også. 
- Så der er nogle perspektiver i det her tværgående, som er forbandet komplekst på tværs af systemer og brugeradfærd. 
- Det er jo klart, at dr.dk og DR LYD, har jo det til fælles at det er meget noget du gør alene, mens DRTV er noget du gør sammen med andre. 
- Så hvad betyder det egentlig, når der er sat "Gurli Gris" på derhjemme? 
- Så er der nogle børneprofiler osv. 
- Men det kan være enormt svært, der er masser af udfordringer, der skal løses. 
- Derfor er det i virkeligheden sådan, at vi kan være så revante som muligt overfor brugerne. 
- Men det er jo perspektivet nok, at vi kan... 
- Nu er DR LYD den lille søster i forsamlingen af de tre digitale DR-produkter. 
- Der kan sagtens være nogle brugere, der er vildt interesserede i f.eks. dokumentarfilm om indonesisk folkemord i løbet af det 20. århundrede, det blev behandlet i dokumentaren "The Act of Killing", som lå på DRTV og der har været en "Tyran"-sæson om den diktator. 
- Det er ikke sikkert, at den, der så den dokumentar, ved, at den findes inde i DR LYD. 
- Men det er meget relevant, fordi det er et perspektiv, der indlægger, at vi kan kæde de ting sammen. 
- Og give dem den oplysning om, at vi viser det her frem. 
+ Definitely, I mean, right now, mandatory login only applies on TV.
+ And our recommendation system and data still don’t communicate across platforms.
+ But the perspective is correct, what you’re saying.
+ I mean, right now, one of the big advantages of login for users is that we currently deliver a siloed experience for the user.
+ That is, in DR LYD, we do the best for those who are currently in DR LYD.
+ In DRTV, they do the best for those who are currently in DRTV, and on dr.dk, they do the best for those who are currently on dr.dk.
+ We don’t really think across platforms.
+ But that’s the way life is right now.
+ I myself listen to the radio in the morning, browse a bit while I’m on the toilet at work, and then watch the news on TV in the evening.
+ So, that’s kind of how a person’s life looks.
+ And therefore, you could say that our recommendations today are handicapped because we can only see you in one of those usage situations.
+ So, you could say that learning more about you as a complete user would also allow us to offer you a much better experience.
+ Because it could mean that you prefer to only listen to current affairs.
+ On LYD, when you started with DRTV watching a film, and then I don’t think the DRTV system necessarily believes you’re interested in current affairs.
+ But if we had the knowledge that you’re actually a big consumer of those topics, we could bring something interesting for you on DRTV as well.
+ So, there are some perspectives here on cross-platforms, which are incredibly complex across systems and user behavior.
+ It’s clear that dr.dk and DR LYD have in common that they’re very much something you do alone, whereas DRTV is something you do with others.
+ So, what does it mean when "Gurli Gris" is put on at home?
+ Then there are child profiles, etc.
+ But it can be incredibly difficult, there are many challenges to solve.
+ Therefore, it’s actually that we can be as relevant as possible for the users.
+ But the perspective is probably that we can…
+ Now DR LYD is the little sister in the group of the three digital DR products.
+ There can easily be users who are extremely interested in, for example, a documentary about the Indonesian genocide in the 20th century, which was covered in the documentary The Act of Killing, which was available on DRTV, and there has been a Tyran season about that dictator.
+ It’s not certain that the person who watched that documentary knows that it exists on DR LYD.
+ But it’s very relevant because it’s a perspective that suggests we can link those things together.
+ And give them the information that we’re showcasing it here.
  
  SW: 
- Det kunne være fedt. 
+ That would be great.
  
  MJ: 
- Men der er lidt arbejde forude. 
+ But there's a bit of work ahead.
  
  SW: 
- Det må man sige. 
- Jeg ved heller ikke, om du her til sidst måske bare kunne sige, hvad du laver til daglig. 
- Nu blev jeg bare henvist til dig af Mads. 
- Så jeg ved ikke så meget om hvad du laver.
+ That’s for sure.
+ I also don’t know if you could just say what you do on a daily basis.
+ I was referred to you by Mads, so I don’t know much about what you do.
  
  MJ: 
- Ja, ja. 
- Så man kan sige, at jeg er udviklingsredaktør i DR LYD publicering. 
- Det vil sige, at jeg er sådan i nogle dele af mit arbejde bindeleddet imellem teknologi, udvikling, brugerbehov og sådan mere det publicistiske, redaktionelle område. 
- Så man kan sige, at jeg prøver ligesom at være det bindeled, der er mellem, okay der er en teknologisk anbefaling, nogle muligheder her. 
- Hvordan oversætter vi det så til, hvad er det så vi vil med det rent publicistisk? 
- Det er meget for mig og mine kolleger, der stiller behovene ned mod teknologi, hvad er det vi gerne vil opnå? 
- Og så prøver vi sammen at formulere nogle løsninger til, hvordan kan vi så komme derhen, så vi kan gøre det i forhold til brugerne. 
- Så i forhold til nogle af de LYD-cases, jeg har beskrevet, f.eks. autoplayeren, vi har behov for, at den her anbefaling opfører sig på den og den måde,hjælper os med at opnå det. 
- Så det er sådan noget af det jeg laver. 
+ Yes, yes.
+ So, you could say that I’m a development editor at DR LYD publishing.
+ This means that in some parts of my work, I act as a link between technology, development, user needs, and the more journalistic, editorial side.
+ So, I try to be the connection between, okay, there’s a technological recommendation, some opportunities here.
+ How do we translate that into what we want to do with it editorially?
+ It’s a lot about me and my colleagues, who set the needs down to technology, what do we want to achieve?
+ And then we try to work together to formulate some solutions for how we can get there, so we can do that for the users.
+ So in relation to some of the LYD cases I’ve described, e.g., the autoplay, we need this recommendation to behave in this and this way to help us achieve that.
+ So that’s some of what I do.
  
  SW: 
- Jamen så har jeg talt med den rigtige. 
+ Well, then I’ve spoken to the right person.
  
  MJ: 
- Ja det er godt! 
+ Yes, that's good!
  
  SW: 
- Jeg tror egentlig, det var alt det jeg ville høre dig om. 
+ I think that was everything I wanted to ask you about. 
  
  MJ: 
- Det er super Sebastian. 
- Og ellers så, du har min mail, og så du skriver bare, hvis der er noget du vil have opklaret, eller hvis der er noget, du er i tvivl om. 
- Ja, så du er velkommen til at skrive noget. 
+ That's great, Sebastian.
+ Otherwise, you have my email, so just write if there’s anything you want clarified or if there’s something you're unsure about.
+ Yes, you're welcome to write anytime.
  
  SW: 
- Og det er helt okay at jeg gemmer optagelsen. 
+ And it’s totally fine if I save the recording.
  
  MJ: 
- Ja, ja, altså du bruger den bare til den opgave. 
- Hvis du bruger den til andet, må du selvfølgelig gerne lige spørge mig om det. 
- Men hvis det er til opgaven, så er det bare så fint. 
+ Yes, yes, as long as you use it for the task.
+ If you use it for something else, of course, you can ask me about it.
+ But if it’s for the task, then it’s absolutely fine.
  
  SW: 
- Det regner jeg ikke med. 
- Tak for din tid.
+ I don’t plan to.
+ Thanks for your time.
