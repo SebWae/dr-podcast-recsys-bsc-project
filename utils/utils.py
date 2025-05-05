@@ -1,5 +1,4 @@
 from collections import defaultdict
-import itertools
 import json
 import os
 import sys
@@ -47,16 +46,16 @@ def compute_dcg(recommendations: list, gain_dict: dict) -> float:
 
 
 def compute_diversity(recommendations: list, 
-                      item_features: pd.DataFrame,
-                      item_id_name: str) -> float:
+                      emb_dict: dict,
+                      user_profile: np.ndarray) -> float:
     """
-    Computes the diversity as the average intra-list distance (AILD) of a recommendations list.
+    Computes the user-centric diversity based on a user profile (embedding) and a list of  recommendations.
     Cosine similarity is chosen as the distance measure and is transformed to be in the range [0,1].
 
     Parameters:
     - recommendations:  List of recommended items.
-    - item_features:    DataFrame whose first column is the item IDs and the following columns are numerical item features.
-    - item_id_name:     Name of the column containing the item IDs. 
+    - emb_dict:         Dictionary containing embeddings for any recommended item.
+    - user_profile:     User profile as a numpy array. 
 
     Returns:
     - diversity:        Diversity metric in the range [0,1], 0 indicates similar items, 1 indicates diverse items.
@@ -64,13 +63,12 @@ def compute_diversity(recommendations: list,
     diversities = []
 
     # iterating through pairs of items
-    for item1, item2 in itertools.combinations(recommendations, 2):
-        # retrieving the feature vectors for the two items
-        vector_1 = item_features[item_features[item_id_name] == item1].iloc[:, 1:].values.flatten()
-        vector_2 = item_features[item_features[item_id_name] == item2].iloc[:, 1:].values.flatten()
+    for item in recommendations:
+        # retrieving the embedding of the recommended item
+        rec_item_embedding = emb_dict[item]
 
         # computing the cosine similarity between the two feature vectors
-        similarity = cosine_similarity([vector_1], [vector_2])[0][0]
+        similarity = cosine_similarity([rec_item_embedding], [user_profile])[0][0]
 
         # transforming similarity to range [0, 1] and flipping the interpretability 
         diversity = 1 - (similarity + 1) / 2
