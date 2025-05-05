@@ -1,28 +1,28 @@
-import json
 import os
 import sys
+
+import pandas as pd
 
 # adding the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 from config import (
-    SCORES_PATH,
-    RECOMMENDATIONS_KEY_CF,
-    RECOMMENDATIONS_KEY_CB_COMBI,
+    SCORES_PATH_CF,
+    SCORES_PATH_CB_COMBI, 
     N_RECOMMENDATIONS,
-    LAMBDA,
+    LAMBDA_HYBRID,
     RECOMMENDATIONS_PATH,
     RECOMMENDATIONS_KEY_HYBRID,
 )
 import utils.utils as utils
 
-# loading scores from cf and cb recommender
-print(f"Loading utils dictionaries from {SCORES_PATH}.")
-with open(SCORES_PATH, "r") as file:
-    scores_dicts = json.load(file)
+# loading cf and cb scores
+cf_scores_df = pd.read_parquet(SCORES_PATH_CF)
+cb_scores_df = pd.read_parquet(SCORES_PATH_CB_COMBI)
 
-cf_scores = scores_dicts[RECOMMENDATIONS_KEY_CF]
-cb_scores = scores_dicts[RECOMMENDATIONS_KEY_CB_COMBI]
+# converting the scores dataframes to dictionaries
+cf_scores = cf_scores_df.to_dict()
+cb_scores = cb_scores_df.to_dict()
 
 # all users
 cf_users = set(cf_scores.keys())
@@ -34,7 +34,7 @@ print("Generating recommendations from hybrid recommender with optimal lambda hy
 hybrid_scores = utils.get_hybrid_scores(scores_dict_1=cf_scores,
                                         scores_dict_2=cb_scores,
                                         users=users,
-                                        _lambda=LAMBDA)
+                                        _lambda=LAMBDA_HYBRID)
     
 hybrid_recs = utils.extract_recs(scores_dict=hybrid_scores,
                                  n_recs=N_RECOMMENDATIONS)

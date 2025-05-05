@@ -1,6 +1,5 @@
 import argparse
 import csv
-import json
 import os
 import sys
 
@@ -13,9 +12,8 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 from config import (
     VAL_DATA_PATH,
-    SCORES_PATH,
-    RECOMMENDATIONS_KEY_CF,
-    RECOMMENDATIONS_KEY_CB_COMBI,
+    SCORES_PATH_CF,
+    SCORES_PATH_CB_COMBI,
     N_RECOMMENDATIONS,
     EXPERIMENTS_HYBRID_PATH,
 )
@@ -35,13 +33,13 @@ lambdas = [int(x) for x in args.lambda_vals(",")]
 print("Loading validation data.")
 val_df = pd.read_parquet(VAL_DATA_PATH)
 
-# loading scores from cf and cb recommender
-print(f"Loading utils dictionaries from {SCORES_PATH}.")
-with open(SCORES_PATH, "r") as file:
-    scores_dicts = json.load(file)
+# loading cf and cb scores
+cf_scores_df = pd.read_parquet(SCORES_PATH_CF)
+cb_scores_df = pd.read_parquet(SCORES_PATH_CB_COMBI)
 
-cf_scores = scores_dicts[RECOMMENDATIONS_KEY_CF]
-cb_scores = scores_dicts[RECOMMENDATIONS_KEY_CB_COMBI]
+# converting the scores dataframes to dictionaries
+cf_scores = cf_scores_df.to_dict()
+cb_scores = cb_scores_df.to_dict()
 
 # all users
 cf_users = set(cf_scores.keys())
