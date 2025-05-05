@@ -17,6 +17,8 @@ from config import (
     METADATA_PATH,
     EMBEDDINGS_TITLE_PATH,
     EMBEDDINGS_DESCR_PATH,
+    LAMBDA_CB,
+    EMBEDDINGS_COMBI_PATH,
 )
 import utils.utils as utils
 
@@ -83,5 +85,20 @@ for i, emb_dict in enumerate(embedding_dicts.values()):
     emb_df = pd.DataFrame(emb_dict_formatted)
     path = emb_paths[i]
     emb_df.to_parquet(path, index=False)
+
+# computing and saving combi embeddings
+print("Generating combi embeddings.")
+items = meta_df["prd_number"].unique()
+combi_embeddings = {}
+
+for item in tqdm(items):
+    title_emb = embedding_dicts[0][item]
+    descr_emb = embedding_dicts[1][item]
+    combi_emb = LAMBDA_CB * title_emb + (1 - LAMBDA_CB) * descr_emb
+    combi_embeddings[item] = combi_emb
+
+print("Saving combi embeddings.")
+combi_emb_df = pd.DataFrame(combi_embeddings)
+combi_emb_df.to_parquet(EMBEDDINGS_COMBI_PATH, index=False)
 
 print("Done! Embeddings have been saved to embeddings folder.")
