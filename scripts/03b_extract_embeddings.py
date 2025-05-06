@@ -41,7 +41,7 @@ stemmer = SnowballStemmer("danish")
 meta_df = pd.read_parquet(METADATA_PATH)
 
 # computing embeddings for each episode
-print("Computing embeddings.")
+print("Computing embeddings based on episode titles and descriptions.")
 for _, row in tqdm(meta_df.iterrows(), total=len(meta_df)):
     # extracting prd_number and textual features
     prd_number = row["prd_number"]
@@ -87,18 +87,19 @@ for i, emb_dict in enumerate(embedding_dicts.values()):
     emb_df.to_parquet(path, index=False)
 
 # computing and saving combi embeddings
-print("Generating combi embeddings.")
+print("Computing combi embeddings.")
 items = meta_df["prd_number"].unique()
 combi_embeddings = {}
 
 for item in tqdm(items):
     title_emb = embedding_dicts[0][item]
     descr_emb = embedding_dicts[1][item]
-    combi_emb = LAMBDA_CB * title_emb + (1 - LAMBDA_CB) * descr_emb
-    combi_embeddings[item] = combi_emb
+    combi_emb = LAMBDA_CB * np.array(title_emb) + (1 - LAMBDA_CB) * np.array(descr_emb)
+    combi_emb_list = list(combi_emb)
+    combi_embeddings[item] = combi_emb_list
 
 print("Saving combi embeddings.")
 combi_emb_df = pd.DataFrame(combi_embeddings)
 combi_emb_df.to_parquet(EMBEDDINGS_COMBI_PATH, index=False)
 
-print("Done! Embeddings have been saved to embeddings folder.")
+print("Done! All embeddings have been saved to embeddings folder.")
