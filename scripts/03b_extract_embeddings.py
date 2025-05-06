@@ -94,8 +94,9 @@ combi_embeddings = {}
 for item in tqdm(items):
     title_emb = embedding_dicts[0][item]
     descr_emb = embedding_dicts[1][item]
-    combi_emb = LAMBDA_CB * title_emb + (1 - LAMBDA_CB) * descr_emb
-    combi_embeddings[item] = combi_emb
+    combi_emb = LAMBDA_CB * np.array(title_emb) + (1 - LAMBDA_CB) * np.array(descr_emb)
+    combi_emb_list = list(combi_emb)
+    combi_embeddings[item] = combi_emb_list
 
 print("Saving combi embeddings.")
 combi_emb_df = pd.DataFrame(combi_embeddings)
