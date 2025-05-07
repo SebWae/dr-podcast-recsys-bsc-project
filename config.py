@@ -74,7 +74,11 @@ RECOMMENDATIONS_KEY_CB_TITLE = "cb_recommendations_title"
 RECOMMENDATIONS_KEY_CF = "cf_recommendations"
 RECOMMENDATIONS_KEY_HYBRID = "hybrid_recommendations"
 RECOMMENDATIONS_PATH = "results/recommendations.json"
-RECOMMENDERS = ["cf_recommendations"]
+RECOMMENDERS = [RECOMMENDATIONS_KEY_CF, 
+                RECOMMENDATIONS_KEY_CB_TITLE, 
+                RECOMMENDATIONS_KEY_CB_DESCR, 
+                RECOMMENDATIONS_KEY_CB_COMBI
+                ]
 REG = 0.005
 SCORES_PATH_CF = "results/cf_scores.parquet"
 SCORES_PATH_CB_COMBI = "results/cb_combi_scores.parquet"
