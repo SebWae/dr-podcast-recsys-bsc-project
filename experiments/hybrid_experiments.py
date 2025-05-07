@@ -27,17 +27,19 @@ parser.add_argument("--lambda_vals", type=str, required=True, help="Comma-separa
 args = parser.parse_args()
 
 # parsing the input arguments
-lambdas = [int(x) for x in args.lambda_vals(",")]
+lambdas = [float(x) for x in args.lambda_vals.split(",")]
 
 # loading validation data
 print("Loading validation data.")
 val_df = pd.read_parquet(VAL_DATA_PATH)
 
 # loading cf and cb scores
+print("Loading scores data.")
 cf_scores_df = pd.read_parquet(SCORES_PATH_CF)
 cb_scores_df = pd.read_parquet(SCORES_PATH_CB_COMBI)
 
 # converting the scores dataframes to dictionaries
+print("Converting scores dataframes to dictionaries.")
 cf_scores = cf_scores_df.to_dict()
 cb_scores = cb_scores_df.to_dict()
 

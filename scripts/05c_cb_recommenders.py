@@ -62,16 +62,17 @@ train_df["date"] = pd.to_datetime(train_df["date"])
 train_df["days_since"] = (reference_date - train_df["date"]).dt.days
 
 # iterating over levels of metadata
-metadata_levels = {"title": {"emb_df": title_emb_df,
-                             "rec_key": RECOMMENDATIONS_KEY_CB_TITLE,
-                             "scores_path": SCORES_PATH_CB_TITLE},
-                    "descr": {"emb_df": descr_emb_df,
-                             "rec_key": RECOMMENDATIONS_KEY_CB_DESCR,
-                             "scores_path": SCORES_PATH_CB_DESCR},
-                    "combi": {"emb_df": combi_emb_df,
-                             "rec_key": RECOMMENDATIONS_KEY_CB_COMBI,
-                             "scores_path": SCORES_PATH_CB_COMBI}
-                    }
+metadata_levels = {
+"title": {"emb_df": title_emb_df,
+            "rec_key": RECOMMENDATIONS_KEY_CB_TITLE,
+            "scores_path": SCORES_PATH_CB_TITLE},
+    "descr": {"emb_df": descr_emb_df,
+            "rec_key": RECOMMENDATIONS_KEY_CB_DESCR,
+            "scores_path": SCORES_PATH_CB_DESCR},
+    "combi": {"emb_df": combi_emb_df,
+            "rec_key": RECOMMENDATIONS_KEY_CB_COMBI,
+            "scores_path": SCORES_PATH_CB_COMBI}
+    }
 
 for level in metadata_levels.values():
     # unpacking values from sub dictionary

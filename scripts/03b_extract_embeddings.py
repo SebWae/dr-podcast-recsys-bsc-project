@@ -99,7 +99,8 @@ for item in tqdm(items):
     combi_embeddings[item] = combi_emb_list
 
 print("Saving combi embeddings.")
-combi_emb_df = pd.DataFrame(combi_embeddings)
+combi_embeddings_formatted = utils.format_embedding_dict(combi_embeddings)
+combi_emb_df = pd.DataFrame(combi_embeddings_formatted)
 combi_emb_df.to_parquet(EMBEDDINGS_COMBI_PATH, index=False)
 
 print("Done! All embeddings have been saved to embeddings folder.")
