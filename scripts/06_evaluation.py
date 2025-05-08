@@ -64,8 +64,8 @@ for recommender in RECOMMENDERS:
     for level in eval_levels:
         print(f"Evaluation @{level}.")
         # initializing dictionaries to store metrics per user
-        hit_dict = defaultdict(int)
-        ndcg_dict = hit_dict.copy()
+        hit_dict = {user_id: 0 for user_id in recommendations.keys()}
+        ndcg_dict = defaultdict(int)
         diversity_dict = hit_dict.copy()
 
         for user_id, rec_items in tqdm(recommendations.items()):
@@ -77,7 +77,7 @@ for recommender in RECOMMENDERS:
             correct_recs = true_items.intersection(rec_items)
             n_correct_recs = len(correct_recs)
             if n_correct_recs > 0:
-                hit_dict[user_id] = 1
+                hit_dict[user_id] += 1
 
             # computing NDCG for each user
             gain_dict = completion_rate_dict[user_id]
