@@ -130,13 +130,17 @@ for level in metadata_levels.values():
         # storing the results
         scores_dict[user] = normalized_user_scores
 
-    # saving scores to parquet
-    scores_df = pd.DataFrame(scores_dict)
-    scores_df.to_parquet(scores_path)
+    # saving scores from cb_descr to parquet
+    if rec_key == RECOMMENDATIONS_KEY_CB_DESCR:
+        print("Saving scores.")
+        scores_df = pd.DataFrame(scores_dict)
+        scores_df.to_parquet(scores_path)
 
     # extract recommendations from scores
+    print("Extracting recommendations from scores_dict.")
     recs_dict = utils.extract_recs(scores_dict=scores_dict, n_recs=N_RECOMMENDATIONS)
 
     # saving recommendations
+    print(f"Saving recommendations to {RECOMMENDATIONS_PATH}.")
     recs_dict_key = {rec_key: recs_dict}
     utils.save_dict_to_json(data_dict=recs_dict_key, file_path=RECOMMENDATIONS_PATH)
