@@ -1,5 +1,4 @@
 from collections import defaultdict
-import itertools
 import json
 import os
 import sys
@@ -68,7 +67,7 @@ def compute_diversity(recommendations: list,
     # iterating through pair of items in the recommendations list
     for i in range(n_embs):
         emb_1 = embs[i]
-        
+
         for j in range(i + 1, n_embs):
             emb_2 = embs[j]
             sim = cosine_similarity([emb_1], [emb_2])[0][0]
@@ -131,6 +130,45 @@ def format_embedding_dict(emb_dict: dict) -> dict:
     formatted_dict = reshaped_df.to_dict(orient="list")
 
     return formatted_dict
+
+
+def get_cb_scores(user: str, 
+                  show_episodes: dict, 
+                  user_profile: np.ndarray, 
+                  item_embeddings: np.ndarray,
+                  items: Iterable) -> dict:
+    """
+    Returns a dictionary of normalized scores for all items possible to recommend for a given user.
+
+    Parameters:
+    - user:                     ID of user to generate scores for.
+    - show_episodes:            Dictionary containing the shows and episodes listened by every user, {"user_id": {"show_id": ["episode_x", "episode_y"]}}
+    - user_profile:             Numpy array containing vector corresponding to the user profile.
+    - item_embeddings:          Numpy array containing all item embeddings.
+    - items:                    Iterable containing all item_ids.
+
+    Returns:
+    - normalized_user_scores:   Dictionary of normalized scores for the given user.
+    """
+    # items consumed by the user
+    user_show_episodes_dict = show_episodes[user]
+    user_items = {item for sublist in user_show_episodes_dict.values() for item in sublist}
+
+    # computing all cosine similarities at once for all items
+    cos_sim = cosine_similarity(user_profile, item_embeddings).flatten()
+
+    # filtering out items already consumed by the user
+    user_scores = {}
+    for idx, item in enumerate(items):
+        if item not in user_items:
+            user_scores[item] = cos_sim[idx]
+
+    # normalizing the user scores
+    values = np.array(list(user_scores.values()))
+    norm = np.linalg.norm(values)
+    normalized_user_scores = {key: value / norm for key, value in user_scores.items()}
+
+    return normalized_user_scores
 
 
 def get_cf_scores(model: BiasedMF, 
@@ -208,51 +246,40 @@ def get_cf_scores(model: BiasedMF,
 def get_hybrid_scores(scores_dict_1: dict,
                       scores_dict_2: dict,
                       users: Iterable,
+                      items: Iterable,
                       _lambda: int) -> dict:
     """
-    Retrieves a dictionary containing scores for relevant items for each user.
+    Generates scores for a weighting hybrid recommender. 
     The scores are computed as a weighted average of the scores from scores_dict_1 and scores_dict_2.
 
     Parameters:
-    - scores_dict_1: Dictionary of scores for each item for each user from the first recommender.
-    - scores_dict_2: Dictionary of scores for each item for each user from the second recommender.
-    - users: Iterable containing all users.
-    - _lambda: Parameter controlling the weighting of scores with weights _lambda and (1 - _lambda).
+    - scores_dict_1:    Dictionary of scores for each item for each user from the first recommender.
+    - scores_dict_2:    Dictionary of scores for each item for each user from the second recommender.
+    - users:            Iterable containing all users.
+    - items:            Iterable containing all items possible to recommend.
+    - _lambda:          Parameter controlling the weighting of scores with weights _lambda and (1 - _lambda).
 
     Returns:
-    - scores_dict: Dictionary of scores for each item for each user. 
+    - scores_dict:      Dictionary of scores for each item for each user. 
     """
     # initializing scores_dict
-    scores_dict = defaultdict(dict)
+    hybrid_scores = defaultdict(dict)
 
+    # generating hybrid scores for each user
     for user in users:
-        # initializing dictionary to store scores for each user
-        user_scores = {}
+        cf_scores_user = scores_dict_1[user]
+        cb_scores_user = scores_dict_2[user]
+        user_hybrid_scores = {}
 
-        # user scores from cf and cb recommenders
-        user_cf_scores = scores_dict_1[user]
-        user_cb_scores = scores_dict_2[user]
+        for item in items:
+            cf_score = cf_scores_user[item] if item in cf_scores_user else 0
+            cb_score = cb_scores_user[item] if item in cb_scores_user else 0
+            hybrid_score = _lambda * cf_score + (1 - _lambda) * cb_score
+            user_hybrid_scores[item] = hybrid_score
 
-        # keys from each of the two dictionaries
-        cf_items = user_cf_scores.keys()
-        cb_items = user_cb_scores.keys()
+        hybrid_scores[user] = user_hybrid_scores
 
-        # apply weighting by lambda if item both has a cf and a cb score
-        for item in cf_items & cb_items: 
-            user_scores[item] = _lambda * user_cf_scores[item] + (1 - _lambda) * user_cb_scores[item]
-
-        # retieve cf score if item only has a cf score
-        for item in cf_items - cb_items: 
-            user_scores[item] = user_cf_scores[item]
-
-        # retieve cb score if item only has a cb score
-        for item in cb_items - cf_items:  
-            user_scores[item] = user_cb_scores[item]
-        
-        # adding user_scores to scores_dict
-        scores_dict[user] = user_scores
-
-    return scores_dict
+    return hybrid_scores
 
 
 def get_ratings_dict(data: pd.DataFrame,
@@ -328,6 +355,9 @@ def get_user_profile(emb_size: int,
 
     # applying weights to embeddings and accumulate to user profile
     user_profile += np.sum(embeddings * (weights[:, np.newaxis] / weight_total), axis=0)
+
+    # reshaping the user profile to a 2D numpy array
+    user_profile = user_profile.reshape(1, -1)
 
     return user_profile
 
