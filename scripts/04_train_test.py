@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import pandas as pd
 import sys
@@ -29,6 +30,13 @@ int_test_df = transformed_df[transformed_df["date"] >= SPLIT_DATE_VAL_TEST]
 train_df = int_train_df[COLUMNS_TO_KEEP_TRAIN]
 val_df = int_val_df[COLUMNS_TO_KEEP]
 test_df = int_test_df[COLUMNS_TO_KEEP]
+
+# adding days since val-test split date as a column to the train_df and val_df
+reference_date = datetime.strptime(SPLIT_DATE_VAL_TEST, "%Y-%m-%d")
+train_df["date"] = pd.to_datetime(train_df["date"])
+val_df["date"] = pd.to_datetime(val_df["date"])
+train_df["days_since"] = (reference_date - train_df["date"]).dt.days
+val_df["days_since"] = (reference_date - val_df["date"]).dt.days
 
 # saving train and test data to parquet files
 train_df.to_parquet(TRAIN_DATA_PATH)
