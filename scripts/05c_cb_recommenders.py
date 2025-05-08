@@ -1,12 +1,10 @@
 from collections import defaultdict
-from datetime import datetime
 import json
 import os
 import sys
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
 
 # adding the parent directory to the Python path
@@ -19,7 +17,6 @@ from config import (
     EMBEDDINGS_DESCR_PATH,
     EMBEDDINGS_COMBI_PATH,
     UTILS_PATH,
-    SPLIT_DATE_TRAIN_VAL,
     RECOMMENDATIONS_KEY_CB_TITLE,
     RECOMMENDATIONS_KEY_CB_DESCR,
     RECOMMENDATIONS_KEY_CB_COMBI,
@@ -52,30 +49,20 @@ with open(UTILS_PATH, "r") as file:
 
 all_users_show_episodes_dict = utils_dicts["user_show_episodes"]
 
-# adding days since train-val split date as a column in the train_df
-print("Computing days since train-val date for each train interaction.")
-reference_date = datetime.strptime(SPLIT_DATE_TRAIN_VAL, "%Y-%m-%d")
-train_df["date"] = pd.to_datetime(train_df["date"])
-train_df["days_since"] = (reference_date - train_df["date"]).dt.days
-
 # iterating over levels of metadata
 metadata_levels = {
-"title": {"emb_df": title_emb_df,
-            "rec_key": RECOMMENDATIONS_KEY_CB_TITLE,
-            "scores_path": SCORES_PATH_CB_TITLE},
+    "title": {"emb_df": title_emb_df,
+              "rec_key": RECOMMENDATIONS_KEY_CB_TITLE},
     "descr": {"emb_df": descr_emb_df,
-            "rec_key": RECOMMENDATIONS_KEY_CB_DESCR,
-            "scores_path": SCORES_PATH_CB_DESCR},
+              "rec_key": RECOMMENDATIONS_KEY_CB_DESCR},
     "combi": {"emb_df": combi_emb_df,
-            "rec_key": RECOMMENDATIONS_KEY_CB_COMBI,
-            "scores_path": SCORES_PATH_CB_COMBI}
+              "rec_key": RECOMMENDATIONS_KEY_CB_COMBI}
     }
 
 for level in metadata_levels.values():
     # unpacking values from sub dictionary
     emb_df = level["emb_df"]
     rec_key = level["rec_key"]
-    scores_path = level["scores_path"]
 
     # initializing dictionary to store scores for each user
     scores_dict = defaultdict(dict)
@@ -103,26 +90,12 @@ for level in metadata_levels.values():
                                               emb_dict=emb_dict,
                                               wght_scheme=WGHT_METHOD)
 
-        # reshaping the user profile to a 2D numpy array
-        user_profile_rshpd = user_profile.reshape(1, -1)
-
-        # items consumed by the user
-        user_show_episodes_dict = all_users_show_episodes_dict[user]
-        user_items = {item for sublist in user_show_episodes_dict.values() for item in sublist}
-
-        # computing all cosine similarities at once for all items
-        cos_sim = cosine_similarity(user_profile_rshpd, item_embeddings).flatten()
-
-        # filtering out items already consumed by the user
-        user_scores = {}
-        for idx, item in enumerate(items):
-            if item not in user_items:
-                user_scores[item] = cos_sim[idx]
-
-        # normalizing the user scores
-        values = np.array(list(user_scores.values()))
-        norm = np.linalg.norm(values)
-        normalized_user_scores = {key: value / norm for key, value in user_scores.items()}
+        # scores for user for each item not consumed by the user
+        normalized_user_scores = utils.get_cb_scores(user=user,
+                                                     show_episodes=all_users_show_episodes_dict,
+                                                     user_profile=user_profile,
+                                                     item_embeddings=item_embeddings,
+                                                     items=items)
 
         # storing the results
         scores_dict[user] = normalized_user_scores
