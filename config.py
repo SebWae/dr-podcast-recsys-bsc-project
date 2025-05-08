@@ -81,9 +81,6 @@ RECOMMENDERS = [RECOMMENDATIONS_KEY_CF,
                 ]
 REG = 0.005
 SCORES_PATH_CF = "results/cf_scores.parquet"
-SCORES_PATH_CB_COMBI = "results/cb_combi_scores.parquet"
-SCORES_PATH_CB_DESCR = "results/cb_descr_scores.parquet"
-SCORES_PATH_CB_TITLE = "results/cb_title_scores.parquet"
 WGHT_METHOD = "inverse"
 
 # for evaluation
