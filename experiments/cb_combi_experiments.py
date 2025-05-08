@@ -2,6 +2,7 @@ import argparse
 from collections import defaultdict
 import csv
 from datetime import datetime
+from itertools import product
 import json
 import os
 import sys
@@ -38,7 +39,7 @@ args = parser.parse_args()
 
 # parsing the input arguments
 lambdas = [float(x) for x in args.lambda_vals.split(",")]
-wght_scheme = args.wght_scheme
+wght_schemes = [scheme for scheme in args.wght_scheme.split(",")]
 
 # loading data and embeddings
 print("Loading data and embeddings.")
@@ -76,11 +77,11 @@ completion_rates_dict = utils.get_ratings_dict(data=val_df,
 
 # hyperparameter tuning for _lambda (weighting hyperparameter)
 print("Performing hyperparameter tuning for weighting parameter lambda.")
-print(f"Lambda values to test: {lambdas}.")
-print(f"Weighting method: {wght_scheme}")
+print(f"Testing values: lambda={lambdas}, wght_scheme={wght_schemes}")
 
-for _lambda in lambdas:
+for _lambda, wght_scheme in list(product(lambdas, wght_schemes)):
     print(f"\nTesting lambda={_lambda}.")
+    print(f"Testing weight scheme: {wght_scheme}")
     # initializing dictionary to store scores for each user
     scores_dict = defaultdict(dict)
 
