@@ -66,6 +66,14 @@ completion_rate_dict = utils.get_ratings_dict(data=test_df,
                                               item_col="prd_number",
                                               ratings_col="completion_rate")
 
+# construction dictionary containing embeddings
+print("Constructing dictionary containing embeddings.")
+emb_dict = {}
+for _, row in tqdm(emb_df.iterrows()):
+    prd_number = row["episode"]
+    embedding = row[1:].values.flatten()
+    emb_dict[prd_number] = embedding
+
 # dictionaries to store evaluation metrics for each recommender
 recommender_dict = defaultdict(dict)
 user_dict = defaultdict(dict)
@@ -92,7 +100,7 @@ for level in tqdm(eval_levels):
             hit_dict[user_id] += 1
 
         # computing NDCG for each user
-        optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)
+        optimal_items = sorted(gain_dict, key=lambda x: gain_dict[x], reverse=True)[:level]
         dcg = utils.compute_dcg(recs, gain_dict)
         dcg_star = utils.compute_dcg(optimal_items, gain_dict)
         ndcg = dcg / dcg_star 
@@ -113,9 +121,7 @@ for level in tqdm(eval_levels):
     recommender_dict[level]["ndcg"] = ndcg
 
     # computing global diversity (same for all users)
-    diversity = utils.compute_diversity(recommendations=recs, 
-                                        item_features=emb_df, 
-                                        item_id_name="episode")
+    diversity = utils.compute_diversity(recommendations=recs, emb_dict=emb_dict)
     recommender_dict[level]["diversity"] = diversity
 
 # final dictionaries
