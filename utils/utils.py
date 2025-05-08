@@ -174,7 +174,8 @@ def get_cb_scores(user: str,
 def get_cf_scores(model: BiasedMF, 
                   items: list,
                   users: Iterable,
-                  item_mapping: dict) -> dict:
+                  item_mapping: dict,
+                  incl_val_interactions: bool) -> dict:
     """
     Retrieves a dictionary containing scores for relevant items for each user.
 
@@ -195,7 +196,10 @@ def get_cf_scores(model: BiasedMF,
 
     # extracting dictionaries
     show_episodes_dict = utils_dicts["show_episodes"]
-    user_show_episodes_dict = utils_dicts["user_show_episodes"]
+    if incl_val_interactions:
+        user_show_episodes_dict = utils_dicts["user_show_episodes"]
+    else:
+        user_show_episodes_dict = utils_dicts["user_show_episodes_val"]
 
     for user in users:
         # retrieving scores for user
