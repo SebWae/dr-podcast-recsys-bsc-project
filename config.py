@@ -45,8 +45,8 @@ METADATA_PATH = "data/episode_metadata.parquet"
 UTILS_PATH = "utils/utils.json"
 
 # for train-test splitting
-COLUMNS_TO_KEEP = ["user_id", "prd_number", "completion_rate"]
-COLUMNS_TO_KEEP_TRAIN = ["user_id", "prd_number", "date", "completion_rate"]
+COLUMNS_TO_KEEP_TEST = ["user_id", "prd_number", "completion_rate"]
+COLUMNS_TO_KEEP = ["user_id", "prd_number", "date", "completion_rate"]
 MIN_PLAYS_PER_USER = 2
 MIN_USERS_PER_SHOW = 10
 SPLIT_DATE_TRAIN_VAL = "2024-10-21"
