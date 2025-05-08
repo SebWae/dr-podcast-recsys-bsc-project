@@ -10,8 +10,8 @@ from config import (
     TRANSFORMED_DATA_PATH,
     SPLIT_DATE_TRAIN_VAL,
     SPLIT_DATE_VAL_TEST,
-    COLUMNS_TO_KEEP_TRAIN,
     COLUMNS_TO_KEEP,
+    COLUMNS_TO_KEEP_TEST,
     TRAIN_DATA_PATH,
     VAL_DATA_PATH,
     TEST_DATA_PATH,
@@ -27,16 +27,18 @@ int_val_df = transformed_df[(transformed_df["date"] >= SPLIT_DATE_TRAIN_VAL) & (
 int_test_df = transformed_df[transformed_df["date"] >= SPLIT_DATE_VAL_TEST]
 
 # only keeping relevant columns
-train_df = int_train_df[COLUMNS_TO_KEEP_TRAIN]
+train_df = int_train_df[COLUMNS_TO_KEEP]
 val_df = int_val_df[COLUMNS_TO_KEEP]
-test_df = int_test_df[COLUMNS_TO_KEEP]
+test_df = int_test_df[COLUMNS_TO_KEEP_TEST]
 
 # adding days since val-test split date as a column to the train_df and val_df
-reference_date = datetime.strptime(SPLIT_DATE_VAL_TEST, "%Y-%m-%d")
+reference_date_val = datetime.strptime(SPLIT_DATE_TRAIN_VAL, "%Y-%m-%d")
+reference_date_test = datetime.strptime(SPLIT_DATE_VAL_TEST, "%Y-%m-%d")
 train_df["date"] = pd.to_datetime(train_df["date"])
 val_df["date"] = pd.to_datetime(val_df["date"])
-train_df["days_since"] = (reference_date - train_df["date"]).dt.days
-val_df["days_since"] = (reference_date - val_df["date"]).dt.days
+train_df["days_since"] = (reference_date_val - train_df["date"]).dt.days
+train_df["days_since_test"] = (reference_date_test - train_df["date"]).dt.days
+val_df["days_since_test"] = (reference_date_test - val_df["date"]).dt.days
 
 # saving train and test data to parquet files
 train_df.to_parquet(TRAIN_DATA_PATH)
