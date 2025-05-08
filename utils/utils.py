@@ -17,6 +17,7 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 from config import (
     RANDOM_STATE,
     UTILS_PATH,
+    UTILS_INTERACTIONS_PATH,
 )
 
 
@@ -194,12 +195,15 @@ def get_cf_scores(model: BiasedMF,
     with open(UTILS_PATH, "r") as file:
         utils_dicts = json.load(file)
 
+    with open(UTILS_INTERACTIONS_PATH, "r") as file:
+        train_val_interactions = json.load(file)
+
     # extracting dictionaries
     show_episodes_dict = utils_dicts["show_episodes"]
     if incl_val_interactions:
-        user_show_episodes_dict = utils_dicts["user_show_episodes"]
+        user_show_episodes_dict = train_val_interactions["user_show_episodes_val"]
     else:
-        user_show_episodes_dict = utils_dicts["user_show_episodes_val"]
+        user_show_episodes_dict = utils_dicts["user_show_episodes"]
 
     for user in users:
         # retrieving scores for user
