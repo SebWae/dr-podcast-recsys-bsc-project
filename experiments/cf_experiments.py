@@ -117,7 +117,8 @@ for n_components, reg, damping in tqdm(list(product(n_components_values, reg_val
         episode_scores = utils.get_cf_scores(model=mf, 
                                              items=item_list,
                                              users=user_list,
-                                             item_mapping=show_mapping)
+                                             item_mapping=show_mapping,
+                                             incl_val_interactions=False)
 
         recs_dict = utils.extract_recs(scores_dict=episode_scores,
                                        n_recs=N_RECOMMENDATIONS)
