@@ -86,7 +86,8 @@ for epochs in tqdm(range(1, N_EPOCHS+1)):
     episode_scores = utils.get_cf_scores(model=mf, 
                                          items=item_list,
                                          users=user_list,
-                                         item_mapping=show_mapping)
+                                         item_mapping=show_mapping,
+                                         incl_val_interactions=True)
 
     recs_dict = utils.extract_recs(scores_dict=episode_scores,
                                     n_recs=N_RECOMMENDATIONS)
