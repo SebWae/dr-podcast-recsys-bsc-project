@@ -1,5 +1,4 @@
 from collections import defaultdict
-import itertools
 import json
 import os
 import sys
@@ -68,7 +67,7 @@ def compute_diversity(recommendations: list,
     # iterating through pair of items in the recommendations list
     for i in range(n_embs):
         emb_1 = embs[i]
-        
+
         for j in range(i + 1, n_embs):
             emb_2 = embs[j]
             sim = cosine_similarity([emb_1], [emb_2])[0][0]
