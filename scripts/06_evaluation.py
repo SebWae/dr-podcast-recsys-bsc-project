@@ -15,8 +15,6 @@ from config import (
     TEST_DATA_PATH,
     EMBEDDINGS_DESCR_PATH,
     RECOMMENDATIONS_PATH,
-    EMBEDDING_DIM,
-    WGHT_METHOD,
     RECOMMENDERS,
     USER_EVAL_PATH,
     RECOMMENDER_EVAL_PATH,
@@ -50,22 +48,8 @@ for _, row in tqdm(emb_df.iterrows()):
     embedding = row[1:].values.flatten()
     emb_dict[prd_number] = embedding
 
-# constructing user profiles
-print("Constructing user profiles.")
-user_profiles = {}
-users = test_df["user_id"].unique()
-for user in tqdm(users):
-    user_interactions = train_df[train_df["user_id"] == user].reset_index()
-    user_profile = utils.get_user_profile(emb_size=EMBEDDING_DIM,
-                                                user_int=user_interactions,
-                                                time_col="days_since",
-                                                item_col="prd_number",
-                                                emb_dict=emb_dict,
-                                                wght_scheme=WGHT_METHOD)
-    user_profiles[user] = user_profile
-
 # iterating over the recommenders to evaluate them
-for recommender in tqdm(RECOMMENDERS):
+for recommender in RECOMMENDERS:
     print(f"\nEvaluating the {recommender}.")
     # retrieving relevant recommendations
     recommendations = data[recommender]
@@ -84,7 +68,7 @@ for recommender in tqdm(RECOMMENDERS):
         ndcg_dict = hit_dict.copy()
         diversity_dict = hit_dict.copy()
 
-        for user_id, rec_items in recommendations.items():
+        for user_id, rec_items in tqdm(recommendations.items()):
             # slicing rec_items according to level
             rec_items = rec_items[:level]
             
@@ -104,10 +88,7 @@ for recommender in tqdm(RECOMMENDERS):
             ndcg_dict[user_id] = ndcg_user
 
             # computing diversity for each user
-            user_profile = user_profiles[user_id]
-            diversity_user = utils.compute_diversity(recommendations=rec_items, 
-                                                     emb_dict=emb_dict, 
-                                                     user_profile=user_profile)
+            diversity_user = utils.compute_diversity(recommendations=rec_items, emb_dict=emb_dict)
             diversity_dict[user_id] = diversity_user
 
         # adding metric dictionaries to user_dict

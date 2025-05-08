@@ -1,4 +1,5 @@
 from collections import defaultdict
+import itertools
 import json
 import os
 import sys
@@ -46,38 +47,35 @@ def compute_dcg(recommendations: list, gain_dict: dict) -> float:
 
 
 def compute_diversity(recommendations: list, 
-                      emb_dict: dict,
-                      user_profile: np.ndarray) -> float:
+                      emb_dict: dict) -> float:
     """
-    Computes the user-centric diversity based on a user profile (embedding) and a list of  recommendations.
+    Computes the diversity as the average intra-list distance (AILD) of a recommendations list.
     Cosine similarity is chosen as the distance measure and is transformed to be in the range [0,1].
 
     Parameters:
     - recommendations:  List of recommended items.
-    - emb_dict:         Dictionary containing embeddings for any recommended item.
-    - user_profile:     User profile as a numpy array. 
+    - emb_dict:         Dictionary whose keys are item_ids and values and the corresponding item embedding.
 
     Returns:
     - diversity:        Diversity metric in the range [0,1], 0 indicates similar items, 1 indicates diverse items.
     """
+    # retrieving embeddings for items in the recommendations list
+    embs = [emb_dict[item] for item in recommendations]
+    n_embs = len(embs)
+
     diversities = []
 
-    # iterating through pairs of items
-    for item in recommendations:
-        # retrieving the embedding of the recommended item
-        rec_item_embedding = emb_dict[item]
+    # iterating through pair of items in the recommendations list
+    for i in range(n_embs):
+        emb_1 = embs[i]
+        
+        for j in range(i + 1, n_embs):
+            emb_2 = embs[j]
+            sim = cosine_similarity([emb_1], [emb_2])[0][0]
+            diversity = 1 - (sim + 1) / 2
+            diversities.append(diversity)
 
-        # computing the cosine similarity between the two feature vectors
-        similarity = cosine_similarity([rec_item_embedding], [user_profile])[0][0]
-
-        # transforming similarity to range [0, 1] and flipping the interpretability 
-        diversity = 1 - (similarity + 1) / 2
-        diversities.append(diversity)
-
-    # computing the average diversity across all item pairs
-    avg_diversity = np.average(diversities)
-
-    return avg_diversity
+    return np.mean(diversities)
 
 
 def extract_recs(scores_dict: dict,
