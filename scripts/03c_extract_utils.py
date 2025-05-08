@@ -15,6 +15,7 @@ from config import (
     METADATA_PATH,
     SPLIT_DATE_TRAIN_VAL,
     UTILS_PATH,
+    UTILS_INTERACTIONS_PATH,
 )
 import utils.utils as utils
 
@@ -78,4 +79,4 @@ user_show_episodes_val_final = {"user_show_episodes_val": user_show_episodes_val
 utils.save_dict_to_json(data_dict=user_show_episodes_final,
                         file_path=UTILS_PATH)
 utils.save_dict_to_json(data_dict=user_show_episodes_val_final,
-                        file_path=UTILS_PATH)
+                        file_path=UTILS_INTERACTIONS_PATH)
