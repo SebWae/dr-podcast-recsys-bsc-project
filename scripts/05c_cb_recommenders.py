@@ -47,7 +47,7 @@ print(f"Loading utils dictionaries from {UTILS_PATH}")
 with open(UTILS_PATH, "r") as file:
     utils_dicts = json.load(file)
 
-all_users_show_episodes_dict = utils_dicts["user_show_episodes"]
+all_users_show_episodes_dict = utils_dicts["user_show_episodes_val"]
 
 # iterating over levels of metadata
 metadata_levels = {
