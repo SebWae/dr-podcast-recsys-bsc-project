@@ -43,6 +43,7 @@ METADATA_COLUMNS = {"series_title":         "first",
                     }
 METADATA_PATH = "data/episode_metadata.parquet"
 UTILS_PATH = "utils/utils.json"
+UTILS_INTERACTIONS_PATH = "utils/train_val_interactions.json"
 
 # for train-test splitting
 COLUMNS_TO_KEEP_TEST = ["user_id", "prd_number", "completion_rate"]
