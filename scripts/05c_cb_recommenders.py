@@ -16,7 +16,7 @@ from config import (
     EMBEDDINGS_TITLE_PATH,
     EMBEDDINGS_DESCR_PATH,
     EMBEDDINGS_COMBI_PATH,
-    UTILS_PATH,
+    UTILS_INTERACTIONS_PATH,
     RECOMMENDATIONS_KEY_CB_TITLE,
     RECOMMENDATIONS_KEY_CB_DESCR,
     RECOMMENDATIONS_KEY_CB_COMBI,
@@ -43,8 +43,8 @@ users = train_df["user_id"].unique()
 items = meta_df["prd_number"].unique()
 
 # loading utils dictionaries
-print(f"Loading utils dictionaries from {UTILS_PATH}")
-with open(UTILS_PATH, "r") as file:
+print(f"Loading utils dictionaries from {UTILS_INTERACTIONS_PATH}")
+with open(UTILS_INTERACTIONS_PATH, "r") as file:
     utils_dicts = json.load(file)
 
 all_users_show_episodes_dict = utils_dicts["user_show_episodes_val"]
