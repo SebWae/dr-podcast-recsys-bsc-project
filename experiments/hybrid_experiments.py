@@ -78,8 +78,9 @@ with open(UTILS_PATH, "r") as file:
 
 all_users_show_episodes_dict = utils_dicts["user_show_episodes"]
 
-print("Generating user profiles and scores.")
-cb_scores = defaultdict()
+# generating user profiles
+print("Generating user profiles.")
+user_profiles = {}
 for user in tqdm(users):
     # initialize user profile (embedding)
     user_interactions = train_df[train_df["user_id"] == user].reset_index()
@@ -89,14 +90,7 @@ for user in tqdm(users):
                                           item_col="prd_number",
                                           emb_dict=emb_dict,
                                           wght_scheme=WGHT_METHOD)
-
-    # scores for user for each item not consumed by the user
-    normalized_user_scores = utils.get_cb_scores(user=user,
-                                                 show_episodes=all_users_show_episodes_dict,
-                                                 user_profile=user_profile,
-                                                 item_embeddings=item_embeddings,
-                                                 items=items)
-    cb_scores[user] = normalized_user_scores
+    user_profiles[user] = user_profile
 
 # hyperparameter tuning for _lambda (weighting hyperparameter)
 print("Performing hyperparameter tuning for weighting parameter lambda.")
@@ -104,15 +98,37 @@ print(f"Lambda values to test: {lambdas}.")
 
 for _lambda in lambdas:
     print(f"\nTesting lambda={_lambda}.")
+
+    # generating cb scores
+    print("Generating cb scores.")
+    cb_scores = defaultdict()
+    for user in tqdm(users):
+        # retrieving user profile from dictionary
+        user_profile = user_profiles[user]
+
+        # scores for user for each item not consumed by the user
+        normalized_user_scores = utils.get_cb_scores(user=user,
+                                                     show_episodes=all_users_show_episodes_dict,
+                                                     user_profile=user_profile,
+                                                     item_embeddings=item_embeddings,
+                                                     items=items)
+        cb_scores[user] = normalized_user_scores
+
+    # generating hybrid scores from cf and cb scores
+    print("Generating hybrid scores")
     hybrid_scores = utils.get_hybrid_scores(scores_dict_1=cf_scores,
                                             scores_dict_2=cb_scores,
                                             users=users,
-                                            items=items)
+                                            items=items,
+                                            _lambda=_lambda)
 
+    # extracting recommendations from hybrid scores
+    print("Extracting recommendations from hybrid scores.")
     recs_dict = utils.extract_recs(scores_dict=hybrid_scores,
                                    n_recs=N_RECOMMENDATIONS)
 
-    # computing ndcg@10
+    # computing NDCG@10
+    print("Computing NDCG@10.")
     ndcgs = []
     for user_id, rec_items in recs_dict.items():
         gain_dict = completion_rates_dict[user_id]
@@ -123,11 +139,10 @@ for _lambda in lambdas:
         ndcgs.append(ndcg_user)
 
     ndcg = np.mean(ndcgs)
-    print(f"ndcg@10: {ndcg:.10f}")
+    print(f"NDCG@10: {ndcg:.10f}")
 
     # saving experiment result
     print(f"Saving experiment results to {EXPERIMENTS_HYBRID_PATH}.")
-
     row = [_lambda, ndcg]
     with open(EXPERIMENTS_HYBRID_PATH, mode="a", newline="") as file:
         writer = csv.writer(file)
