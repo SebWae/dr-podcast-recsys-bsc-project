@@ -47,7 +47,8 @@ def compute_dcg(recommendations: list, gain_dict: dict) -> float:
 
 
 def compute_diversity(recommendations: list, 
-                      emb_dict: dict) -> float:
+                      emb_dict: dict,
+                      weights_dict: dict) -> float:
     """
     Computes the diversity as the average intra-list distance (AILD) of a recommendations list.
     Cosine similarity is chosen as the distance measure and is transformed to be in the range [0,1].
@@ -55,27 +56,33 @@ def compute_diversity(recommendations: list,
     Parameters:
     - recommendations:  List of recommended items.
     - emb_dict:         Dictionary whose keys are item_ids and values and the corresponding item embedding.
+    - weights_dict:     Dictionary containing weights for each item pair.
 
     Returns:
-    - diversity:        Diversity metric in the range [0,1], 0 indicates similar items, 1 indicates diverse items.
+    - total_diversity:  Diversity metric in the range [0,1], 0 indicates similar items, 1 indicates diverse items.
     """
     # retrieving embeddings for items in the recommendations list
     embs = [emb_dict[item] for item in recommendations]
     n_embs = len(embs)
 
-    diversities = []
-
+    total_diversity = 0
     # iterating through pair of items in the recommendations list
     for i in range(n_embs):
         emb_1 = embs[i]
 
         for j in range(i + 1, n_embs):
             emb_2 = embs[j]
+
+            # computing cosine similarity and transforming to diversity metric
             sim = cosine_similarity([emb_1], [emb_2])[0][0]
             diversity = 1 - (sim + 1) / 2
-            diversities.append(diversity)
 
-    return np.mean(diversities)
+            # retrieving and applying weight
+            weight = weights_dict[(i, j)]
+            diversity_weighted = diversity * weight
+            total_diversity += diversity_weighted
+
+    return total_diversity
 
 
 def extract_recs(scores_dict: dict,
@@ -288,6 +295,34 @@ def get_hybrid_scores(scores_dict_1: dict,
         hybrid_scores[user] = user_hybrid_scores
 
     return hybrid_scores
+
+
+def get_pair_weights(n: int) -> dict:
+    """
+    Constructs a dictionary of weights for each possible pair of elements from an iterable.
+
+    Parameters:
+    - n:                Lenght of list whose pairs to compute a weight for.
+
+    Returns:
+    - weights_dict:     Dictionary of weights for each pair of item indices.
+    """
+    # initializing weights_dict
+    weights_dict = {}
+
+    # initial values for each item pair
+    for i in range(n):
+        for j in range(i+1, n):
+            weights_dict[(i, j)] = i + j
+
+    # taking the inverse of each value
+    weights_dict = {pair: 1 / v for pair, v in weights_dict.items()}
+
+    # normalizing 
+    total_inv_value = sum(weights_dict.values())
+    weights_dict = {pair: v / total_inv_value for pair, v in weights_dict.items()}
+
+    return weights_dict
 
 
 def get_ratings_dict(data: pd.DataFrame,
