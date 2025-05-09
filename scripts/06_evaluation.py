@@ -15,6 +15,7 @@ from config import (
     TEST_DATA_PATH,
     EMBEDDINGS_DESCR_PATH,
     RECOMMENDATIONS_PATH,
+    N_RECOMMENDATIONS,
     RECOMMENDERS,
     USER_EVAL_PATH,
     RECOMMENDER_EVAL_PATH,
@@ -47,6 +48,10 @@ for _, row in tqdm(emb_df.iterrows()):
     prd_number = row["episode"]
     embedding = row[1:].values.flatten()
     emb_dict[prd_number] = embedding
+
+# constructing item pair weights dictionary
+print("Constructing weights dictionary for item pairs.")
+weights_dict = utils.get_pair_weights(N_RECOMMENDATIONS)
 
 # iterating over the recommenders to evaluate them
 for recommender in RECOMMENDERS:
@@ -88,7 +93,9 @@ for recommender in RECOMMENDERS:
             ndcg_dict[user_id] = ndcg_user
 
             # computing diversity for each user
-            diversity_user = utils.compute_diversity(recommendations=rec_items, emb_dict=emb_dict)
+            diversity_user = utils.compute_diversity(recommendations=rec_items, 
+                                                     emb_dict=emb_dict, 
+                                                     weights_dict=weights_dict)
             diversity_dict[user_id] = diversity_user
 
         # adding metric dictionaries to user_dict
