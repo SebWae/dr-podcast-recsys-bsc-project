@@ -82,12 +82,19 @@ for epochs in tqdm(range(1, N_EPOCHS+1)):
     # fitting the model
     mf.fit(ratings_df)
 
-    # getting scores for each item for each user
+    # for evaluation (considers interactions in validation period)
+    episode_scores_incl_val = utils.get_cf_scores(model=mf, 
+                                                  items=item_list,
+                                                  users=user_list,
+                                                  item_mapping=show_mapping,
+                                                  incl_val_interactions=True)
+    
+    # for validation (only considers training interactions)
     episode_scores = utils.get_cf_scores(model=mf, 
                                          items=item_list,
                                          users=user_list,
                                          item_mapping=show_mapping,
-                                         incl_val_interactions=True)
+                                         incl_val_interactions=False)
 
     recs_dict = utils.extract_recs(scores_dict=episode_scores,
                                     n_recs=N_RECOMMENDATIONS)
@@ -123,11 +130,12 @@ for epochs in tqdm(range(1, N_EPOCHS+1)):
 
         # saving recommendations
         print(f"Saving recommendations to {RECOMMENDATIONS_PATH}.")
-        recs_dict_key = {RECOMMENDATIONS_KEY_CF: prev_recs}
+        final_recs = utils.extract_recs(scores_dict=prev_scores,
+                                        n_recs=N_RECOMMENDATIONS)
+        recs_dict_key = {RECOMMENDATIONS_KEY_CF: final_recs}
         utils.save_dict_to_json(data_dict=recs_dict_key, 
                                 file_path=RECOMMENDATIONS_PATH)
         break
 
     prev_ndcg = ndcg
-    prev_recs = recs_dict
-    prev_scores = episode_scores
+    prev_scores = episode_scores_incl_val
