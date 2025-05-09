@@ -16,7 +16,7 @@ from config import (
     VAL_DATA_PATH,
     EMBEDDINGS_DESCR_PATH,
     SCORES_PATH_CF,
-    UTILS_INTERACTIONS_PATH,
+    UTILS_PATH,
     EMBEDDING_DIM,
     WGHT_METHOD,
     N_RECOMMENDATIONS,
@@ -71,11 +71,11 @@ items = emb_dict.keys()
 item_embeddings = np.array([emb_dict[item] for item in items], dtype=np.float64)
 
 # loading utils dictionaries
-print(f"Loading utils dictionaries from {UTILS_INTERACTIONS_PATH}")
-with open(UTILS_INTERACTIONS_PATH, "r") as file:
+print(f"Loading utils dictionaries from {UTILS_PATH}")
+with open(UTILS_PATH, "r") as file:
     utils_dicts = json.load(file)
 
-all_users_show_episodes_dict = utils_dicts["user_show_episodes_val"]
+all_users_show_episodes_dict = utils_dicts["user_show_episodes"]
 
 # generating user profiles
 print("Generating user profiles.")
@@ -107,11 +107,11 @@ for _lambda in lambdas:
 
         # scores for user for each item not consumed by the user
         cb_scores_user = utils.get_cb_scores(user=user,
-                                                     show_episodes=all_users_show_episodes_dict,
-                                                     user_profile=user_profile,
-                                                     item_embeddings=item_embeddings,
-                                                     items=items)
-        
+                                             show_episodes=all_users_show_episodes_dict,
+                                             user_profile=user_profile,
+                                             item_embeddings=item_embeddings,
+                                             items=items)
+
         # retrieving cf scores for user
         cf_scores_user = cf_scores[user]
 
