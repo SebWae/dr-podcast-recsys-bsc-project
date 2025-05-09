@@ -15,9 +15,12 @@ from config import (
     TEST_DATA_PATH,
     EMBEDDINGS_DESCR_PATH,
     RECOMMENDATIONS_PATH,
-    N_RECOMMENDATIONS,
     RECOMMENDERS,
+    RECOMMENDATIONS_KEY_CB_TITLE,
+    RECOMMENDATIONS_KEY_CB_DESCR,
+    RECOMMENDATIONS_KEY_CB_COMBI,
     USER_EVAL_PATH,
+    USER_EVAL_CB_PATH,
     RECOMMENDER_EVAL_PATH,
 )
 import utils.utils as utils
@@ -49,10 +52,6 @@ for _, row in tqdm(emb_df.iterrows()):
     embedding = row[1:].values.flatten()
     emb_dict[prd_number] = embedding
 
-# constructing item pair weights dictionary
-print("Constructing weights dictionary for item pairs.")
-weights_dict = utils.get_pair_weights(N_RECOMMENDATIONS)
-
 # iterating over the recommenders to evaluate them
 for recommender in RECOMMENDERS:
     print(f"\nEvaluating the {recommender}.")
@@ -72,6 +71,10 @@ for recommender in RECOMMENDERS:
         hit_dict = {user_id: 0 for user_id in recommendations.keys()}
         ndcg_dict = defaultdict(int)
         diversity_dict = hit_dict.copy()
+
+        # constructing item pair weights dictionary
+        print("Constructing weights dictionary for item pairs.")
+        weights_dict = utils.get_pair_weights(level)
 
         for user_id, rec_items in tqdm(recommendations.items()):
             # slicing rec_items according to level
@@ -121,7 +124,15 @@ for recommender in RECOMMENDERS:
     final_recommender_dict = {recommender: recommender_dict}
 
     # saving the results
-    utils.save_dict_to_json(data_dict=final_user_dict, 
-                            file_path=USER_EVAL_PATH)
+    cb_recommenders = {RECOMMENDATIONS_KEY_CB_TITLE, 
+                       RECOMMENDATIONS_KEY_CB_DESCR, 
+                       RECOMMENDATIONS_KEY_CB_COMBI,
+                       }
+    if recommender in cb_recommenders:
+        utils.save_dict_to_json(data_dict=final_user_dict, 
+                                file_path=USER_EVAL_CB_PATH)
+    else:
+        utils.save_dict_to_json(data_dict=final_user_dict, 
+                                file_path=USER_EVAL_PATH)
     utils.save_dict_to_json(data_dict=final_recommender_dict, 
                             file_path=RECOMMENDER_EVAL_PATH)

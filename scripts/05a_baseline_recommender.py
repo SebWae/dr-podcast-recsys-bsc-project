@@ -91,6 +91,10 @@ for level in tqdm(eval_levels):
     # number of recommendations according to level
     recs = recommendations[:level]
 
+    # constructing item pair weights dictionary
+    print("Constructing weights dictionary for item pairs.")
+    weights_dict = utils.get_pair_weights(level)
+
     for user_id, gain_dict in completion_rate_dict.items():
         # computing hit-rate (binary) for each user
         true_items = set(gain_dict.keys())
@@ -121,7 +125,9 @@ for level in tqdm(eval_levels):
     recommender_dict[level]["ndcg"] = ndcg
 
     # computing global diversity (same for all users)
-    diversity = utils.compute_diversity(recommendations=recs, emb_dict=emb_dict)
+    diversity = utils.compute_diversity(recommendations=recs, 
+                                        emb_dict=emb_dict, 
+                                        weights_dict=weights_dict)
     recommender_dict[level]["diversity"] = diversity
 
 # final dictionaries

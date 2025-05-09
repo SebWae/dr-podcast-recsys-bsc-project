@@ -21,6 +21,7 @@ from config import (
     RANDOM_STATE,
     OPTIMAL_CF_PATH,
     SCORES_PATH_CF,
+    SCORES_PATH_CF_INCL_VAL,
     RECOMMENDATIONS_KEY_CF,
     RECOMMENDATIONS_PATH,
 )
@@ -124,13 +125,15 @@ for epochs in tqdm(range(1, N_EPOCHS+1)):
         print("Stopping early.")
 
         # saving scores
-        print(f"Saving scores to {SCORES_PATH_CF}.")
+        print(f"Saving scores to {SCORES_PATH_CF} and {SCORES_PATH_CF_INCL_VAL}.")
         scores_df = pd.DataFrame(prev_scores)
         scores_df.to_parquet(SCORES_PATH_CF)
+        scores_incl_val_df = pd.DataFrame(prev_scores_incl_val)
+        scores_incl_val_df.to_parquet(SCORES_PATH_CF_INCL_VAL)
 
         # saving recommendations
         print(f"Saving recommendations to {RECOMMENDATIONS_PATH}.")
-        final_recs = utils.extract_recs(scores_dict=prev_scores,
+        final_recs = utils.extract_recs(scores_dict=prev_scores_incl_val,
                                         n_recs=N_RECOMMENDATIONS)
         recs_dict_key = {RECOMMENDATIONS_KEY_CF: final_recs}
         utils.save_dict_to_json(data_dict=recs_dict_key, 
@@ -138,4 +141,5 @@ for epochs in tqdm(range(1, N_EPOCHS+1)):
         break
 
     prev_ndcg = ndcg
-    prev_scores = episode_scores_incl_val
+    prev_scores_incl_val = episode_scores_incl_val
+    prev_scores = episode_scores

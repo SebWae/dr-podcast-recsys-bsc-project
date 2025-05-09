@@ -14,8 +14,8 @@ from config import (
     TRAIN_DATA_PATH,
     VAL_DATA_PATH,
     EMBEDDINGS_DESCR_PATH,
-    SCORES_PATH_CF,
-    UTILS_PATH,
+    SCORES_PATH_CF_INCL_VAL,
+    UTILS_INTERACTIONS_PATH,
     EMBEDDING_DIM,
     WGHT_METHOD,
     LAMBDA_HYBRID,
@@ -34,7 +34,7 @@ emb_df = pd.read_parquet(EMBEDDINGS_DESCR_PATH)
 
 # loading cf scores
 print("Loading scores from cf recommender.")
-cf_scores_df = pd.read_parquet(SCORES_PATH_CF)
+cf_scores_df = pd.read_parquet(SCORES_PATH_CF_INCL_VAL)
 
 # converting the scores dataframes to dictionaries
 print("Converting scores dataframe to dictionary.")
@@ -63,11 +63,11 @@ items = emb_dict.keys()
 item_embeddings = np.array([emb_dict[item] for item in items], dtype=np.float64)
 
 # loading utils dictionaries
-print(f"Loading utils dictionaries from {UTILS_PATH}")
-with open(UTILS_PATH, "r") as file:
+print(f"Loading utils dictionaries from {UTILS_INTERACTIONS_PATH}")
+with open(UTILS_INTERACTIONS_PATH, "r") as file:
     utils_dicts = json.load(file)
 
-all_users_show_episodes_dict = utils_dicts["user_show_episodes"]
+all_users_show_episodes_dict = utils_dicts["user_show_episodes_val"]
 
 # generating user profiles
 print("Generating user profiles.")

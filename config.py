@@ -76,11 +76,11 @@ RECOMMENDATIONS_KEY_CF = "cf_recommendations"
 RECOMMENDATIONS_KEY_HYBRID = "hybrid_recommendations"
 RECOMMENDATIONS_PATH = "results/recommendations.json"
 RECOMMENDERS = [
-                RECOMMENDATIONS_KEY_CF, 
-                RECOMMENDATIONS_KEY_CB_TITLE, 
-                RECOMMENDATIONS_KEY_CB_DESCR, 
-                RECOMMENDATIONS_KEY_CB_COMBI,
-                # RECOMMENDATIONS_KEY_HYBRID,
+                # RECOMMENDATIONS_KEY_CF, 
+                # # RECOMMENDATIONS_KEY_CB_TITLE, 
+                # # RECOMMENDATIONS_KEY_CB_DESCR, 
+                # # RECOMMENDATIONS_KEY_CB_COMBI,
+                RECOMMENDATIONS_KEY_HYBRID,
                 ]
 REG = 0.005
 SCORES_PATH_CF_INCL_VAL = "results/cf_scores_incl_val.parquet"
@@ -90,4 +90,5 @@ WGHT_METHOD = "inverse"
 # for evaluation
 EVALUATION_METRICS = ["hit_rate", "ndcg"]
 RECOMMENDER_EVAL_PATH = "results/recommender_eval.json"
+USER_EVAL_CB_PATH = "results/user_eval_cb.json"
 USER_EVAL_PATH = "results/user_eval.json"
