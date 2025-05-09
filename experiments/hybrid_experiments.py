@@ -1,5 +1,4 @@
 import argparse
-from collections import defaultdict
 import csv
 import json
 import os
@@ -17,7 +16,7 @@ from config import (
     VAL_DATA_PATH,
     EMBEDDINGS_DESCR_PATH,
     SCORES_PATH_CF,
-    UTILS_PATH,
+    UTILS_INTERACTIONS_PATH,
     EMBEDDING_DIM,
     WGHT_METHOD,
     N_RECOMMENDATIONS,
@@ -72,11 +71,11 @@ items = emb_dict.keys()
 item_embeddings = np.array([emb_dict[item] for item in items], dtype=np.float64)
 
 # loading utils dictionaries
-print(f"Loading utils dictionaries from {UTILS_PATH}")
-with open(UTILS_PATH, "r") as file:
+print(f"Loading utils dictionaries from {UTILS_INTERACTIONS_PATH}")
+with open(UTILS_INTERACTIONS_PATH, "r") as file:
     utils_dicts = json.load(file)
 
-all_users_show_episodes_dict = utils_dicts["user_show_episodes"]
+all_users_show_episodes_dict = utils_dicts["user_show_episodes_val"]
 
 # generating user profiles
 print("Generating user profiles.")
@@ -99,33 +98,35 @@ print(f"Lambda values to test: {lambdas}.")
 for _lambda in lambdas:
     print(f"\nTesting lambda={_lambda}.")
 
-    # generating cb scores
-    print("Generating cb scores.")
-    cb_scores = defaultdict()
+    # generating hybrid scores and recommendations for each user
+    print("Generating hybrid scores and recommendations for each user.")
+    recs_dict = {}
     for user in tqdm(users):
         # retrieving user profile from dictionary
         user_profile = user_profiles[user]
 
         # scores for user for each item not consumed by the user
-        normalized_user_scores = utils.get_cb_scores(user=user,
+        cb_scores_user = utils.get_cb_scores(user=user,
                                                      show_episodes=all_users_show_episodes_dict,
                                                      user_profile=user_profile,
                                                      item_embeddings=item_embeddings,
                                                      items=items)
-        cb_scores[user] = normalized_user_scores
+        
+        # retrieving cf scores for user
+        cf_scores_user = cf_scores[user]
 
-    # generating hybrid scores from cf and cb scores
-    print("Generating hybrid scores")
-    hybrid_scores = utils.get_hybrid_scores(scores_dict_1=cf_scores,
-                                            scores_dict_2=cb_scores,
-                                            users=users,
-                                            items=items,
-                                            _lambda=_lambda)
-
-    # extracting recommendations from hybrid scores
-    print("Extracting recommendations from hybrid scores.")
-    recs_dict = utils.extract_recs(scores_dict=hybrid_scores,
-                                   n_recs=N_RECOMMENDATIONS)
+        # computing hybrid scores
+        item_scores = {}
+        for item in items:
+            cf_score = cf_scores_user[item] if item in cf_scores_user else 0
+            cb_score = cb_scores_user[item] if item in cb_scores_user else 0
+            hybrid_score = _lambda * cf_score + (1 - _lambda) * cb_score
+            item_scores[item] = hybrid_score
+        
+        # retrieving recommendations from item scores dictionary
+        sorted_scores = dict(sorted(item_scores.items(), key=lambda item: item[1], reverse=True))
+        recs = list(sorted_scores.keys())[:N_RECOMMENDATIONS]
+        recs_dict[user] = recs
 
     # computing NDCG@10
     print("Computing NDCG@10.")
