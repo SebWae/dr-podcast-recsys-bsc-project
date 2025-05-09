@@ -83,6 +83,7 @@ RECOMMENDERS = [
                 # RECOMMENDATIONS_KEY_HYBRID,
                 ]
 REG = 0.005
+SCORES_PATH_CF_INCL_VAL = "results/cf_scores_incl_val.parquet"
 SCORES_PATH_CF = "results/cf_scores.parquet"
 WGHT_METHOD = "inverse"
 
