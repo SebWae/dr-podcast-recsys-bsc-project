@@ -19,6 +19,7 @@ from config import (
     USER_EVAL_PATH_2,
     USER_EVAL_PATH_6,
     USER_EVAL_PATH_10,
+    RECOMMENDATIONS_KEY_BASELINE,
     RECOMMENDER_EVAL_PATH,
 )
 import utils.utils as utils
@@ -124,7 +125,7 @@ for level in tqdm(eval_levels):
     user_dict["ndcg"] = ndcg_dict
 
     # saving user evaluation results
-    final_user_dict = {"pop_baseline": user_dict}
+    final_user_dict = {RECOMMENDATIONS_KEY_BASELINE: user_dict}
     user_eval_path = user_eval_paths[level] 
     utils.save_dict_to_json(data_dict=final_user_dict, 
                             file_path=user_eval_path)
@@ -145,7 +146,7 @@ for level in tqdm(eval_levels):
 
 # final dictionaries
 print("Saving results.")
-final_recommender_dict = {"pop_baseline": recommender_dict}
+final_recommender_dict = {RECOMMENDATIONS_KEY_BASELINE: recommender_dict}
 
 # saving the results
 utils.save_dict_to_json(data_dict=final_recommender_dict, 
