@@ -1,6 +1,7 @@
 import argparse
 import csv
 import json
+import math
 import os
 import sys
 
@@ -116,15 +117,21 @@ for _lambda in lambdas:
         cf_scores_user = cf_scores[user]
 
         # computing hybrid scores
-        item_scores = {}
+        hybrid_scores = {}
         for item in items:
             cf_score = cf_scores_user[item] if item in cf_scores_user else 0
             cb_score = cb_scores_user[item] if item in cb_scores_user else 0
             hybrid_score = _lambda * cf_score + (1 - _lambda) * cb_score
-            item_scores[item] = hybrid_score
+            hybrid_scores[item] = hybrid_score
         
         # retrieving recommendations from item scores dictionary
-        sorted_scores = dict(sorted(item_scores.items(), key=lambda item: item[1], reverse=True))
+        sorted_scores = dict(
+            sorted(
+                hybrid_scores.items(),
+                key=lambda item: 0 if item[1] is None or (isinstance(item[1], float) and math.isnan(item[1])) else item[1],
+                reverse=True
+            )
+        )
         recs = list(sorted_scores.keys())[:N_RECOMMENDATIONS]
         recs_dict[user] = recs
 
