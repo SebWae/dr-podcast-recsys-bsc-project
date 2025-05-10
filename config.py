@@ -90,5 +90,4 @@ WGHT_METHOD = "inverse"
 # for evaluation
 EVALUATION_METRICS = ["hit_rate", "ndcg"]
 RECOMMENDER_EVAL_PATH = "results/recommender_eval.json"
-USER_EVAL_CB_PATH = "results/user_eval_cb.json"
 USER_EVAL_PATH = "results/user_eval.json"
