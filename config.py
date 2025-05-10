@@ -69,6 +69,7 @@ N_RECOMMENDATIONS = 10
 OPTIMAL_CF_PATH = "results/cf_optimal.csv"
 OPTIMAL_HYBRID_PATH = "results/hybrid_optimal.csv"
 RANDOM_STATE = 250500
+RECOMMENDATIONS_KEY_BASELINE = "pop_baseline"
 RECOMMENDATIONS_KEY_CB_COMBI = "cb_recommendations_combi"
 RECOMMENDATIONS_KEY_CB_DESCR = "cb_recommendations_descr"
 RECOMMENDATIONS_KEY_CB_TITLE = "cb_recommendations_title"
@@ -76,10 +77,10 @@ RECOMMENDATIONS_KEY_CF = "cf_recommendations"
 RECOMMENDATIONS_KEY_HYBRID = "hybrid_recommendations"
 RECOMMENDATIONS_PATH = "results/recommendations.json"
 RECOMMENDERS = [
-                # RECOMMENDATIONS_KEY_CF, 
-                # # RECOMMENDATIONS_KEY_CB_TITLE, 
-                # # RECOMMENDATIONS_KEY_CB_DESCR, 
-                # # RECOMMENDATIONS_KEY_CB_COMBI,
+                RECOMMENDATIONS_KEY_CF, 
+                RECOMMENDATIONS_KEY_CB_TITLE, 
+                RECOMMENDATIONS_KEY_CB_DESCR, 
+                RECOMMENDATIONS_KEY_CB_COMBI,
                 RECOMMENDATIONS_KEY_HYBRID,
                 ]
 REG = 0.005
