@@ -16,11 +16,7 @@ from config import (
     EMBEDDINGS_DESCR_PATH,
     RECOMMENDATIONS_PATH,
     RECOMMENDERS,
-    RECOMMENDATIONS_KEY_CB_TITLE,
-    RECOMMENDATIONS_KEY_CB_DESCR,
-    RECOMMENDATIONS_KEY_CB_COMBI,
     USER_EVAL_PATH,
-    USER_EVAL_CB_PATH,
     RECOMMENDER_EVAL_PATH,
 )
 import utils.utils as utils
@@ -101,10 +97,11 @@ for recommender in RECOMMENDERS:
                                                      weights_dict=weights_dict)
             diversity_dict[user_id] = diversity_user
 
-        # adding metric dictionaries to user_dict
-        user_dict[level]["hit_rate"] = hit_dict
-        user_dict[level]["ndcg"] = ndcg_dict
-        user_dict[level]["diversity"] = diversity_dict
+        # saving evaluation results at user level @10
+        if level == 10:
+            user_dict["hit_rate"] = hit_dict
+            user_dict["ndcg"] = ndcg_dict
+            user_dict["diversity"] = diversity_dict
 
         # calculating global hit rate
         hit_rate = np.mean(list(hit_dict.values()))
@@ -124,15 +121,7 @@ for recommender in RECOMMENDERS:
     final_recommender_dict = {recommender: recommender_dict}
 
     # saving the results
-    cb_recommenders = {RECOMMENDATIONS_KEY_CB_TITLE, 
-                       RECOMMENDATIONS_KEY_CB_DESCR, 
-                       RECOMMENDATIONS_KEY_CB_COMBI,
-                       }
-    if recommender in cb_recommenders:
-        utils.save_dict_to_json(data_dict=final_user_dict, 
-                                file_path=USER_EVAL_CB_PATH)
-    else:
-        utils.save_dict_to_json(data_dict=final_user_dict, 
-                                file_path=USER_EVAL_PATH)
+    utils.save_dict_to_json(data_dict=final_user_dict, 
+                            file_path=USER_EVAL_PATH)
     utils.save_dict_to_json(data_dict=final_recommender_dict, 
                             file_path=RECOMMENDER_EVAL_PATH)
