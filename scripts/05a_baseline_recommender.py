@@ -16,7 +16,10 @@ from config import (
     EMBEDDINGS_DESCR_PATH,
     N_RECOMMENDATIONS,
     SPLIT_DATE_VAL_TEST,
-    USER_EVAL_PATH,
+    USER_EVAL_PATH_2,
+    USER_EVAL_PATH_6,
+    USER_EVAL_PATH_10,
+    RECOMMENDATIONS_KEY_BASELINE,
     RECOMMENDER_EVAL_PATH,
 )
 import utils.utils as utils
@@ -74,9 +77,13 @@ for _, row in tqdm(emb_df.iterrows()):
     embedding = row[1:].values.flatten()
     emb_dict[prd_number] = embedding
 
+# paths for user evaluation results
+user_eval_paths = {2: USER_EVAL_PATH_2,
+                   6: USER_EVAL_PATH_6,
+                   10: USER_EVAL_PATH_10}
+
 # dictionaries to store evaluation metrics for each recommender
 recommender_dict = defaultdict(dict)
-user_dict = defaultdict(dict)
 
 # evaluation levels (@2, @6, and @10)
 eval_levels = [2, 6, 10]
@@ -84,6 +91,7 @@ eval_levels = [2, 6, 10]
 print("Evaluating baseline recommender.")
 for level in tqdm(eval_levels):
     # initializing dictionaries to store metrics per user
+    user_dict = defaultdict(dict)
     hit_dict = {user_id: 0 for user_id in completion_rate_dict.keys()}
     ndcg_dict = hit_dict.copy()
     diversity_dict = hit_dict.copy()
@@ -111,10 +119,16 @@ for level in tqdm(eval_levels):
         ndcg_dict[user_id] = ndcg
 
     # adding hit_dict to user_dict
-    user_dict[level]["hit_rate"] = hit_dict
+    user_dict["hit_rate"] = hit_dict
 
     # adding ndcg_dict to user_dict
-    user_dict[level]["ndcg"] = ndcg_dict
+    user_dict["ndcg"] = ndcg_dict
+
+    # saving user evaluation results
+    final_user_dict = {RECOMMENDATIONS_KEY_BASELINE: user_dict}
+    user_eval_path = user_eval_paths[level] 
+    utils.save_dict_to_json(data_dict=final_user_dict, 
+                            file_path=user_eval_path)
 
     # computing global hit rate
     hit_rate = np.mean(list(hit_dict.values()))
@@ -132,11 +146,8 @@ for level in tqdm(eval_levels):
 
 # final dictionaries
 print("Saving results.")
-final_user_dict = {"pop_baseline": user_dict}
-final_recommender_dict = {"pop_baseline": recommender_dict}
+final_recommender_dict = {RECOMMENDATIONS_KEY_BASELINE: recommender_dict}
 
 # saving the results
-utils.save_dict_to_json(data_dict=final_user_dict, 
-                        file_path=USER_EVAL_PATH)
 utils.save_dict_to_json(data_dict=final_recommender_dict, 
                         file_path=RECOMMENDER_EVAL_PATH)
