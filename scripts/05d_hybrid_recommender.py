@@ -1,5 +1,5 @@
-from collections import defaultdict
 import json
+import math
 import os
 import sys
 
@@ -12,7 +12,6 @@ sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 from config import (
     TRAIN_DATA_PATH,
-    VAL_DATA_PATH,
     EMBEDDINGS_DESCR_PATH,
     SCORES_PATH_CF_INCL_VAL,
     UTILS_INTERACTIONS_PATH,
@@ -29,7 +28,6 @@ import utils.utils as utils
 # loading train, validation data and descr embeddings
 print("Loading data and embeddings.")
 train_df = pd.read_parquet(TRAIN_DATA_PATH)
-val_df = pd.read_parquet(VAL_DATA_PATH)
 emb_df = pd.read_parquet(EMBEDDINGS_DESCR_PATH)
 
 # loading cf scores
@@ -42,13 +40,6 @@ cf_scores = cf_scores_df.to_dict()
 
 # all users
 users = set(cf_scores.keys())
-
-# dictionary containing completion rates for each user and consumed item in the validation data
-print("Generating completion_rates_dict from validation data.")
-completion_rates_dict = utils.get_ratings_dict(data=val_df, 
-                                               user_col="user_id", 
-                                               item_col="prd_number", 
-                                               ratings_col="completion_rate") 
 
 # extracting embeddings and storing them in a dictionary
 print("Generating embedding dictionary and array.")
@@ -83,33 +74,41 @@ for user in tqdm(users):
                                           wght_scheme=WGHT_METHOD)
     user_profiles[user] = user_profile
 
-# generating cb scores
-print("Generating cb scores.")
-cb_scores = defaultdict()
+# generating hybrid scores and recommendations for each user
+print("Generating hybrid scores and recommendations for each user.")
+recs_dict = {}
 for user in tqdm(users):
     # retrieving user profile from dictionary
     user_profile = user_profiles[user]
 
     # scores for user for each item not consumed by the user
-    normalized_user_scores = utils.get_cb_scores(user=user,
-                                                    show_episodes=all_users_show_episodes_dict,
-                                                    user_profile=user_profile,
-                                                    item_embeddings=item_embeddings,
-                                                    items=items)
-    cb_scores[user] = normalized_user_scores
+    cb_scores_user = utils.get_cb_scores(user=user,
+                                         show_episodes=all_users_show_episodes_dict,
+                                         user_profile=user_profile,
+                                         item_embeddings=item_embeddings,
+                                         items=items)
 
-# generating hybrid scores from cf and cb scores
-print("Generating hybrid scores")
-hybrid_scores = utils.get_hybrid_scores(scores_dict_1=cf_scores,
-                                        scores_dict_2=cb_scores,
-                                        users=users,
-                                        items=items,
-                                        _lambda=LAMBDA_HYBRID)
+    # retrieving cf scores for user
+    cf_scores_user = cf_scores[user]
 
-# extracting recommendations from hybrid scores
-print("Extracting recommendations from hybrid scores.")
-recs_dict = utils.extract_recs(scores_dict=hybrid_scores,
-                                n_recs=N_RECOMMENDATIONS)
+    # computing hybrid scores
+    hybrid_scores = {}
+    for item in items:
+        cf_score = cf_scores_user[item] if item in cf_scores_user else 0
+        cb_score = cb_scores_user[item] if item in cb_scores_user else 0
+        hybrid_score = LAMBDA_HYBRID * cf_score + (1 - LAMBDA_HYBRID) * cb_score
+        hybrid_scores[item] = hybrid_score
+    
+    # retrieving recommendations from item scores dictionary
+    sorted_scores = dict(
+        sorted(
+            hybrid_scores.items(),
+            key=lambda item: 0 if item[1] is None or (isinstance(item[1], float) and math.isnan(item[1])) else item[1],
+            reverse=True
+        )
+    )
+    recs = list(sorted_scores.keys())[:N_RECOMMENDATIONS]
+    recs_dict[user] = recs
 
 # saving recommendations
 print(f"Saving recommendations to {RECOMMENDATIONS_PATH}.")
