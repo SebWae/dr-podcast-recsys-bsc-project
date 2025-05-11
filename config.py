@@ -95,3 +95,5 @@ USER_EVAL_PATH_2 = "results/user_eval_2.json"
 USER_EVAL_PATH_6 = "results/user_eval_6.json"
 USER_EVAL_PATH_10 = "results/user_eval_10.json"
 
+# for analysis
+MAIN_RESULTS_ANALYSIS_PATH = "results/main_results_analysis.csv"
