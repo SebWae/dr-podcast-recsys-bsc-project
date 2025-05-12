@@ -6,6 +6,7 @@ scripts = [
     "scripts/02_transform.py",
     "scripts/03a_extract_metadata.py",
     "scripts/03b_extract_embeddings.py",
+    "scripts/03c_extract_utils.py",
     "scripts/04_train_test.py",
     "scripts/05a_baseline_recommender.py",
     "scripts/05b_cf_recommender.py",
