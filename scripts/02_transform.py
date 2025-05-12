@@ -13,9 +13,11 @@ from config import (
 
 
 # loading filtered data
+print("Loading filtered data.")
 transformed_df = pd.read_parquet(FILTERED_DATA_PATH)
 
 # transforming episode duration to float
+print("Applying data transformations.")
 transformed_df["episode_duration"] = (
     transformed_df["episode_duration"]
     .astype(int) 
@@ -38,4 +40,5 @@ transformed_df["platform"] = transformed_df["platform"].replace({"mobile web": "
 transformed_df["device_type"] = transformed_df["device_type"].replace({"Other": "PC"})
 
 # saving the transformed data as parquet file
+print(f"Saving transformed data to {TRANSFORMED_DATA_PATH}.")
 transformed_df.to_parquet(TRANSFORMED_DATA_PATH, index=False)
