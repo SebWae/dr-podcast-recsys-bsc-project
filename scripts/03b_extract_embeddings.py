@@ -23,16 +23,16 @@ from config import (
 import utils.utils as utils
 
 # downloading stopwords
-nltk.download('stopwords')
+nltk.download("stopwords")
 
 # dictionaries to hold embeddings
 embedding_dicts = defaultdict(dict)
 
 # sentence transformer model used to obtain embeddings
-model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
 
 # Danish stopwords
-stop_words = set(stopwords.words('danish'))
+stop_words = set(stopwords.words("danish"))
 
 # Danish stemmer
 stemmer = SnowballStemmer("danish")
