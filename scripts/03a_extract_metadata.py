@@ -38,7 +38,7 @@ metadata_df = transformed_df_w_descr.groupby("prd_number").agg(METADATA_COLUMNS)
 print("Extracting episode titles.")
 episode_titles = []
 
-for _, row in tqdm(metadata_df.iterrows()):
+for _, row in tqdm(metadata_df.iterrows(), total=len(metadata_df)):
     prd = row["prd_number"]
     series_title = row["series_title"]
     unique_title = row["unique_title"]
