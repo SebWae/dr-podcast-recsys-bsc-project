@@ -2,6 +2,7 @@ import os
 import sys
 
 import pandas as pd
+from tqdm import tqdm
 
 # adding the parent directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
@@ -15,13 +16,13 @@ from config import (
 )
 
 
-# loading the transformed data
+# loading transformed and descriptions data
+print("Loading data.")
 transformed_df = pd.read_parquet(TRANSFORMED_DATA_PATH)
-
-# loading the episode description data
 descr_df = pd.read_parquet(EPISODE_DESCRIPTION_PATH)
 
 # renaming the columns
+print("Formatting descriptions and joining onto transformed data.")
 descr_df = descr_df.rename(columns=DESCRIPTION_VAR_RENAME_DICT)
 
 # converting the prd_number column to string type
@@ -34,9 +35,10 @@ transformed_df_w_descr = pd.merge(transformed_df, descr_df, on="prd_number", how
 metadata_df = transformed_df_w_descr.groupby("prd_number").agg(METADATA_COLUMNS).reset_index()
 
 # extracting episode title from unique title and series title
+print("Extracting episode titles.")
 episode_titles = []
 
-for _, row in metadata_df.iterrows():
+for _, row in tqdm(metadata_df.iterrows()):
     prd = row["prd_number"]
     series_title = row["series_title"]
     unique_title = row["unique_title"]
@@ -61,4 +63,5 @@ for _, row in metadata_df.iterrows():
 metadata_df["episode_title"] = episode_titles
 
 # saving metadata_df
+print(f"Saving metadata to {METADATA_PATH}.")
 metadata_df.to_parquet(METADATA_PATH)
