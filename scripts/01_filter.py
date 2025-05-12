@@ -83,10 +83,10 @@ filtered_df = cts_grp_df[(cts_grp_df["content_time_spent"] > MIN_CONTENT_TIME_SP
 
 # counting the number of unique users for each podcast show
 print("Filtering out infrequent shows (filtering task 6/7)")
-show_grp_df = cts_grp_df.groupby('series_title')['user_id'].nunique()
+show_grp_df = cts_grp_df.groupby("series_title")["user_id"].nunique()
 
 # filtering away shows listened to by less than 10 unique users
-filtered_df = filtered_df[filtered_df['series_title']
+filtered_df = filtered_df[filtered_df["series_title"]
                           .isin(show_grp_df[show_grp_df >= MIN_USERS_PER_SHOW].index)]
 
 # saving intermediary filtered data
@@ -104,8 +104,8 @@ val_users = filtered_df[(filtered_df["date_time"] >= train_val_datetime) &
 test_users = filtered_df[filtered_df["date_time"] >= val_test_datetime]["user_id"]
 
 # filtering away users below threshold for number of plays per user
-grp_train_users = train_users.groupby('user_id')['prd_number'].count()
-filtered_train_users = train_users[train_users['user_id']
+grp_train_users = train_users.groupby("user_id")["prd_number"].count()
+filtered_train_users = train_users[train_users["user_id"]
                                    .isin(grp_train_users[grp_train_users >= MIN_PLAYS_PER_USER].index)]
 filtered_train_users_set = set(filtered_train_users["user_id"])
 
