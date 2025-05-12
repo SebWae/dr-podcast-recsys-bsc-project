@@ -70,8 +70,8 @@ ratings_df = grouped_df.rename(columns={"user_id": "user",
                                         "cf_rating": "rating"})
 
 # list of users and items
-user_list = sorted(train_df['user_id'].unique())
-item_list = sorted(train_w_meta['series_title'].unique().tolist())
+user_list = sorted(train_df["user_id"].unique())
+item_list = sorted(train_w_meta["series_title"].unique().tolist())
 
 # mapping indices to shows
 show_mapping = {i: item for i, item in enumerate(item_list)}
