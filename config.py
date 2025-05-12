@@ -89,7 +89,7 @@ SCORES_PATH_CF = "results/cf_scores.parquet"
 WGHT_METHOD = "inverse"
 
 # for evaluation
-EVALUATION_METRICS = ["hit_rate", "ndcg"]
+EVALUATION_METRICS = ["hit_rate", "ndcg", "diversity"]
 RECOMMENDER_EVAL_PATH = "results/recommender_eval.json"
 USER_EVAL_PATH_2 = "results/user_eval_2.json"
 USER_EVAL_PATH_6 = "results/user_eval_6.json"
