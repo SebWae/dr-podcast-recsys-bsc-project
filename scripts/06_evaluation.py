@@ -21,7 +21,7 @@ from config import (
     USER_EVAL_PATH_10,
     RECOMMENDER_EVAL_PATH,
 )
-import utils.utils as utils
+import utils as utils
 
 
 # loading training data, test data and embeddings

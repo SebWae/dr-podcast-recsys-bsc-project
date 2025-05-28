@@ -20,7 +20,7 @@ from config import (
     LAMBDA_CB,
     EMBEDDINGS_COMBI_PATH,
 )
-import utils.utils as utils
+import utils as utils
 
 # downloading stopwords
 nltk.download("stopwords")

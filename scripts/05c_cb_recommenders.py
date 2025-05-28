@@ -25,7 +25,7 @@ from config import (
     N_RECOMMENDATIONS,
     RECOMMENDATIONS_PATH,
 )
-import utils.utils as utils
+import utils as utils
 
 
 # loading train and metadata

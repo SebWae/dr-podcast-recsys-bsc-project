@@ -27,7 +27,7 @@ from config import (
     N_RECOMMENDATIONS,
     EXPERIMENTS_CB_PATH,
 )
-import utils.utils as utils
+import utils as utils
 
 
 # argument parser for input parameters

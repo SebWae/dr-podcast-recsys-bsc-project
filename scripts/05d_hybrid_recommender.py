@@ -22,7 +22,7 @@ from config import (
     RECOMMENDATIONS_PATH,
     RECOMMENDATIONS_KEY_HYBRID,
 )
-import utils.utils as utils
+import utils as utils
 
 
 # loading train, validation data and descr embeddings

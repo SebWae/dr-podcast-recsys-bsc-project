@@ -17,7 +17,7 @@ from config import (
     UTILS_PATH,
     UTILS_INTERACTIONS_PATH,
 )
-import utils.utils as utils
+import utils as utils
 
 
 # loading transformed, train, validation and metadata

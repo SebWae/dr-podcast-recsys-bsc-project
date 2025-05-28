@@ -22,7 +22,7 @@ from config import (
     RECOMMENDATIONS_KEY_BASELINE,
     RECOMMENDER_EVAL_PATH,
 )
-import utils.utils as utils
+import utils as utils
 
 # the baseline recommender is being implemented differently from the other recommenders
 # identifies the 10 most listened shows in the training data 

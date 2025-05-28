@@ -25,7 +25,7 @@ from config import (
     RECOMMENDATIONS_KEY_CF,
     RECOMMENDATIONS_PATH,
 )
-import utils.utils as utils
+import utils as utils
 
 
 # loading train, validation and metadata

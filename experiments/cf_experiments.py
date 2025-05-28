@@ -21,7 +21,7 @@ from config import (
     EXPERIMENTS_CF_PATH,
     N_RECOMMENDATIONS,
 )
-import utils.utils as utils
+import utils as utils
 
 
 # argument parser for input parameters
