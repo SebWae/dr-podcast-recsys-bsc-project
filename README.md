@@ -145,6 +145,8 @@ Supervisor: [Toine Bogers](https://github.com/toinebogers)
 ```
 
 ## How to run the code?
+NB! The data folder has been gitignored and it is thus not possible to run the recommenders at the moment. 
+
 It is recommended to run the code using the virtual environment specified by [environment.yml](environment.yml). This requires `conda 24.9.2`.
 
 Open a terminal and run the following commands.
