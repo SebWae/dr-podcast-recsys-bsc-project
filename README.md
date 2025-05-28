@@ -6,10 +6,6 @@ The goal of the project is to implement, analyze and compare the following types
 - [Content-based](scripts/05c_cb_recommenders.py)
 - [Hybrid recommender (weighted)](scripts/05d_hybrid_recommender.py)
 
-The recommenders are being compared to a popularity-based [baseline recommender](scripts/05a_baseline_recommender.py). The scope of the project is limited to user interactions from [DR LYD](https://www.dr.dk/lyd) (app and web).  
-
-In collaboration with DR (Danmarks Radio). 
-
 Supervisor: [Toine Bogers](https://github.com/toinebogers)
 
 
